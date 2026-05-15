@@ -614,6 +614,15 @@ Explanation: Divide 2.3×10¹⁴ by 3.9×10⁴..."></textarea>
 // ══════════════════════════════════════
 const ADMIN_PWD = 'gmat2024'; // Change this before deploying
 
+// ── UTILS (must be defined before login) ──
+const g = id => document.getElementById(id);
+
+let _tt;
+function showToast(msg, type='info'){
+  const t=g('toast'); t.textContent=msg; t.className='toast '+type; t.style.display='block';
+  clearTimeout(_tt); _tt=setTimeout(()=>t.style.display='none', 3500);
+}
+
 const SECTION_TARGETS = { Q:21, V:23, D:20 };
 const SECTION_NAMES   = { Q:'Quantitative', V:'Verbal', D:'Data Insights' };
 
@@ -640,14 +649,16 @@ const DB = {
 // LOGIN
 // ══════════════════════════════════════
 function tryLogin(){
-  const pwd=g('pwd').value;
-  if(pwd===ADMIN_PWD){
-    g('screen-login').style.display='none';
+  const pwd = g('pwd').value.trim();
+  if(pwd === ADMIN_PWD){
+    g('screen-login').style.display = 'none';
     g('screen-admin').classList.add('active');
-    refreshAll();
+    try { refreshAll(); } catch(e){ console.error('refreshAll error:', e); }
   } else {
-    g('login-err').style.display='block';
-    g('pwd').value='';
+    const err = g('login-err');
+    if(err) err.style.display = 'block';
+    g('pwd').value = '';
+    g('pwd').focus();
   }
 }
 function doLogout(){
@@ -655,7 +666,10 @@ function doLogout(){
   g('screen-login').style.display='flex';
   g('pwd').value='';
 }
-g('pwd').addEventListener('keydown',e=>{ if(e.key==='Enter') tryLogin(); });
+document.addEventListener('DOMContentLoaded', () => {
+  const pwdInput = g('pwd');
+  if(pwdInput) pwdInput.addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
+});
 
 // ══════════════════════════════════════
 // NAV
@@ -678,14 +692,10 @@ function nav(el){
 // ══════════════════════════════════════
 function refreshDashboard(){
   const c=DB.counts();
-  g('d-total').textContent=c.total;
-  g('d-tagged').textContent=c.tagged;
-  g('d-untagged').textContent=c.untagged;
-  g('sb-total').textContent=c.total;
-  g('sb-Q').textContent=c.Q;
-  g('sb-V').textContent=c.V;
-  g('sb-D').textContent=c.D;
-  ['Q','V','D'].forEach(sec=>renderDashPools(sec));
+  const set=(id,val)=>{ const el=g(id); if(el) el.textContent=val; };
+  set('d-total',c.total); set('d-tagged',c.tagged); set('d-untagged',c.untagged);
+  set('sb-total',c.total); set('sb-Q',c.Q); set('sb-V',c.V); set('sb-D',c.D);
+  ['Q','V','D'].forEach(sec=>{ try{ renderDashPools(sec); }catch(e){} });
 }
 
 function renderDashPools(sec){
@@ -1294,8 +1304,6 @@ function dlFile(blob,name){
 // ══════════════════════════════════════
 // UTILS
 // ══════════════════════════════════════
-const g=id=>document.getElementById(id);
-
 function clearAllQs(){
   if(!confirm('Delete ALL questions? This cannot be undone.')) return;
   DB.saveQs([]);
@@ -1306,21 +1314,13 @@ function clearAllQs(){
 
 function refreshSidebarCounts(){
   const c=DB.counts();
-  g('sb-total').textContent=c.total;
-  g('sb-Q').textContent=c.Q;
-  g('sb-V').textContent=c.V;
-  g('sb-D').textContent=c.D;
+  const set=(id,val)=>{ const el=g(id); if(el) el.textContent=val; };
+  set('sb-total',c.total); set('sb-Q',c.Q); set('sb-V',c.V); set('sb-D',c.D);
 }
 
 function refreshAll(){
   refreshSidebarCounts();
   refreshDashboard();
-}
-
-let _tt;
-function showToast(msg,type='info'){
-  const t=g('toast');t.textContent=msg;t.className='toast '+type;t.style.display='block';
-  clearTimeout(_tt);_tt=setTimeout(()=>t.style.display='none',3500);
 }
 
 // Drag-drop on upload zone
