@@ -4,33 +4,739 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Sasta GMAT Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
-body{font-family:'Inter',sans-serif;background:#0F172A;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;font-size:15px}
-.box{text-align:center;padding:48px 40px}
-.logo{font-size:22px;font-weight:700;color:#14B8A6;margin-bottom:12px}
-.msg{font-size:18px;color:rgba(255,255,255,0.7);margin-bottom:32px}
-.btn{background:#14B8A6;color:#0F172A;border:none;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer}
-.btn:hover{background:#0D9488}
+:root{
+  --navy:#0F172A;--teal:#14B8A6;--teal-d:#0D9488;--teal-l:rgba(20,184,166,0.1);
+  --bg:#F8FAFC;--white:#FFFFFF;--text:#111827;--muted:#6B7280;
+  --border:#E5E7EB;--green:#22C55E;--green-bg:rgba(34,197,94,0.08);
+  --red:#EF4444;--red-bg:rgba(239,68,68,0.08);
+  --amber:#F59E0B;--amber-bg:rgba(245,158,11,0.08);
+  --shadow:0 1px 3px rgba(0,0,0,0.07),0 4px 12px rgba(0,0,0,0.05);
+  --shadow-lg:0 8px 32px rgba(15,23,42,0.12);
+  --radius:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+
+/* AUTH LOADING */
+#auth-loading{position:fixed;inset:0;background:var(--white);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:14px}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#main-content{display:none}
+
+/* TOPBAR */
+.topbar{background:var(--navy);height:60px;display:flex;align-items:center;padding:0 32px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,0.06)}
+.topbar-inner{max-width:1200px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.topbar-logo{font-family:'Playfair Display',serif;font-size:18px;color:#fff;text-decoration:none}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.user-chip{display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--teal);color:var(--navy);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.user-name{font-size:13px;color:rgba(255,255,255,0.8)}
+.user-tier{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:100px}
+.tier-free{background:rgba(34,197,94,0.15);color:#4ade80}
+.tier-pro{background:rgba(20,184,166,0.2);color:var(--teal)}
+.btn-signout{background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-signout:hover{border-color:rgba(255,255,255,0.4);color:#fff}
+
+/* LAYOUT */
+.page{max-width:1200px;margin:0 auto;padding:32px 24px 80px}
+
+/* WELCOME BANNER */
+.welcome-banner{background:var(--navy);border-radius:var(--radius);padding:28px 32px;margin-bottom:28px;position:relative;overflow:hidden}
+.welcome-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(20,184,166,0.12) 0%,transparent 60%);pointer-events:none}
+.welcome-name{font-size:20px;font-weight:700;color:#fff;margin-bottom:6px}
+.welcome-name span{color:var(--teal)}
+.welcome-msg{font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;max-width:600px}
+.welcome-streak{position:absolute;right:32px;top:50%;transform:translateY(-50%);text-align:center}
+.streak-fire{font-size:32px;line-height:1}
+.streak-num{font-family:'Playfair Display',serif;font-size:28px;color:var(--teal);display:block;line-height:1;margin-top:4px}
+.streak-lbl{font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.5px}
+
+/* ABOUT SECTIONALS NOTE */
+.note-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:28px;display:flex;gap:16px;align-items:flex-start;border-left:4px solid var(--teal)}
+.note-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.note-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.note-text{font-size:13px;color:var(--muted);line-height:1.65}
+.note-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.note-pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:var(--teal-l);color:var(--teal-d);border:1px solid rgba(20,184,166,0.2)}
+
+/* QUICK STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;transition:box-shadow .2s}
+.stat-card:hover{box-shadow:var(--shadow)}
+.stat-val{font-family:'Playfair Display',serif;font-size:30px;color:var(--navy);display:block;line-height:1;margin-bottom:4px}
+.stat-val.teal{color:var(--teal)}
+.stat-val.green{color:var(--green)}
+.stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+
+/* SECTION TABS */
+.tabs-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:28px}
+.tabs-header{display:flex;border-bottom:1px solid var(--border)}
+.tab-btn{flex:1;padding:16px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:transparent;font-family:'Inter',sans-serif;transition:all .2s;position:relative;display:flex;align-items:center;justify-content:center;gap:8px}
+.tab-btn:hover{color:var(--text);background:var(--bg)}
+.tab-btn.active{color:var(--navy);background:var(--white)}
+.tab-btn.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2.5px;background:var(--teal)}
+.tab-label{font-size:22px;font-weight:700;font-family:'Playfair Display',serif;color:var(--teal)}
+.tab-count{font-size:11px;font-weight:600;padding:2px 8px;border-radius:100px;background:var(--teal-l);color:var(--teal-d)}
+
+.tabs-body{padding:24px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.tests-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+
+/* TEST CARD */
+.test-item{border-radius:10px;border:1.5px solid var(--border);overflow:hidden;transition:box-shadow .2s,border-color .2s;cursor:pointer;position:relative}
+.test-item:hover:not(.locked){box-shadow:var(--shadow);border-color:var(--teal)}
+.test-item.locked{cursor:default;opacity:.75}
+.test-item-header{padding:16px 14px 12px;background:var(--white)}
+.test-item-num{font-family:'Playfair Display',serif;font-size:28px;color:var(--navy);line-height:1;margin-bottom:2px}
+.test-item-name{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.test-item-body{padding:10px 14px 14px;background:var(--white)}
+.test-item-meta{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5}
+.test-item-meta span{display:block}
+.btn-start{width:100%;padding:8px;background:var(--navy);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s}
+.btn-start:hover{background:#1e293b}
+.lock-overlay{position:absolute;inset:0;background:rgba(248,250,252,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:8px}
+.lock-icon{font-size:22px}
+.lock-label{font-size:11px;font-weight:700;color:var(--muted);text-align:center;line-height:1.3}
+.btn-upgrade{font-size:11px;font-weight:700;padding:5px 12px;background:var(--teal);color:var(--navy);border:none;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:2px}
+
+/* RECENT SESSIONS */
+.section-title{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.section-title-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:var(--teal-l);color:var(--teal-d)}
+
+.sessions-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:28px}
+.sessions-head{display:grid;grid-template-columns:120px 1fr 80px 80px 80px 100px;background:var(--navy);color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:10px 20px;gap:12px}
+.session-row{display:grid;grid-template-columns:120px 1fr 80px 80px 80px 100px;padding:14px 20px;gap:12px;border-bottom:1px solid var(--border);align-items:center;transition:background .1s;cursor:pointer}
+.session-row:last-child{border-bottom:none}
+.session-row:hover{background:var(--bg)}
+.sc{font-size:13px;color:var(--text)}
+.sc.dim{color:var(--muted);font-size:12px}
+.sec-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px}
+.sec-Q{background:#e8f0f8;color:#003865}
+.sec-V{background:#fce8e8;color:#c62828}
+.sec-D{background:#e8f5e8;color:#2e7d32}
+.acc-pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:100px}
+.acc-high{background:var(--green-bg);color:var(--green)}
+.acc-mid{background:var(--amber-bg);color:var(--amber)}
+.acc-low{background:var(--red-bg);color:var(--red)}
+.btn-report{font-size:11px;font-weight:700;padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s}
+.btn-report:hover{background:#1e293b}
+.empty-sessions{padding:48px 24px;text-align:center;color:var(--muted)}
+.empty-sessions .ei{font-size:36px;margin-bottom:12px}
+.empty-sessions p{font-size:14px;line-height:1.6}
+
+/* ANALYTICS */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px}
+.analytics-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.analytics-card-title{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:20px}
+
+/* Bar chart */
+.bar-group{margin-bottom:14px}
+.bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.bar-label{font-size:12px;font-weight:600;color:var(--text);min-width:52px;font-family:'Inter',sans-serif}
+.bar-track{flex:1;height:10px;background:var(--border);border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px;transition:width .8s ease}
+.bar-fill.easy{background:var(--green)}
+.bar-fill.medium{background:var(--amber)}
+.bar-fill.hard{background:var(--red)}
+.bar-val{font-size:12px;font-weight:700;color:var(--text);min-width:36px;text-align:right;font-family:'Inter',sans-serif}
+
+/* Donut */
+.donut-wrap{display:flex;align-items:center;gap:24px}
+.donut-svg{flex-shrink:0}
+.donut-legend{flex:1}
+.donut-item{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px}
+.donut-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Section accuracy table */
+.acc-table{width:100%}
+.acc-table th{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);padding:0 0 10px;text-align:left}
+.acc-table td{font-size:13px;color:var(--text);padding:8px 0;border-top:1px solid var(--border)}
+.acc-table td:not(:first-child){text-align:center}
+
+/* MODAL - Report */
+.modal-ov{position:fixed;inset:0;z-index:200;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:24px}
+.modal-ov.open{display:flex}
+.modal{background:var(--white);border-radius:16px;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:mIn .25s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.modal-header{background:var(--navy);padding:24px 28px;position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:16px;font-weight:700;color:#fff}
+.modal-close{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:rgba(255,255,255,.2)}
+.modal-body{padding:24px 28px}
+.report-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.report-stat{background:var(--bg);border-radius:8px;padding:14px;text-align:center}
+.report-stat-val{font-family:'Playfair Display',serif;font-size:26px;color:var(--navy);display:block}
+.report-stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.report-section-title{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:20px 0 12px}
+.report-q-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.report-q-row:last-child{border-bottom:none}
+.rq-num{font-weight:700;color:var(--muted);min-width:24px}
+.rq-text{flex:1;color:var(--text);line-height:1.5}
+.rq-diff{font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px;flex-shrink:0}
+.rq-diff.Easy{background:#e8f5e8;color:#2e7d32}
+.rq-diff.Medium{background:#fff8e1;color:#f57f17}
+.rq-diff.Hard{background:#fce8e8;color:#c62828}
+.rq-result{font-size:13px;font-weight:700;min-width:20px;flex-shrink:0}
+.rq-result.C{color:var(--green)}.rq-result.W{color:var(--red)}.rq-result.S{color:var(--muted)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:13px;padding:11px 22px;border-radius:8px;z-index:400;display:none;box-shadow:var(--shadow-lg);font-family:'Inter',sans-serif;border:1px solid rgba(255,255,255,.1)}
+
+@media(max-width:900px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .tests-grid{grid-template-columns:repeat(2,1fr)}
+  .analytics-grid{grid-template-columns:1fr}
+  .sessions-head,.session-row{grid-template-columns:90px 1fr 64px 64px 64px 80px;font-size:11px;padding:10px 14px}
+  .topbar{padding:0 16px}
+  .page{padding:20px 16px 60px}
+  .welcome-streak{display:none}
+}
+@media(max-width:600px){
+  .tests-grid{grid-template-columns:repeat(2,1fr)}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .tabs-header{flex-wrap:wrap}
+}
 </style>
 </head>
 <body>
-<div class="box">
-  <div class="logo">Sasta GMAT Prep</div>
-  <div class="msg" id="msg">Dashboard coming soon...</div>
-  <button class="btn" onclick="window.location.href='index.html'">← Back to Home</button>
+
+<div id="auth-loading">
+  <div class="spinner"></div>
+  <span style="font-family:'Inter',sans-serif;font-size:13px;color:#6B7280">Loading your dashboard...</span>
 </div>
+
+<div id="main-content">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-logo" href="index.html">Sasta GMAT Prep</a>
+    <div class="topbar-right">
+      <div class="user-chip">
+        <div class="user-avatar" id="top-avatar">R</div>
+        <div>
+          <div class="user-name" id="top-name">Loading...</div>
+          <span class="user-tier tier-free" id="top-tier">Free</span>
+        </div>
+      </div>
+      <button class="btn-signout" onclick="handleSignOut()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- WELCOME -->
+  <div class="welcome-banner">
+    <div class="welcome-name">Welcome back, <span id="wb-name">there</span>! 👋</div>
+    <div class="welcome-msg">Your dashboard tracks every test session, accuracy trend, and streak. Pick a sectional below to keep practising — consistency beats cramming every time.</div>
+    <div class="welcome-streak">
+      <div class="streak-fire">🔥</div>
+      <span class="streak-num" id="streak-num">0</span>
+      <div class="streak-lbl">Day Streak</div>
+    </div>
+  </div>
+
+  <!-- QUICK STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="stat-val teal" id="qs-total">0</span>
+      <span class="stat-lbl">Tests Taken</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-val green" id="qs-accuracy">—</span>
+      <span class="stat-lbl">Overall Accuracy</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-val" id="qs-best">—</span>
+      <span class="stat-lbl">Best Score</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-val" id="qs-avgtime">—</span>
+      <span class="stat-lbl">Avg Time / Question</span>
+    </div>
+  </div>
+
+  <!-- NOTE ABOUT SECTIONALS -->
+  <div class="note-card">
+    <div class="note-icon">📋</div>
+    <div>
+      <div class="note-title">About Sectional Tests</div>
+      <div class="note-text">
+        Each sectional is a <strong>timed 21-question practice test</strong> designed to simulate real GMAT conditions.
+        The goal is not just accuracy — it's building <strong>time management under pressure</strong>.
+        Questions use a <strong>streak method</strong>: answer correctly and the difficulty increases,
+        struggle and it adjusts down — exactly how the real GMAT adapts to you.
+        Aim to complete all 21 questions within the 45-minute window every time.
+      </div>
+      <div class="note-pills">
+        <span class="note-pill">⏱ 45 Minutes</span>
+        <span class="note-pill">🎯 21 Questions</span>
+        <span class="note-pill">📈 Adaptive Difficulty</span>
+        <span class="note-pill">🔥 Streak Method</span>
+        <span class="note-pill">📊 Post-Test Review</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTIONAL TABS -->
+  <div class="tabs-wrap">
+    <div class="tabs-header">
+      <button class="tab-btn active" onclick="switchTab('Q')">
+        <span class="tab-label">Q</span> Quantitative
+        <span class="tab-count">10 tests</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('V')">
+        <span class="tab-label">V</span> Verbal
+        <span class="tab-count">10 tests</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('D')">
+        <span class="tab-label">DI</span> Data Insights
+        <span class="tab-count">10 tests</span>
+      </button>
+    </div>
+    <div class="tabs-body">
+      <div class="tab-panel active" id="tab-Q">
+        <div class="tests-grid" id="grid-Q"></div>
+      </div>
+      <div class="tab-panel" id="tab-V">
+        <div class="tests-grid" id="grid-V"></div>
+      </div>
+      <div class="tab-panel" id="tab-D">
+        <div class="tests-grid" id="grid-D"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENT SESSIONS -->
+  <div class="section-title">
+    Recent Test Sessions <span class="section-title-tag">Last 10</span>
+  </div>
+  <div class="sessions-wrap">
+    <div class="sessions-head">
+      <div>Date</div><div>Test</div><div>Score</div>
+      <div>Correct</div><div>Time</div><div>Action</div>
+    </div>
+    <div id="sessions-body"></div>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div class="section-title">
+    Analytics <span class="section-title-tag">All Time</span>
+  </div>
+  <div class="analytics-grid">
+
+    <!-- Accuracy by difficulty -->
+    <div class="analytics-card">
+      <div class="analytics-card-title">Accuracy by Difficulty</div>
+      <div class="bar-group">
+        <div class="bar-row">
+          <span class="bar-label">Easy</span>
+          <div class="bar-track"><div class="bar-fill easy" id="bar-easy" style="width:0%"></div></div>
+          <span class="bar-val" id="val-easy">—</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Medium</span>
+          <div class="bar-track"><div class="bar-fill medium" id="bar-medium" style="width:0%"></div></div>
+          <span class="bar-val" id="val-medium">—</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Hard</span>
+          <div class="bar-track"><div class="bar-fill hard" id="bar-hard" style="width:0%"></div></div>
+          <span class="bar-val" id="val-hard">—</span>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Questions Attempted</div>
+        <div style="display:flex;gap:16px">
+          <div style="text-align:center">
+            <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--green)" id="cnt-easy">0</div>
+            <div style="font-size:11px;color:var(--muted)">Easy</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--amber)" id="cnt-medium">0</div>
+            <div style="font-size:11px;color:var(--muted)">Medium</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--red)" id="cnt-hard">0</div>
+            <div style="font-size:11px;color:var(--muted)">Hard</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accuracy by section -->
+    <div class="analytics-card">
+      <div class="analytics-card-title">Accuracy by Section</div>
+      <table class="acc-table">
+        <thead>
+          <tr>
+            <th>Section</th>
+            <th>Attempted</th>
+            <th>Correct</th>
+            <th>Accuracy</th>
+          </tr>
+        </thead>
+        <tbody id="section-acc-table">
+          <tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px 0">No data yet — take a test!</td></tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Score Trend (Last 5 Tests)</div>
+        <div id="trend-bars" style="display:flex;align-items:flex-end;gap:8px;height:60px"></div>
+        <div style="display:flex;gap:8px;margin-top:4px" id="trend-labels"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- REPORT MODAL -->
+<div class="modal-ov" id="report-modal" onclick="if(event.target===this)closeReport()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="report-modal-title">Test Report</div>
+      <button class="modal-close" onclick="closeReport()">✕</button>
+    </div>
+    <div class="modal-body" id="report-modal-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const sb = supabase.createClient(
-  'https://uavoffiwmocvvymtrsat.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhdm9mZml3bW9jdnZ5bXRyc2F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MjkxMjAsImV4cCI6MjA5NDQwNTEyMH0.YSob4QEO0lIZl9GNdjEKS4RHFSB7yhc7eLekV6PuWAY'
-);
-(async () => {
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) { window.location.href = 'index.html'; return; }
-  const name = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
-  document.getElementById('msg').textContent = 'Welcome, ' + name.split(' ')[0] + '! Dashboard is being built.';
-})();
+const SUPA_URL='https://uavoffiwmocvvymtrsat.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhdm9mZml3bW9jdnZ5bXRyc2F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MjkxMjAsImV4cCI6MjA5NDQwNTEyMH0.YSob4QEO0lIZl9GNdjEKS4RHFSB7yhc7eLekV6PuWAY';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+
+let currentUser=null;
+let userTier='free'; // 'free' | 'pro'
+
+// ── SECTION CONFIGS ──
+const SECTIONS={
+  Q:{label:'Quantitative',file:'test.html',color:'#003865'},
+  V:{label:'Verbal',file:'test-verbal.html',color:'#c62828'},
+  D:{label:'Data Insights',file:'test-di.html',color:'#2e7d32'}
+};
+
+// ── AUTH ──
+async function initAuth(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='index.html';return;}
+  currentUser=session.user;
+  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+  const initials=name.slice(0,2).toUpperCase();
+  const firstName=name.split(' ')[0];
+
+  // Get tier from profile (default free)
+  try{
+    const{data}=await sb.from('profiles').select('subscription_tier').eq('id',currentUser.id).single();
+    if(data?.subscription_tier==='pro') userTier='pro';
+  }catch(e){}
+
+  // Update UI
+  g('top-avatar').textContent=initials;
+  g('top-name').textContent=name;
+  g('top-tier').textContent=userTier==='pro'?'Pro':'Free';
+  g('top-tier').className='user-tier '+(userTier==='pro'?'tier-pro':'tier-free');
+  g('wb-name').textContent=firstName;
+
+  // Load data
+  const sessions=loadSessions();
+  renderStreak(sessions);
+  renderQuickStats(sessions);
+  renderTestGrids();
+  renderSessions(sessions);
+  renderAnalytics(sessions);
+
+  // Show
+  g('auth-loading').style.display='none';
+  g('main-content').style.display='block';
+}
+
+async function handleSignOut(){
+  await sb.auth.signOut();
+  window.location.href='index.html';
+}
+
+// ── SESSION STORAGE (localStorage per user) ──
+function sessionsKey(){return'gmat_sessions_'+(currentUser?.id||'guest');}
+
+function loadSessions(){
+  try{return JSON.parse(localStorage.getItem(sessionsKey())||'[]');}
+  catch(e){return[];}
+}
+
+function saveSessions(s){localStorage.setItem(sessionsKey(),JSON.stringify(s));}
+
+// Called from test pages after completing a test
+window.saveTestSession=function(session){
+  const sessions=loadSessions();
+  sessions.unshift({...session,id:Date.now(),date:new Date().toISOString()});
+  saveSessions(sessions.slice(0,50)); // keep last 50
+};
+
+// ── STREAK ──
+function renderStreak(sessions){
+  if(!sessions.length){g('streak-num').textContent='0';return;}
+  // Count consecutive days with at least one session
+  const today=new Date().toDateString();
+  const days=new Set(sessions.map(s=>new Date(s.date).toDateString()));
+  let streak=0,d=new Date();
+  while(days.has(d.toDateString())){streak++;d.setDate(d.getDate()-1);}
+  g('streak-num').textContent=streak;
+}
+
+// ── QUICK STATS ──
+function renderQuickStats(sessions){
+  if(!sessions.length){
+    ['qs-total','qs-accuracy','qs-best','qs-avgtime'].forEach(id=>{
+      if(id==='qs-total') g(id).textContent='0';
+      else g(id).textContent='—';
+    });
+    return;
+  }
+  const total=sessions.length;
+  const allCorrect=sessions.reduce((s,x)=>s+(x.correct||0),0);
+  const allTotal=sessions.reduce((s,x)=>s+(x.total||0),0);
+  const acc=allTotal?Math.round(allCorrect/allTotal*100):0;
+  const best=Math.max(...sessions.map(s=>s.pct||0));
+  const avgTime=sessions.reduce((s,x)=>s+(x.avgTime||0),0)/total;
+
+  g('qs-total').textContent=total;
+  g('qs-accuracy').textContent=acc+'%';
+  g('qs-best').textContent=best+'%';
+  g('qs-avgtime').textContent=Math.round(avgTime)+'s';
+}
+
+// ── TEST GRIDS ──
+function renderTestGrids(){
+  ['Q','V','D'].forEach(sec=>{
+    const grid=g('grid-'+sec);
+    grid.innerHTML='';
+    for(let i=1;i<=10;i++){
+      const isFree=i<=2;
+      const canAccess=isFree||userTier==='pro';
+      const card=document.createElement('div');
+      card.className='test-item'+(canAccess?'':' locked');
+
+      card.innerHTML=`
+        <div class="test-item-header">
+          <div class="test-item-num">${String(i).padStart(2,'0')}</div>
+          <div class="test-item-name">Sectional ${i}</div>
+        </div>
+        <div class="test-item-body">
+          <div class="test-item-meta">
+            <span>21 Questions</span>
+            <span>45 Minutes</span>
+            <span>${isFree?'<span style="color:var(--green);font-weight:600">Free</span>':'<span style="color:var(--teal);font-weight:600">Premium</span>'}</span>
+          </div>
+          ${canAccess
+            ?`<button class="btn-start" onclick="startTest('${sec}',${i})">Start Test →</button>`
+            :`<div class="lock-overlay">
+                <div class="lock-icon">🔒</div>
+                <div class="lock-label">Premium only</div>
+                <button class="btn-upgrade" onclick="showUpgrade()">Upgrade</button>
+              </div>`
+          }
+        </div>`;
+      grid.appendChild(card);
+    }
+  });
+}
+
+function startTest(sec,num){
+  const url=SECTIONS[sec]?.file||'test.html';
+  // Store which test is being taken
+  localStorage.setItem('current_test',JSON.stringify({section:sec,num}));
+  window.location.href=url;
+}
+
+function showUpgrade(){
+  showToast('Upgrade to Premium coming soon! 🚀');
+}
+
+// ── TAB SWITCHING ──
+function switchTab(sec){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  g('tab-'+sec).classList.add('active');
+}
+
+// ── SESSIONS ──
+function renderSessions(sessions){
+  const body=g('sessions-body');
+  const recent=sessions.slice(0,10);
+
+  if(!recent.length){
+    body.innerHTML=`<div class="empty-sessions">
+      <div class="ei">📝</div>
+      <p>No test sessions yet.<br>Take your first sectional test to see your results here.</p>
+    </div>`;
+    return;
+  }
+
+  body.innerHTML='';
+  recent.forEach(s=>{
+    const date=new Date(s.date);
+    const dateStr=date.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+    const acc=s.pct||0;
+    const accCls=acc>=70?'acc-high':acc>=50?'acc-mid':'acc-low';
+    const secBadge=`<span class="sec-badge sec-${s.section||'Q'}">${s.section||'Q'}</span>`;
+
+    const row=document.createElement('div');
+    row.className='session-row';
+    row.innerHTML=`
+      <div class="sc dim">${dateStr}</div>
+      <div class="sc">${secBadge} Sectional ${s.testNum||1}</div>
+      <div class="sc"><span class="acc-pill ${accCls}">${acc}%</span></div>
+      <div class="sc">${s.correct||0}/${s.total||21}</div>
+      <div class="sc dim">${s.elapsed||'—'}</div>
+      <div class="sc"><button class="btn-report" onclick="openReport(${s.id})">View Report</button></div>`;
+    body.appendChild(row);
+  });
+}
+
+// ── REPORT MODAL ──
+function openReport(id){
+  const sessions=loadSessions();
+  const s=sessions.find(x=>x.id===id);
+  if(!s){showToast('Session not found');return;}
+
+  const date=new Date(s.date).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+  g('report-modal-title').textContent=`${s.section||'Q'} Sectional ${s.testNum||1} · ${date}`;
+
+  const body=g('report-modal-body');
+  const entries=s.entries||[];
+  const correct=entries.filter(e=>e.result==='correct').length;
+  const wrong=entries.filter(e=>e.result==='wrong').length;
+  const skipped=entries.filter(e=>e.result==='skip').length;
+  const pct=entries.length?Math.round(correct/entries.length*100):0;
+
+  body.innerHTML=`
+    <div class="report-stat-row">
+      <div class="report-stat"><span class="report-stat-val" style="color:var(--teal)">${pct}%</span><span class="report-stat-lbl">Accuracy</span></div>
+      <div class="report-stat"><span class="report-stat-val" style="color:var(--green)">${correct}</span><span class="report-stat-lbl">Correct</span></div>
+      <div class="report-stat"><span class="report-stat-val" style="color:var(--red)">${wrong}</span><span class="report-stat-lbl">Wrong</span></div>
+      <div class="report-stat"><span class="report-stat-val" style="color:var(--muted)">${skipped}</span><span class="report-stat-lbl">Skipped</span></div>
+    </div>
+    <div class="report-section-title">Question Breakdown</div>
+    <div id="report-q-list"></div>`;
+
+  const qList=body.querySelector('#report-q-list');
+  if(!entries.length){
+    qList.innerHTML='<p style="color:var(--muted);font-size:13px;padding:12px 0">No question data available.</p>';
+  } else {
+    entries.forEach((e,i)=>{
+      const row=document.createElement('div');
+      row.className='report-q-row';
+      const resultIcon=e.result==='correct'?'✓':e.result==='wrong'?'✗':'—';
+      const resultCls=e.result==='correct'?'C':e.result==='wrong'?'W':'S';
+      const qText=e.q?.question||`Question ${i+1}`;
+      const short=qText.length>80?qText.slice(0,80)+'…':qText;
+      row.innerHTML=`
+        <div class="rq-num">${i+1}</div>
+        <div class="rq-text">${short}</div>
+        <span class="rq-diff ${e.q?.difficulty||'Medium'}">${e.q?.difficulty||'—'}</span>
+        <span class="rq-result ${resultCls}">${resultIcon}</span>`;
+      qList.appendChild(row);
+    });
+  }
+
+  g('report-modal').classList.add('open');
+}
+
+function closeReport(){
+  g('report-modal').classList.remove('open');
+}
+
+// ── ANALYTICS ──
+function renderAnalytics(sessions){
+  // Flatten all entries
+  const all=sessions.flatMap(s=>s.entries||[]);
+
+  if(!all.length){
+    ['easy','medium','hard'].forEach(d=>{
+      g(`bar-${d}`).style.width='0%';
+      g(`val-${d}`).textContent='—';
+      g(`cnt-${d}`).textContent='0';
+    });
+    return;
+  }
+
+  // Accuracy by difficulty
+  ['Easy','Medium','Hard'].forEach(diff=>{
+    const dqs=all.filter(e=>e.q?.difficulty===diff);
+    const correct=dqs.filter(e=>e.result==='correct').length;
+    const pct=dqs.length?Math.round(correct/dqs.length*100):0;
+    const key=diff.toLowerCase();
+    g(`bar-${key}`).style.width=pct+'%';
+    g(`val-${key}`).textContent=dqs.length?pct+'%':'—';
+    g(`cnt-${key}`).textContent=dqs.length;
+  });
+
+  // Section accuracy table
+  const secData={};
+  sessions.forEach(s=>{
+    const sec=s.section||'Q';
+    if(!secData[sec]) secData[sec]={total:0,correct:0};
+    secData[sec].total+=(s.total||0);
+    secData[sec].correct+=(s.correct||0);
+  });
+
+  const tbody=g('section-acc-table');
+  const secNames={Q:'Quantitative',V:'Verbal',D:'Data Insights'};
+  const rows=Object.entries(secData).map(([sec,d])=>{
+    const pct=d.total?Math.round(d.correct/d.total*100):0;
+    const cls=pct>=70?'color:var(--green)':pct>=50?'color:var(--amber)':'color:var(--red)';
+    return`<tr>
+      <td><span class="sec-badge sec-${sec}">${sec}</span> ${secNames[sec]||sec}</td>
+      <td>${d.total}</td>
+      <td>${d.correct}</td>
+      <td style="font-weight:700;${cls}">${pct}%</td>
+    </tr>`;
+  });
+  tbody.innerHTML=rows.length?rows.join(''):'<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px 0">No data yet — take a test!</td></tr>';
+
+  // Score trend (last 5 tests)
+  const last5=sessions.slice(0,5).reverse();
+  const trendWrap=g('trend-bars');
+  const trendLabels=g('trend-labels');
+  trendWrap.innerHTML=''; trendLabels.innerHTML='';
+  last5.forEach((s,i)=>{
+    const pct=s.pct||0;
+    const h=Math.max(4,Math.round(pct*0.6));
+    const col=pct>=70?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+    const bar=document.createElement('div');
+    bar.style.cssText=`flex:1;height:${h}px;background:${col};border-radius:3px 3px 0 0;transition:height .6s ease;min-height:4px;position:relative;cursor:default`;
+    bar.title=`${pct}%`;
+    trendWrap.appendChild(bar);
+    const lbl=document.createElement('div');
+    lbl.style.cssText='flex:1;font-size:10px;color:var(--muted);text-align:center;font-family:Inter,sans-serif';
+    lbl.textContent=pct+'%';
+    trendLabels.appendChild(lbl);
+  });
+}
+
+// ── UTILS ──
+const g=id=>document.getElementById(id);
+let _tt;
+function showToast(msg){
+  const t=g('toast');t.textContent=msg;t.style.display='block';
+  clearTimeout(_tt);_tt=setTimeout(()=>t.style.display='none',3000);
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeReport();});
+
+initAuth();
 </script>
 </body>
 </html>

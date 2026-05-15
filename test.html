@@ -10,31 +10,45 @@ body{font-family:Georgia,serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh
 .screen{display:none;min-height:100vh;flex-direction:column}
 .screen.active{display:flex}
 
+/* AUTH LOADING */
+#auth-loading{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:14px}
+.spinner{width:32px;height:32px;border:3px solid #e8e6e0;border-top-color:#003865;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 /* HOME */
 #screen-home{background:#fff;align-items:center;justify-content:center}
-.home-wrap{width:100%;max-width:660px;padding:60px 32px;text-align:center}
+.home-wrap{width:100%;max-width:680px;padding:60px 32px;text-align:center}
 .home-logo{display:inline-block;background:#003865;color:#fff;font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;padding:6px 16px;border-radius:2px;margin-bottom:28px;text-transform:uppercase}
 .home-title{font-size:26px;font-weight:normal;color:#1a1a1a;margin-bottom:6px}
-.home-sub{font-family:Arial,sans-serif;font-size:13px;color:#666;margin-bottom:16px}
-.home-user{font-family:Arial,sans-serif;font-size:13px;color:#003865;font-weight:600;margin-bottom:32px;padding:10px 20px;background:#e8f0f8;border-radius:6px;display:inline-block}
-.test-card{background:#fff;border:2px solid #003865;border-radius:4px;padding:28px 32px;margin-bottom:16px;text-align:left;cursor:pointer;transition:background .15s,box-shadow .15s}
+.home-sub{font-family:Arial,sans-serif;font-size:13px;color:#666;margin-bottom:10px}
+.home-user{font-family:Arial,sans-serif;font-size:13px;color:#003865;font-weight:600;margin-bottom:28px;padding:10px 20px;background:#e8f0f8;border-radius:6px;display:inline-block}
+
+/* streak */
+.home-streak{display:inline-flex;align-items:center;gap:8px;font-family:Arial,sans-serif;font-size:12px;color:#555;background:#f8f7f4;border:1px solid #e0ddd8;padding:6px 14px;border-radius:100px;margin-bottom:28px}
+.streak-fire{font-size:15px}
+
+.test-card{background:#fff;border:2px solid #003865;border-radius:4px;padding:24px 28px;margin-bottom:14px;text-align:left;cursor:pointer;transition:background .15s,box-shadow .15s;position:relative}
 .test-card:hover{background:#f0f4f8;box-shadow:0 4px 16px rgba(0,56,101,.1)}
-.test-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.test-card-name{font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:#003865}
+.test-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.test-card-name{font-family:Arial,sans-serif;font-size:15px;font-weight:700;color:#003865}
 .test-card-badge{font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:2px;background:#e8f0f8;color:#003865}
 .test-card-meta{font-family:Arial,sans-serif;font-size:12px;color:#555;line-height:1.7}
-.test-card-meta span{margin-right:16px}
+.test-card-meta span{margin-right:14px}
 .test-card-meta span::before{content:'✓ ';color:#003865}
-.home-footer{margin-top:24px;display:flex;gap:12px;justify-content:center}
-.btn-sm-link{font-family:Arial,sans-serif;font-size:13px;color:#003865;background:transparent;border:1px solid #d0cfc8;padding:8px 18px;border-radius:3px;cursor:pointer;text-decoration:none;transition:border-color .15s}
-.btn-sm-link:hover{border-color:#003865}
+.test-card-prev{font-family:Arial,sans-serif;font-size:11px;color:#888;margin-top:6px}
+.test-card-prev .prev-score{color:#003865;font-weight:600}
+
+.home-footer{margin-top:20px;display:flex;gap:10px;justify-content:center}
+.btn-link{font-family:Arial,sans-serif;font-size:13px;color:#003865;background:transparent;border:1px solid #d0cfc8;padding:8px 18px;border-radius:3px;cursor:pointer;transition:border-color .15s;text-decoration:none;display:inline-block}
+.btn-link:hover{border-color:#003865}
 
 /* EXAM HEADER */
 .exam-header{background:#003865;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:52px;flex-shrink:0}
 .exam-header-left{font-family:Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px}
 .exam-header-center{font-family:Arial,sans-serif;font-size:13px;color:#c5d8e8}
 .exam-timer{font-family:'Courier New',monospace;font-size:16px;font-weight:700;background:rgba(255,255,255,.1);padding:4px 14px;border-radius:3px;letter-spacing:2px;min-width:80px;text-align:center}
-.exam-timer.urgent{color:#ffb3b3;background:rgba(255,80,80,.15)}
+.exam-timer.urgent{color:#ffb3b3;background:rgba(255,80,80,.15);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 .progress-bar-wrap{background:#d0cfc8;height:4px;flex-shrink:0}
 .progress-bar-fill{height:100%;background:#003865;transition:width .4s ease}
 
@@ -50,6 +64,7 @@ body{font-family:Georgia,serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh
 .q-diff-badge.Hard{background:#fce8e8;color:#c62828}
 .q-topic{font-family:Arial,sans-serif;font-size:11px;color:#999;margin-left:auto;max-width:200px;text-align:right}
 .question-text{font-size:15px;line-height:1.9;color:#1a1a1a;white-space:pre-wrap}
+
 .options-panel{flex:1;background:#fff;border:1px solid #d0cfc8;border-radius:3px;padding:28px;display:flex;flex-direction:column;justify-content:space-between;min-width:280px}
 .options-title{font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888;margin-bottom:14px}
 .options-list{display:flex;flex-direction:column;gap:10px;flex:1}
@@ -70,7 +85,7 @@ body{font-family:Georgia,serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh
 .results-body{flex:1;max-width:840px;width:100%;margin:0 auto;padding:36px 24px 80px}
 .results-title{font-size:22px;font-weight:normal;margin-bottom:4px}
 .results-sub{font-family:Arial,sans-serif;font-size:13px;color:#666;margin-bottom:28px}
-.scorecard{background:#fff;border:1px solid #d0cfc8;border-radius:3px;padding:28px 32px;margin-bottom:20px;display:flex;gap:0;align-items:center}
+.scorecard{background:#fff;border:1px solid #d0cfc8;border-radius:3px;padding:28px 32px;margin-bottom:20px;display:flex;align-items:center}
 .score-main{flex:0 0 160px;text-align:center;border-right:1px solid #e8e6e0;padding-right:28px;margin-right:28px}
 .score-pct{font-family:Arial,sans-serif;font-size:52px;font-weight:700;color:#003865;line-height:1}
 .score-lbl{font-family:Arial,sans-serif;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
@@ -79,6 +94,14 @@ body{font-family:Georgia,serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh
 .score-val{font-family:Arial,sans-serif;font-size:24px;font-weight:700;display:block}
 .score-val.g{color:#2e7d32}.score-val.r{color:#c62828}.score-val.gr{color:#888}
 .score-stat-lbl{font-family:Arial,sans-serif;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px}
+
+/* Streak update card */
+.streak-card{background:#fff;border:1px solid #d0cfc8;border-radius:3px;padding:16px 24px;margin-bottom:20px;display:flex;align-items:center;gap:16px;font-family:Arial,sans-serif}
+.streak-card-icon{font-size:28px}
+.streak-card-text{font-size:14px;color:#333;line-height:1.5}
+.streak-card-text strong{color:#003865}
+
+/* Trail */
 .trail-card{background:#fff;border:1px solid #d0cfc8;border-radius:3px;padding:22px 28px;margin-bottom:20px}
 .card-title{font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#666;margin-bottom:14px}
 .trail-dots{display:flex;flex-wrap:wrap;gap:8px}
@@ -90,6 +113,8 @@ body{font-family:Georgia,serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh
 .trail-legend{display:flex;gap:16px;margin-top:12px;font-family:Arial,sans-serif;font-size:11px;color:#888;flex-wrap:wrap}
 .trail-legend span{display:flex;align-items:center;gap:5px}
 .leg-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+/* Review */
 .review-card{background:#fff;border:1px solid #d0cfc8;border-radius:3px;overflow:hidden;margin-bottom:24px}
 .review-head{display:grid;grid-template-columns:36px 1fr 80px 80px 60px 60px;background:#003865;color:#fff;font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:10px 20px;gap:8px}
 .review-row{display:grid;grid-template-columns:36px 1fr 80px 80px 60px 60px;padding:13px 20px;gap:8px;border-bottom:1px solid #f0ede8;align-items:start;cursor:pointer;transition:background .1s}
@@ -110,16 +135,12 @@ body{font-family:Georgia,serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh
 .exp-opt{font-family:Arial,sans-serif;font-size:13px;padding:3px 0;color:#333}
 .exp-opt.ca{color:#2e7d32;font-weight:700}.exp-opt.wa{color:#c62828;text-decoration:line-through}
 .exp-text{font-family:Arial,sans-serif;font-size:13px;line-height:1.75;color:#444;border-top:1px solid #e0ddd8;padding-top:12px;white-space:pre-wrap}
+
 .results-actions{display:flex;gap:12px;margin-top:8px}
 .btn-primary{font-family:Arial,sans-serif;font-size:13px;font-weight:700;padding:13px 32px;background:#003865;color:#fff;border:none;border-radius:3px;cursor:pointer;transition:background .15s}
 .btn-primary:hover{background:#004d8a}
 .btn-secondary{font-family:Arial,sans-serif;font-size:13px;font-weight:500;padding:13px 32px;background:transparent;color:#003865;border:1.5px solid #003865;border-radius:3px;cursor:pointer;transition:all .15s}
 .btn-secondary:hover{background:#e8f0f8}
-
-/* AUTH LOADING */
-#auth-loading{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px;font-family:Arial,sans-serif;font-size:14px;color:#666}
-.loading-spinner{width:32px;height:32px;border:3px solid #e8e6e0;border-top-color:#003865;border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
 
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;font-family:Arial,sans-serif;font-size:13px;padding:12px 24px;border-radius:4px;z-index:9999;display:none;box-shadow:0 4px 16px rgba(0,0,0,.3)}
 
@@ -133,10 +154,10 @@ body{font-family:Georgia,serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh
 </head>
 <body>
 
-<!-- Auth loading overlay -->
+<!-- Auth loading -->
 <div id="auth-loading">
-  <div class="loading-spinner"></div>
-  <div>Checking your session...</div>
+  <div class="spinner"></div>
+  <span style="font-family:Arial,sans-serif;font-size:13px;color:#888">Checking session...</span>
 </div>
 
 <!-- HOME -->
@@ -145,11 +166,15 @@ body{font-family:Georgia,serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh
     <div class="home-logo">GMAT Focus Edition</div>
     <h1 class="home-title">Quantitative Reasoning</h1>
     <p class="home-sub">Adaptive Problem Solving · Sectional Practice</p>
-    <div class="home-user" id="home-user-greeting">Welcome!</div>
+    <div class="home-user" id="home-greeting">Welcome!</div>
+    <div class="home-streak" id="home-streak">
+      <span class="streak-fire">🔥</span>
+      <span id="streak-text">0 day streak</span>
+    </div>
     <div id="test-cards"></div>
     <div class="home-footer">
-      <a class="btn-sm-link" href="dashboard.html">← Dashboard</a>
-      <button class="btn-sm-link" onclick="handleSignOut()">Sign Out</button>
+      <a class="btn-link" href="dashboard.html">← Dashboard</a>
+      <button class="btn-link" onclick="handleSignOut()">Sign Out</button>
     </div>
   </div>
 </div>
@@ -208,6 +233,7 @@ body{font-family:Georgia,serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh
         <div class="score-stat"><span class="score-val" id="res-time">—</span><span class="score-stat-lbl">Avg/Q</span></div>
       </div>
     </div>
+    <div class="streak-card" id="streak-card"></div>
     <div class="trail-card">
       <div class="card-title">Adaptive Path — click any dot to expand</div>
       <div class="trail-dots" id="trail-dots"></div>
@@ -238,47 +264,108 @@ body{font-family:Georgia,serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="questions.js"></script>
 <script>
-// ── SUPABASE + AUTH GUARD ──
-const SUPA_URL = 'https://uavoffiwmocvvymtrsat.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhdm9mZml3bW9jdnZ5bXRyc2F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MjkxMjAsImV4cCI6MjA5NDQwNTEyMH0.YSob4QEO0lIZl9GNdjEKS4RHFSB7yhc7eLekV6PuWAY';
-const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+const SUPA_URL='https://uavoffiwmocvvymtrsat.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhdm9mZml3bW9jdnZ5bXRyc2F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MjkxMjAsImV4cCI6MjA5NDQwNTEyMH0.YSob4QEO0lIZl9GNdjEKS4RHFSB7yhc7eLekV6PuWAY';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 
-let currentUser = null;
+let currentUser=null;
+let currentTestNum=1;
 
-async function initAuth() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) {
-    window.location.href = 'index.html';
-    return;
-  }
-  currentUser = session.user;
-  const name = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
-  document.getElementById('home-user-greeting').textContent = 'Welcome back, ' + name.split(' ')[0] + '!';
-  document.getElementById('auth-loading').style.display = 'none';
+// ── AUTH GUARD ──
+async function initAuth(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='index.html';return;}
+  currentUser=session.user;
+  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+  const firstName=name.split(' ')[0];
+
+  // Get current test info from dashboard
+  try{
+    const info=JSON.parse(localStorage.getItem('current_test')||'{}');
+    currentTestNum=info.num||1;
+  }catch(e){}
+
+  g('home-greeting').textContent='Welcome back, '+firstName+'!';
+  updateStreakDisplay();
+  g('auth-loading').style.display='none';
   renderHome();
   showScreen('home');
 }
 
-async function handleSignOut() {
+async function handleSignOut(){
   await sb.auth.signOut();
-  window.location.href = 'index.html';
+  window.location.href='index.html';
+}
+
+// ── SESSION STORAGE ──
+function sessKey(){return'gmat_sessions_'+(currentUser?.id||'guest');}
+function loadSessions(){try{return JSON.parse(localStorage.getItem(sessKey())||'[]');}catch(e){return[];}}
+function saveSessions(s){localStorage.setItem(sessKey(),JSON.stringify(s));}
+
+function saveSession(entries,secsLeft){
+  const sessions=loadSessions();
+  const correct=entries.filter(e=>e.result==='correct').length;
+  const total=entries.length;
+  const elapsed=45*60-secsLeft;
+  const em=Math.floor(elapsed/60),es=elapsed%60;
+  const avgTime=total?Math.round(entries.reduce((s,e)=>s+e.time,0)/total):0;
+
+  sessions.unshift({
+    id:Date.now(),
+    date:new Date().toISOString(),
+    section:'Q',
+    testNum:currentTestNum,
+    entries:entries.map(e=>({
+      result:e.result,
+      selected:e.selected,
+      time:e.time,
+      q:{
+        question:e.q.question,
+        answer:e.q.answer,
+        difficulty:e.q.difficulty,
+        topic:e.q.topic,
+        options:e.q.options,
+        explanation:e.q.explanation
+      }
+    })),
+    correct,total,
+    pct:total?Math.round(correct/total*100):0,
+    avgTime,
+    elapsed:em+'m '+es+'s'
+  });
+  saveSessions(sessions.slice(0,50));
+}
+
+// ── STREAK ──
+function getStreak(){
+  const sessions=loadSessions();
+  if(!sessions.length) return 0;
+  const days=new Set(sessions.map(s=>new Date(s.date).toDateString()));
+  let streak=0,d=new Date();
+  while(days.has(d.toDateString())){streak++;d.setDate(d.getDate()-1);}
+  return streak;
+}
+
+function updateStreakDisplay(){
+  const s=getStreak();
+  g('streak-text').textContent=s+' day streak'+(s>=3?' 🔥':'');
 }
 
 // ── ADAPTIVE ENGINE ──
-const Adaptive = {
-  diff:'Medium', last2:[], used:new Set(),
+const Adaptive={
+  diff:'Medium',last2:[],used:new Set(),
   pools:{Easy:[],Medium:[],Hard:[]},
 
-  init(qs) {
-    const byDiff = {Easy:[],Medium:[],Hard:[]};
-    qs.forEach(q => byDiff[q.difficulty] && byDiff[q.difficulty].push(q));
-    this.pools.Easy   = shuffle(byDiff.Easy);
-    this.pools.Medium = shuffle(byDiff.Medium);
-    this.pools.Hard   = shuffle(byDiff.Hard);
-    this.diff='Medium'; this.last2=[]; this.used=new Set();
+  init(qs){
+    const by={Easy:[],Medium:[],Hard:[]};
+    qs.forEach(q=>by[q.difficulty]&&by[q.difficulty].push(q));
+    this.pools.Easy=shuffle(by.Easy);
+    this.pools.Medium=shuffle(by.Medium);
+    this.pools.Hard=shuffle(by.Hard);
+    this.diff='Medium';this.last2=[];this.used=new Set();
   },
 
-  update(result) {
+  update(result){
     if(result==='skip') return;
     this.last2.push(result);
     if(this.last2.length>2) this.last2.shift();
@@ -292,15 +379,15 @@ const Adaptive = {
     }
   },
 
-  next() {
+  next(){
     let q=this._pick(this.diff);
     if(q) return q;
     const fb=this.diff==='Hard'?['Medium','Easy']:this.diff==='Easy'?['Medium','Hard']:['Hard','Easy'];
-    for(const d of fb){q=this._pick(d);if(q)return q;}
+    for(const d of fb){q=this._pick(d);if(q) return q;}
     return null;
   },
 
-  _pick(d) {
+  _pick(d){
     const avail=this.pools[d].filter(q=>!this.used.has(q.id));
     if(!avail.length) return null;
     this.used.add(avail[0].id);
@@ -309,55 +396,55 @@ const Adaptive = {
 };
 
 // ── TEST STATE ──
-const Test = {
-  entries:[], idx:0, total:21,
-  secsLeft:45*60, interval:null,
-  qStart:null, sel:null,
+const Test={
+  entries:[],idx:0,total:21,
+  secsLeft:45*60,interval:null,
+  qStart:null,sel:null,
 
-  start(questions) {
-    this.entries=[]; this.idx=0;
-    this.secsLeft=45*60; this.sel=null;
+  start(questions){
+    this.entries=[];this.idx=0;
+    this.secsLeft=45*60;this.sel=null;
     clearInterval(this.interval);
     Adaptive.init(questions);
     const first=Adaptive.next();
-    if(!first){toast('Not enough questions.');return;}
+    if(!first){toast('Not enough questions in bank.');return;}
     this.entries.push({q:first,selected:null,result:null,time:0});
     showScreen('test');
     this.renderQ();
     this.startTimer();
   },
 
-  renderQ() {
-    const e=this.entries[this.idx], q=e.q;
-    document.getElementById('test-prog-lbl').textContent=`Question ${this.idx+1} of ${this.total}`;
-    document.getElementById('prog-bar').style.width=(this.idx/this.total*100)+'%';
-    document.getElementById('q-num').textContent=`Q${this.idx+1}`;
-    const db=document.getElementById('q-diff');
-    db.textContent=q.difficulty; db.className=`q-diff-badge ${q.difficulty}`;
-    document.getElementById('q-topic').textContent=q.topic||'';
-    document.getElementById('q-text').textContent=q.question;
-    const ol=document.getElementById('opts-list');
-    ol.innerHTML='';
+  renderQ(){
+    const e=this.entries[this.idx],q=e.q;
+    g('test-prog-lbl').textContent='Question '+(this.idx+1)+' of '+this.total;
+    g('prog-bar').style.width=(this.idx/this.total*100)+'%';
+    g('q-num').textContent='Q'+(this.idx+1);
+    const db=g('q-diff');
+    db.textContent=q.difficulty;db.className='q-diff-badge '+q.difficulty;
+    g('q-topic').textContent=q.topic||'';
+    g('q-text').textContent=q.question;
+
+    const ol=g('opts-list');ol.innerHTML='';
     ['A','B','C','D','E'].forEach(l=>{
       if(!q.options[l]) return;
       const row=document.createElement('div');
-      row.className='option-row'; row.dataset.l=l;
-      row.innerHTML=`<span class="option-letter">${l}.</span><span class="option-text">${q.options[l]}</span>`;
+      row.className='option-row';row.dataset.l=l;
+      row.innerHTML='<span class="option-letter">'+l+'.</span><span class="option-text">'+q.options[l]+'</span>';
       row.addEventListener('click',()=>this.pick(l));
       ol.appendChild(row);
     });
     this.sel=null;
-    document.getElementById('btn-next').disabled=true;
+    g('btn-next').disabled=true;
     this.qStart=Date.now();
   },
 
-  pick(l) {
+  pick(l){
     this.sel=l;
     document.querySelectorAll('.option-row').forEach(r=>r.classList.toggle('selected',r.dataset.l===l));
-    document.getElementById('btn-next').disabled=false;
+    g('btn-next').disabled=false;
   },
 
-  advance(skip=false) {
+  advance(skip=false){
     const e=this.entries[this.idx];
     e.time=Math.round((Date.now()-this.qStart)/1000);
     if(skip){e.selected=null;e.result='skip';Adaptive.update('skip');}
@@ -370,25 +457,29 @@ const Test = {
     this.renderQ();
   },
 
-  startTimer() {
-    const el=document.getElementById('test-timer');
+  startTimer(){
+    const el=g('test-timer');
     this.interval=setInterval(()=>{
       this.secsLeft--;
       const m=Math.floor(this.secsLeft/60),s=this.secsLeft%60;
-      el.textContent=`${m}:${String(s).padStart(2,'0')}`;
+      el.textContent=m+':'+String(s).padStart(2,'0');
       if(this.secsLeft<=300) el.classList.add('urgent');
       if(this.secsLeft<=0){clearInterval(this.interval);this.end();}
     },1000);
   },
 
-  end() {
+  end(){
     clearInterval(this.interval);
-    document.getElementById('prog-bar').style.width='100%';
+    g('prog-bar').style.width='100%';
+
+    // ── SAVE SESSION TO DASHBOARD ──
+    saveSession(this.entries,this.secsLeft);
+
     this.renderResults();
     showScreen('results');
   },
 
-  renderResults() {
+  renderResults(){
     const es=this.entries;
     const correct=es.filter(e=>e.result==='correct').length;
     const wrong=es.filter(e=>e.result==='wrong').length;
@@ -399,122 +490,117 @@ const Test = {
     const elapsed=45*60-this.secsLeft;
     const em=Math.floor(elapsed/60),esec=elapsed%60;
 
-    document.getElementById('res-pct').textContent=pct+'%';
-    document.getElementById('res-correct').textContent=correct;
-    document.getElementById('res-wrong').textContent=wrong;
-    document.getElementById('res-skip').textContent=skip;
-    document.getElementById('res-time').textContent=avgT+'s';
-    document.getElementById('res-sub').textContent=`${total} questions · ${em}m ${esec}s elapsed · Adaptive difficulty`;
+    g('res-pct').textContent=pct+'%';
+    g('res-correct').textContent=correct;
+    g('res-wrong').textContent=wrong;
+    g('res-skip').textContent=skip;
+    g('res-time').textContent=avgT+'s';
+    g('res-sub').textContent=total+' questions · '+em+'m '+esec+'s elapsed · Adaptive difficulty';
+
+    // Streak card
+    const streak=getStreak();
+    const sc=g('streak-card');
+    sc.innerHTML='<div class="streak-card-icon">🔥</div><div class="streak-card-text">You\'re on a <strong>'+streak+' day streak</strong>! '+(streak>=3?'Keep it up — consistency is your biggest edge.':'Come back tomorrow to build your streak.')+'</div>';
 
     // Trail
-    const td=document.getElementById('trail-dots');
-    td.innerHTML='';
+    const td=g('trail-dots');td.innerHTML='';
     es.forEach((e,i)=>{
       const d=document.createElement('div');
       const d0=e.q.difficulty[0];
-      let cls=e.result==='skip'?'sk':e.result==='correct'?`c${d0}`:`w${d0}`;
-      d.className=`tdot ${cls}`;
-      d.textContent=d0;
-      d.title=`Q${i+1}: ${e.q.difficulty} · ${e.result}`;
+      const cls=e.result==='skip'?'sk':e.result==='correct'?'c'+d0:'w'+d0;
+      d.className='tdot '+cls;d.textContent=d0;
+      d.title='Q'+(i+1)+': '+e.q.difficulty+' · '+e.result;
       d.addEventListener('click',()=>{
-        const row=document.getElementById(`rrow-${i}`);
+        const row=g('rrow-'+i);
         if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.click();}
       });
       td.appendChild(d);
     });
 
     // Review rows
-    const rr=document.getElementById('review-rows');
-    rr.innerHTML='';
+    const rr=g('review-rows');rr.innerHTML='';
     es.forEach((e,i)=>{
       const cls=e.result==='correct'?'cr':e.result==='wrong'?'wr':'sk';
       const pill=e.result==='correct'?'<span class="rpill C">✓ Correct</span>':
                  e.result==='wrong'  ?'<span class="rpill W">✗ Wrong</span>':
                                       '<span class="rpill S">— Skip</span>';
-      const dp=`<span class="dpill ${e.q.difficulty}">${e.q.difficulty}</span>`;
+      const dp='<span class="dpill '+e.q.difficulty+'">'+e.q.difficulty+'</span>';
       const qShort=e.q.question.length>55?e.q.question.slice(0,55)+'…':e.q.question;
 
       const row=document.createElement('div');
-      row.className=`review-row ${cls}`; row.id=`rrow-${i}`;
-      row.innerHTML=`<div class="rc">${i+1}</div>
-        <div class="rc qt" title="${e.q.question.replace(/"/g,'')}">${qShort}</div>
-        <div class="rc">${pill}</div><div class="rc">${dp}</div>
-        <div class="rc">${e.selected||'—'}</div>
-        <div class="rc">${e.q.answer}</div>`;
+      row.className='review-row '+cls;row.id='rrow-'+i;
+      row.innerHTML='<div class="rc">'+(i+1)+'</div>'
+        +'<div class="rc qt" title="'+e.q.question.replace(/"/g,'')+'">'+qShort+'</div>'
+        +'<div class="rc">'+pill+'</div><div class="rc">'+dp+'</div>'
+        +'<div class="rc">'+(e.selected||'—')+'</div>'
+        +'<div class="rc">'+e.q.answer+'</div>';
 
       const exp=document.createElement('div');
       exp.className='exp-panel';
-      const qDiv=document.createElement('div');
-      qDiv.className='exp-q'; qDiv.textContent=e.q.question;
-      const optsDiv=document.createElement('div');
-      optsDiv.className='exp-opts';
+      const qDiv=document.createElement('div');qDiv.className='exp-q';qDiv.textContent=e.q.question;
+      const optsDiv=document.createElement('div');optsDiv.className='exp-opts';
       ['A','B','C','D','E'].forEach(l=>{
         if(!e.q.options[l]) return;
         const line=document.createElement('div');
         line.className='exp-opt'+(l===e.q.answer?' ca':l===e.selected&&l!==e.q.answer?' wa':'');
-        line.textContent=`${l}. ${e.q.options[l]}`;
+        line.textContent=l+'. '+e.q.options[l];
         optsDiv.appendChild(line);
       });
-      const explDiv=document.createElement('div');
-      explDiv.className='exp-text';
-      explDiv.textContent=e.q.explanation?`Explanation:\n${e.q.explanation}`:`The correct answer is ${e.q.answer}.`;
-
-      exp.appendChild(qDiv); exp.appendChild(optsDiv); exp.appendChild(explDiv);
+      const explDiv=document.createElement('div');explDiv.className='exp-text';
+      explDiv.textContent=e.q.explanation?'Explanation:\n'+e.q.explanation:'The correct answer is '+e.q.answer+'.';
+      exp.appendChild(qDiv);exp.appendChild(optsDiv);exp.appendChild(explDiv);
 
       let open=false;
       row.addEventListener('click',()=>{open=!open;exp.style.display=open?'block':'none';});
-      rr.appendChild(row); rr.appendChild(exp);
+      rr.appendChild(row);rr.appendChild(exp);
     });
   }
 };
 
 // ── HOME ──
-function renderHome() {
-  const allQs = typeof PRELOADED_QUESTIONS!=='undefined' ? PRELOADED_QUESTIONS : [];
-  const wrap=document.getElementById('test-cards');
+function renderHome(){
+  const allQs=typeof PRELOADED_QUESTIONS!=='undefined'?PRELOADED_QUESTIONS:[];
+  const sessions=loadSessions();
+  const wrap=g('test-cards');
   wrap.innerHTML='';
 
-  if(allQs.length===0){
-    wrap.innerHTML='<p style="font-family:Arial,sans-serif;font-size:13px;color:#999;padding:20px;background:#f8f7f4;border-radius:3px">No questions loaded yet.</p>';
+  if(!allQs.length){
+    wrap.innerHTML='<p style="font-family:Arial,sans-serif;font-size:13px;color:#999;padding:20px;background:#f8f7f4;border-radius:3px;text-align:center">No questions loaded yet. Add questions via the Admin panel.</p>';
     return;
   }
 
-  const tests=[
-    {id:'T1',name:'Sectional Test 1'},
-    {id:'T2',name:'Sectional Test 2'},
-  ];
-
-  tests.forEach((t,idx)=>{
-    const easy=allQs.filter(q=>q.difficulty==='Easy').length;
-    const medium=allQs.filter(q=>q.difficulty==='Medium').length;
-    const hard=allQs.filter(q=>q.difficulty==='Hard').length;
+  // Show 2 test cards (expandable later)
+  [1,2].forEach(num=>{
+    const prev=sessions.find(s=>s.testNum===num&&s.section==='Q');
     const card=document.createElement('div');
     card.className='test-card';
-    card.innerHTML=`<div class="test-card-top">
-      <div class="test-card-name">${t.name}</div>
-      <div class="test-card-badge">Adaptive</div>
-    </div>
-    <div class="test-card-meta">
-      <span>21 Questions</span>
-      <span>45 Minutes</span>
-      <span>E:${easy} M:${medium} H:${hard}</span>
-    </div>`;
-    card.addEventListener('click',()=>Test.start(allQs));
+    card.innerHTML='<div class="test-card-top">'
+      +'<div class="test-card-name">Sectional Test '+num+'</div>'
+      +'<div class="test-card-badge">Adaptive</div>'
+      +'</div>'
+      +'<div class="test-card-meta">'
+      +'<span>21 Questions</span><span>45 Minutes</span><span>Problem Solving</span>'
+      +'</div>'
+      +(prev?'<div class="test-card-prev">Last attempt: <span class="prev-score">'+prev.pct+'%</span> · '+prev.correct+'/'+prev.total+' correct · '+prev.elapsed+'</div>':'');
+    card.addEventListener('click',()=>{
+      currentTestNum=num;
+      localStorage.setItem('current_test',JSON.stringify({section:'Q',num}));
+      Test.start(allQs);
+    });
     wrap.appendChild(card);
   });
 }
 
 // ── UTILS ──
+const g=id=>document.getElementById(id);
 function showScreen(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-'+name).classList.add('active');
+  g('screen-'+name).classList.add('active');
   window.scrollTo(0,0);
 }
 function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.style.display='block';
-  clearTimeout(window._tt);
-  window._tt=setTimeout(()=>t.style.display='none',3000);
+  const t=g('toast');t.textContent=msg;t.style.display='block';
+  clearTimeout(window._tt);window._tt=setTimeout(()=>t.style.display='none',3000);
 }
 function shuffle(a){
   const b=[...a];
@@ -523,11 +609,10 @@ function shuffle(a){
 }
 
 // ── EVENTS ──
-document.getElementById('btn-next').addEventListener('click',()=>Test.advance(false));
-document.getElementById('btn-skip').addEventListener('click',()=>Test.advance(true));
-document.getElementById('btn-home').addEventListener('click',()=>{renderHome();showScreen('home');});
+g('btn-next').addEventListener('click',()=>Test.advance(false));
+g('btn-skip').addEventListener('click',()=>Test.advance(true));
+g('btn-home').addEventListener('click',()=>{renderHome();showScreen('home');});
 
-// ── INIT ──
 initAuth();
 </script>
 </body>
