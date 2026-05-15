@@ -3,147 +3,229 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GMAT Admin Panel</title>
+<title>Admin — Sasta GMAT Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
+:root{
+  --navy:#0F172A;--teal:#14B8A6;--teal-d:#0D9488;--teal-l:rgba(20,184,166,0.1);
+  --bg:#F0F2F5;--white:#FFFFFF;--text:#111827;--muted:#6B7280;
+  --border:#E5E7EB;--green:#22C55E;--red:#EF4444;--amber:#F59E0B;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 12px rgba(0,0,0,0.05);
+  --shadow-lg:0 8px 32px rgba(15,23,42,0.12);--radius:10px;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:#f0f2f5;color:#1a1a1a;min-height:100vh;font-size:14px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
 
-/* ── LOGIN ── */
-#screen-login{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#fff}
-.login-box{width:100%;max-width:400px;padding:48px 40px;border:1px solid #e0ddd8;border-radius:4px;text-align:center}
-.login-logo{display:inline-block;background:#003865;color:#fff;font-size:10px;font-weight:700;letter-spacing:3px;padding:6px 16px;border-radius:2px;margin-bottom:24px;text-transform:uppercase}
-.login-title{font-size:20px;font-weight:600;margin-bottom:6px;color:#1a1a1a}
-.login-sub{font-size:12px;color:#888;margin-bottom:28px}
-.login-input{width:100%;padding:11px 14px;border:1.5px solid #d0cfc8;border-radius:3px;font-size:14px;outline:none;margin-bottom:12px;font-family:Arial,sans-serif}
-.login-input:focus{border-color:#003865}
-.login-btn{width:100%;padding:12px;background:#003865;color:#fff;border:none;border-radius:3px;font-size:14px;font-weight:700;cursor:pointer}
-.login-btn:hover{background:#004d8a}
-.login-err{color:#c62828;font-size:12px;margin-top:10px;display:none}
+/* LOGIN */
+#screen-login{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:999}
+.login-box{width:100%;max-width:380px;padding:48px 36px;border:1px solid var(--border);border-radius:16px;text-align:center;box-shadow:var(--shadow-lg)}
+.login-logo{font-family:'Playfair Display',serif;font-size:22px;color:var(--navy);margin-bottom:6px}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+.login-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;outline:none;margin-bottom:12px;transition:border-color .2s}
+.login-input:focus{border-color:var(--teal)}
+.login-btn{width:100%;padding:12px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s}
+.login-btn:hover{background:#1e293b}
+.login-err{color:var(--red);font-size:12px;margin-top:8px;display:none}
 
-/* ── ADMIN LAYOUT ── */
-#screen-admin{display:none;min-height:100vh;flex-direction:column}
+/* LAYOUT */
+#screen-admin{display:none;flex-direction:column;min-height:100vh}
 #screen-admin.active{display:flex}
 
-.admin-header{background:#003865;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:52px;flex-shrink:0}
-.admin-header-left{font-size:14px;font-weight:700;letter-spacing:.5px}
-.admin-header-right{display:flex;align-items:center;gap:16px}
-.header-btn{font-size:12px;padding:6px 14px;border-radius:3px;cursor:pointer;border:none;font-weight:600}
-.header-btn.outline{background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff}
-.header-btn.outline:hover{border-color:#fff}
-.header-btn.danger{background:rgba(255,80,80,.2);border:1px solid rgba(255,100,100,.4);color:#ffb3b3}
-.header-btn.danger:hover{background:rgba(255,80,80,.3)}
+/* TOPBAR */
+.topbar{background:var(--navy);height:56px;display:flex;align-items:center;padding:0 24px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06)}
+.topbar-logo{font-family:'Playfair Display',serif;font-size:17px;color:#fff;margin-right:8px}
+.topbar-tag{background:var(--teal);color:var(--navy);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:4px}
+.topbar-right{margin-left:auto;display:flex;gap:10px}
+.btn-topbar{font-size:12px;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;border:none;transition:all .2s}
+.btn-topbar.outline{background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7)}
+.btn-topbar.outline:hover{border-color:rgba(255,255,255,0.5);color:#fff}
+.btn-topbar.danger{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#fca5a5}
+.btn-topbar.danger:hover{background:rgba(239,68,68,0.25)}
 
+/* SIDEBAR + MAIN */
 .admin-body{display:flex;flex:1;overflow:hidden}
+.sidebar{width:200px;background:var(--white);border-right:1px solid var(--border);flex-shrink:0;overflow-y:auto}
+.sb-section{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:16px 16px 6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;font-size:13px;color:#444;transition:all .15s;border-left:3px solid transparent}
+.sb-item:hover{background:var(--bg);color:var(--text)}
+.sb-item.active{background:#e8f0f8;color:var(--navy);font-weight:600;border-left-color:var(--teal)}
+.sb-item .sb-icon{font-size:14px;min-width:16px}
+.sb-badge{margin-left:auto;background:var(--teal-l);color:var(--teal-d);font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px}
 
-/* ── SIDEBAR ── */
-.sidebar{width:220px;background:#fff;border-right:1px solid #e0ddd8;flex-shrink:0;padding:20px 0}
-.sidebar-section{padding:8px 20px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#999;margin-top:8px}
-.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;font-size:13px;color:#444;transition:background .1s,color .1s;border-left:3px solid transparent}
-.sidebar-item:hover{background:#f5f6f8;color:#003865}
-.sidebar-item.active{background:#e8f0f8;color:#003865;font-weight:600;border-left-color:#003865}
-.sidebar-item .icon{font-size:15px;min-width:18px}
-.sidebar-badge{margin-left:auto;background:#e8f0f8;color:#003865;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+/* SECTION TABS inside sidebar */
+.sb-sec-group{border-top:1px solid var(--border);margin-top:4px}
 
-/* ── MAIN CONTENT ── */
-.main-content{flex:1;overflow-y:auto;padding:28px 32px}
+.main{flex:1;overflow-y:auto;padding:24px}
 
-/* Panels */
-.panel{display:none}
-.panel.active{display:block}
+/* PANELS */
+.panel{display:none}.panel.active{display:block}
+.panel-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.panel-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
 
-.panel-title{font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:4px}
-.panel-sub{font-size:12px;color:#888;margin-bottom:24px}
+/* STATS */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-box{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+.stat-box-val{font-family:'Playfair Display',serif;font-size:28px;color:var(--navy);display:block;line-height:1;margin-bottom:3px}
+.stat-box-val.teal{color:var(--teal)}.stat-box-val.green{color:var(--green)}
+.stat-box-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 
-/* Stats row */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
-.stat-card{background:#fff;border:1px solid #e0ddd8;border-radius:4px;padding:20px 22px}
-.stat-val{font-size:28px;font-weight:700;color:#003865;display:block}
-.stat-lbl{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+/* SECTION OVERVIEW */
+.sec-overview{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.sec-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;cursor:pointer;transition:box-shadow .2s,border-color .2s}
+.sec-card:hover{box-shadow:var(--shadow);border-color:var(--teal)}
+.sec-card-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sec-big-letter{font-family:'Playfair Display',serif;font-size:28px;color:var(--teal);line-height:1}
+.sec-card-name{font-size:14px;font-weight:700;color:var(--navy)}
+.sec-card-meta{font-size:12px;color:var(--muted)}
+.sec-progress-row{display:flex;gap:6px;margin-top:10px}
+.sec-prog-item{flex:1;background:var(--bg);border-radius:6px;padding:6px 8px;text-align:center;border:1px solid var(--border)}
+.sec-prog-num{font-size:14px;font-weight:700;color:var(--navy);display:block}
+.sec-prog-lbl{font-size:10px;color:var(--muted)}
 
-/* Question list */
-.q-list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px}
-.q-filters{display:flex;gap:8px;flex-wrap:wrap}
-.filter-sel{padding:7px 12px;border:1.5px solid #d0cfc8;border-radius:3px;font-size:12px;background:#fff;outline:none;cursor:pointer;color:#333}
-.filter-sel:focus{border-color:#003865}
+/* UPLOAD AREA */
+.upload-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.upload-card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.upload-zone{border:2px dashed var(--border);border-radius:8px;padding:32px 24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--teal);background:var(--teal-l)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone-icon{font-size:32px;margin-bottom:10px}
+.upload-zone-text{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.upload-zone-sub{font-size:12px;color:var(--muted)}
+.upload-config{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px}
+.form-group{margin-bottom:0}
+.form-label{display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.form-select,.form-input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:var(--white);outline:none;transition:border-color .2s}
+.form-select:focus,.form-input:focus{border-color:var(--teal)}
+.form-textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:'Courier New',monospace;color:var(--text);background:#fafaf8;outline:none;resize:vertical;min-height:140px;line-height:1.6;transition:border-color .2s}
+.form-textarea:focus{border-color:var(--teal)}
 
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:background .15s}
-.btn-blue{background:#003865;color:#fff}.btn-blue:hover{background:#004d8a}
-.btn-outline{background:#fff;color:#003865;border:1.5px solid #003865}.btn-outline:hover{background:#e8f0f8}
-.btn-red{background:#c62828;color:#fff}.btn-red:hover{background:#b71c1c}
-.btn-sm{padding:6px 12px;font-size:12px}
-.btn-green{background:#2e7d32;color:#fff}.btn-green:hover{background:#1b5e20}
+/* PARSE RESULT */
+.parse-result{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;margin-top:14px;display:none}
+.parse-result.show{display:block}
+.parse-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.parse-count{font-size:13px;font-weight:700;color:var(--navy)}
+.parse-actions{display:flex;gap:8px}
+.parsed-q-list{max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;background:var(--white)}
+.pq-item{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;display:flex;align-items:flex-start;gap:10px}
+.pq-item:last-child{border-bottom:none}
+.pq-check{width:16px;height:16px;flex-shrink:0;margin-top:1px;accent-color:var(--teal);cursor:pointer}
+.pq-body{flex:1}
+.pq-q{color:var(--text);line-height:1.5;margin-bottom:5px}
+.pq-meta{display:flex;gap:8px;flex-wrap:wrap}
+.pq-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px}
+.pq-tag.ans{background:#e8f0f8;color:#003865}
+.pq-tag.diff-Easy{background:#e8f5e8;color:#2e7d32}
+.pq-tag.diff-Medium{background:#fff8e1;color:#f57f17}
+.pq-tag.diff-Hard{background:#fce8e8;color:#c62828}
+.pq-tag.topic{background:var(--bg);color:var(--muted);border:1px solid var(--border)}
+.pq-edit-diff{font-size:11px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--white);cursor:pointer;font-family:'Inter',sans-serif}
 
-.q-table{background:#fff;border:1px solid #e0ddd8;border-radius:4px;overflow:hidden}
-.q-table-head{display:grid;grid-template-columns:48px 1fr 90px 90px 80px 100px;background:#003865;color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:10px 16px;gap:8px}
-.q-table-row{display:grid;grid-template-columns:48px 1fr 90px 90px 80px 100px;padding:12px 16px;gap:8px;border-bottom:1px solid #f0ede8;align-items:center;transition:background .1s}
+/* MANUAL FORM */
+.manual-form{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.manual-form-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.opt-row{display:flex;align-items:center;gap:8px}
+.opt-ltr{font-weight:700;color:var(--teal);min-width:16px;font-size:14px}
+
+/* QUESTION BANK */
+.qbank-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap}
+.filter-sel{padding:7px 11px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;background:var(--white);outline:none;cursor:pointer;font-family:'Inter',sans-serif;color:var(--text)}
+.filter-sel:focus{border-color:var(--teal)}
+.search-input{padding:7px 12px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;background:var(--white);outline:none;font-family:'Inter',sans-serif;width:200px;transition:border-color .2s}
+.search-input:focus{border-color:var(--teal)}
+
+.q-table{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.q-table-head{display:grid;grid-template-columns:36px 48px 1fr 80px 80px 70px 110px 90px;background:var(--navy);color:#fff;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:10px 14px;gap:8px;align-items:center}
+.q-table-row{display:grid;grid-template-columns:36px 48px 1fr 80px 80px 70px 110px 90px;padding:11px 14px;gap:8px;border-bottom:1px solid var(--border);align-items:center;transition:background .1s;font-size:12px}
 .q-table-row:last-child{border-bottom:none}
-.q-table-row:hover{background:#f8f9fb}
-.tc{font-size:13px;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tc.bold{font-weight:600;color:#1a1a1a}
-.dpill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:2px;display:inline-block}
-.dpill.Easy{background:#e8f5e8;color:#2e7d32}
-.dpill.Medium{background:#fff8e1;color:#f57f17}
-.dpill.Hard{background:#fce8e8;color:#c62828}
-.action-btns{display:flex;gap:6px}
-.btn-icon{background:transparent;border:1px solid #d0cfc8;border-radius:3px;padding:4px 8px;cursor:pointer;font-size:12px;color:#555;transition:all .1s}
-.btn-icon:hover{border-color:#003865;color:#003865}
-.btn-icon.del:hover{border-color:#c62828;color:#c62828}
+.q-table-row:hover{background:var(--bg)}
+.tc{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+.tc.dim{color:var(--muted);font-size:11px}
+.tc.mono{font-family:'Courier New',monospace;font-size:11px;color:var(--muted)}
+.dpill{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;display:inline-block}
+.dpill.Easy{background:#e8f5e8;color:#2e7d32}.dpill.Medium{background:#fff8e1;color:#f57f17}.dpill.Hard{background:#fce8e8;color:#c62828}
+.spill{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;display:inline-block}
+.spill-Q{background:#e8f0f8;color:#003865}.spill-V{background:#fce8e8;color:#c62828}.spill-D{background:#e8f5e8;color:#2e7d32}
+.action-btns{display:flex;gap:4px}
+.btn-icon{background:transparent;border:1px solid var(--border);border-radius:4px;padding:3px 7px;cursor:pointer;font-size:11px;color:var(--muted);transition:all .1s;font-family:'Inter',sans-serif}
+.btn-icon:hover{border-color:var(--teal);color:var(--teal)}
+.btn-icon.del:hover{border-color:var(--red);color:var(--red)}
+.empty-state{text-align:center;padding:48px 24px;color:var(--muted)}
+.empty-state .ei{font-size:36px;margin-bottom:10px}
 
-.empty-state{text-align:center;padding:60px 24px;color:#aaa}
-.empty-icon{font-size:40px;margin-bottom:12px}
-.empty-text{font-size:14px}
+/* SECTIONAL MANAGER */
+.sectional-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.sectional-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:box-shadow .2s,border-color .2s;cursor:pointer}
+.sectional-card:hover{box-shadow:var(--shadow);border-color:var(--teal)}
+.sectional-card.selected{border-color:var(--teal);box-shadow:0 0 0 3px rgba(20,184,166,0.15)}
+.sc-header{padding:12px 14px 8px;background:var(--navy)}
+.sc-num{font-family:'Playfair Display',serif;font-size:22px;color:#fff;line-height:1}
+.sc-name{font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.5px}
+.sc-body{padding:10px 14px 12px}
+.sc-counts{display:flex;gap:8px;margin-bottom:8px}
+.sc-count{text-align:center;flex:1}
+.sc-count-num{font-size:14px;font-weight:700;display:block}
+.sc-count-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.sc-total{font-size:11px;color:var(--muted);text-align:center;padding-top:6px;border-top:1px solid var(--border)}
+.sc-total span{color:var(--navy);font-weight:700}
 
-/* Add / Edit question form */
-.form-card{background:#fff;border:1px solid #e0ddd8;border-radius:4px;padding:28px 32px;margin-bottom:20px}
-.form-card-title{font-size:14px;font-weight:700;color:#003865;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid #f0ede8}
-.form-row{margin-bottom:16px}
-.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
-.form-label{display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#555;margin-bottom:5px}
-.form-label .req{color:#c62828}
-.form-input,.form-select,.form-textarea{width:100%;padding:9px 12px;border:1.5px solid #d0cfc8;border-radius:3px;font-size:14px;font-family:Georgia,serif;color:#1a1a1a;background:#fff;outline:none;transition:border-color .15s}
-.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:#003865}
-.form-select{font-family:Arial,sans-serif;font-size:13px}
-.form-textarea{min-height:80px;resize:vertical;line-height:1.6}
-.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.opt-wrap{display:flex;align-items:center;gap:8px}
-.opt-ltr{font-weight:700;color:#003865;min-width:18px;font-size:14px}
-.form-actions{display:flex;gap:10px;padding-top:8px}
+/* POOL EDITOR */
+.pool-editor{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:none}
+.pool-editor.show{display:block}
+.pool-editor-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.pool-editor-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.pool-target{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;padding:14px;background:var(--bg);border-radius:8px;border:1px solid var(--border)}
+.pool-target-item{text-align:center}
+.pool-target-val{font-size:22px;font-weight:700;display:block}
+.pool-target-val.easy-col{color:var(--green)}.pool-target-val.med-col{color:var(--amber)}.pool-target-val.hard-col{color:var(--red)}
+.pool-target-lbl{font-size:11px;color:var(--muted)}
+.pool-q-list{max-height:380px;overflow-y:auto;border:1px solid var(--border);border-radius:6px}
+.pool-q-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;transition:background .1s}
+.pool-q-item:last-child{border-bottom:none}
+.pool-q-item:hover{background:var(--bg)}
+.pool-q-item input{accent-color:var(--teal);cursor:pointer;flex-shrink:0;margin-top:2px}
+.pool-q-text{flex:1;color:var(--text);line-height:1.5}
+.pool-q-tags{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap}
 
-/* Paste parser */
-.paste-box{width:100%;min-height:160px;border:1.5px solid #d0cfc8;border-radius:3px;padding:12px;font-family:'Courier New',monospace;font-size:12px;line-height:1.6;color:#333;background:#fafaf8;resize:vertical;outline:none}
-.paste-box:focus{border-color:#003865}
-.parse-msg{margin-top:12px;padding:12px 14px;border-radius:3px;font-size:13px;display:none}
-.parse-msg.ok{background:#e8f5e8;color:#2e7d32;border:1px solid #a5d6a7}
-.parse-msg.err{background:#fce8e8;color:#c62828;border:1px solid #ef9a9a}
-.parse-preview{background:#f8f9fb;border:1px solid #e0ddd8;border-radius:3px;padding:16px;margin-top:12px;display:none;font-size:13px}
-.preview-row{display:flex;gap:10px;margin-bottom:6px}
-.preview-lbl{font-weight:700;min-width:100px;color:#003865}
-.preview-val{color:#333;flex:1}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-blue{background:var(--navy);color:#fff}.btn-blue:hover{background:#1e293b}
+.btn-teal{background:var(--teal);color:var(--navy)}.btn-teal:hover{background:var(--teal-d)}
+.btn-outline{background:var(--white);color:var(--navy);border:1.5px solid var(--border)}.btn-outline:hover{border-color:var(--navy)}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{background:#dc2626}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#16a34a}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-xs{padding:4px 9px;font-size:11px}
 
-/* Test manager */
-.test-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px}
-.test-mgr-card{background:#fff;border:1px solid #e0ddd8;border-radius:4px;padding:20px 22px}
-.test-mgr-name{font-size:15px;font-weight:700;color:#003865;margin-bottom:6px}
-.test-mgr-meta{font-size:12px;color:#888;margin-bottom:14px;line-height:1.6}
-.test-mgr-actions{display:flex;gap:8px;flex-wrap:wrap}
-.test-q-assign{margin-top:16px;padding-top:16px;border-top:1px solid #f0ede8}
-.test-q-assign-title{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#666;margin-bottom:10px}
-.q-assign-list{max-height:200px;overflow-y:auto;border:1px solid #e0ddd8;border-radius:3px}
-.q-assign-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #f5f5f5;font-size:12px;color:#333}
-.q-assign-item:last-child{border-bottom:none}
-.q-assign-item input[type=checkbox]{accent-color:#003865;cursor:pointer}
-.q-assign-text{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.q-assign-diff{font-size:10px;font-weight:600;min-width:50px}
+/* PROGRESS BAR */
+.prog-bar-wrap{background:var(--border);border-radius:4px;height:6px;margin-top:4px;overflow:hidden}
+.prog-bar{height:100%;border-radius:4px;transition:width .5s ease;background:var(--teal)}
+.prog-bar.red{background:var(--red)}
 
-/* Export */
-.export-section{background:#fff;border:1px solid #e0ddd8;border-radius:4px;padding:24px 28px;margin-bottom:20px}
-.export-title{font-size:14px;font-weight:700;margin-bottom:6px}
-.export-desc{font-size:13px;color:#666;margin-bottom:16px;line-height:1.6}
-.code-block{background:#1a1a2e;color:#a8ff78;font-family:'Courier New',monospace;font-size:12px;padding:16px;border-radius:4px;white-space:pre-wrap;margin-bottom:12px;line-height:1.5}
+/* EXPORT */
+.export-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.export-card-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.export-card-desc{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6}
 
-/* Toast */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;font-size:13px;padding:12px 24px;border-radius:4px;z-index:9999;display:none;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);font-size:13px;padding:11px 22px;border-radius:8px;z-index:500;display:none;box-shadow:var(--shadow-lg);font-family:'Inter',sans-serif;white-space:nowrap}
+.toast.info{background:var(--navy);color:#fff;border:1px solid rgba(255,255,255,.1)}
+.toast.success{background:#052e16;color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.toast.error{background:#450a0a;color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;z-index:200;background:rgba(15,23,42,.6);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:20px}
+.modal-ov.open{display:flex}
+.modal{background:var(--white);border-radius:14px;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:mIn .22s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.modal-hdr{background:var(--navy);padding:20px 24px;position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;border-radius:14px 14px 0 0}
+.modal-title{font-size:15px;font-weight:700;color:#fff}
+.modal-close{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);width:27px;height:27px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:rgba(255,255,255,.2)}
+.modal-body{padding:20px 24px}
 </style>
 </head>
 <body>
@@ -151,776 +233,1107 @@ body{font-family:Arial,sans-serif;background:#f0f2f5;color:#1a1a1a;min-height:10
 <!-- LOGIN -->
 <div id="screen-login">
   <div class="login-box">
-    <div class="login-logo">GMAT Admin</div>
-    <h2 class="login-title">Admin Access</h2>
-    <p class="login-sub">Enter your password to manage questions and tests</p>
-    <input class="login-input" type="password" id="pwd-input" placeholder="Password" autocomplete="current-password">
-    <button class="login-btn" id="login-btn">Sign In →</button>
-    <div class="login-err" id="login-err">Incorrect password. Try again.</div>
+    <div class="login-logo">Sasta GMAT Prep</div>
+    <div class="login-sub">Admin Panel — Restricted Access</div>
+    <input class="login-input" type="password" id="pwd" placeholder="Enter admin password" autocomplete="current-password">
+    <button class="login-btn" onclick="tryLogin()">Sign In →</button>
+    <div class="login-err" id="login-err">Incorrect password.</div>
   </div>
 </div>
 
 <!-- ADMIN -->
-<div id="screen-admin" class="screen">
-
-  <div class="admin-header">
-    <div class="admin-header-left">GMAT Admin Panel</div>
-    <div class="admin-header-right">
-      <button class="header-btn outline" id="btn-view-site" onclick="window.open('index.html','_blank')">
-        View Site ↗
-      </button>
-      <button class="header-btn danger" id="btn-logout">Sign Out</button>
+<div id="screen-admin">
+  <div class="topbar">
+    <span class="topbar-logo">Sasta GMAT Prep</span>
+    <span class="topbar-tag">Admin</span>
+    <div class="topbar-right">
+      <button class="btn-topbar outline" onclick="window.open('index.html','_blank')">View Site ↗</button>
+      <button class="btn-topbar danger" onclick="doLogout()">Sign Out</button>
     </div>
   </div>
 
   <div class="admin-body">
-    <!-- Sidebar -->
+    <!-- SIDEBAR -->
     <div class="sidebar">
-      <div class="sidebar-section">Content</div>
-      <div class="sidebar-item active" data-panel="dashboard">
-        <span class="icon">📊</span> Dashboard
+      <div class="sb-section">Overview</div>
+      <div class="sb-item active" data-panel="dashboard" onclick="nav(this)">
+        <span class="sb-icon">📊</span> Dashboard
       </div>
-      <div class="sidebar-item" data-panel="questions">
-        <span class="icon">📝</span> Questions
-        <span class="sidebar-badge" id="sb-q-count">0</span>
+      <div class="sb-section">Questions</div>
+      <div class="sb-item" data-panel="add-q" onclick="nav(this)">
+        <span class="sb-icon">➕</span> Add Questions
       </div>
-      <div class="sidebar-item" data-panel="add-question">
-        <span class="icon">➕</span> Add Question
+      <div class="sb-item" data-panel="bank" onclick="nav(this)">
+        <span class="sb-icon">🗃️</span> Question Bank
+        <span class="sb-badge" id="sb-total">0</span>
       </div>
-      <div class="sidebar-section">Tests</div>
-      <div class="sidebar-item" data-panel="tests">
-        <span class="icon">🧪</span> Manage Tests
+      <div class="sb-section">Sectionals</div>
+      <div class="sb-item" data-panel="sec-Q" onclick="nav(this)">
+        <span class="sb-icon">📐</span> Quant
+        <span class="sb-badge" id="sb-Q">0</span>
       </div>
-      <div class="sidebar-section">Tools</div>
-      <div class="sidebar-item" data-panel="export">
-        <span class="icon">📦</span> Export / Deploy
+      <div class="sb-item" data-panel="sec-V" onclick="nav(this)">
+        <span class="sb-icon">📖</span> Verbal
+        <span class="sb-badge" id="sb-V">0</span>
+      </div>
+      <div class="sb-item" data-panel="sec-D" onclick="nav(this)">
+        <span class="sb-icon">📊</span> Data Insights
+        <span class="sb-badge" id="sb-D">0</span>
+      </div>
+      <div class="sb-section">Deploy</div>
+      <div class="sb-item" data-panel="export" onclick="nav(this)">
+        <span class="sb-icon">📦</span> Export
       </div>
     </div>
 
-    <!-- Main -->
-    <div class="main-content">
+    <!-- MAIN -->
+    <div class="main">
 
       <!-- DASHBOARD -->
       <div id="panel-dashboard" class="panel active">
         <div class="panel-title">Dashboard</div>
-        <div class="panel-sub">Overview of your question bank and tests</div>
-        <div class="stats-row">
-          <div class="stat-card"><span class="stat-val" id="dash-total">0</span><div class="stat-lbl">Total Questions</div></div>
-          <div class="stat-card"><span class="stat-val" id="dash-easy" style="color:#2e7d32">0</span><div class="stat-lbl">Easy</div></div>
-          <div class="stat-card"><span class="stat-val" id="dash-med" style="color:#f57f17">0</span><div class="stat-lbl">Medium</div></div>
-          <div class="stat-card"><span class="stat-val" id="dash-hard" style="color:#c62828">0</span><div class="stat-lbl">Hard</div></div>
+        <div class="panel-sub">Overview of your question bank and sectional pools</div>
+        <div class="stat-row">
+          <div class="stat-box"><span class="stat-box-val teal" id="d-total">0</span><div class="stat-box-lbl">Total Questions</div></div>
+          <div class="stat-box"><span class="stat-box-val green" id="d-tagged">0</span><div class="stat-box-lbl">Tagged to Sectionals</div></div>
+          <div class="stat-box"><span class="stat-box-val" id="d-untagged" style="color:var(--amber)">0</span><div class="stat-box-lbl">Untagged (Pool)</div></div>
+          <div class="stat-box"><span class="stat-box-val" id="d-sectionals">30</span><div class="stat-box-lbl">Total Sectionals</div></div>
         </div>
-        <div class="stats-row" style="grid-template-columns:repeat(2,1fr)">
-          <div class="stat-card"><span class="stat-val" id="dash-tests">0</span><div class="stat-lbl">Sectional Tests</div></div>
-          <div class="stat-card"><span class="stat-val" id="dash-ready">0</span><div class="stat-lbl">Tests Ready (≥5 questions)</div></div>
-        </div>
-      </div>
-
-      <!-- QUESTIONS -->
-      <div id="panel-questions" class="panel">
-        <div class="panel-title">Question Bank</div>
-        <div class="panel-sub">All questions currently in your bank</div>
-        <div class="q-list-header">
-          <div class="q-filters">
-            <select class="filter-sel" id="filter-diff">
-              <option value="all">All Difficulties</option>
-              <option value="Easy">Easy</option>
-              <option value="Medium">Medium</option>
-              <option value="Hard">Hard</option>
-            </select>
-            <select class="filter-sel" id="filter-topic">
-              <option value="all">All Topics</option>
-            </select>
+        <div class="sec-overview">
+          <div class="sec-card" onclick="nav(document.querySelector('[data-panel=sec-Q]'))">
+            <div class="sec-card-top"><div class="sec-big-letter">Q</div><div><div class="sec-card-name">Quantitative</div><div class="sec-card-meta">21 Qs per sectional · PS</div></div></div>
+            <div class="sec-progress-row" id="dash-Q-pools"></div>
           </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-outline btn-sm" id="btn-import-json">Import JSON</button>
-            <button class="btn btn-red btn-sm" id="btn-clear-bank">Clear All</button>
+          <div class="sec-card" onclick="nav(document.querySelector('[data-panel=sec-V]'))">
+            <div class="sec-card-top"><div class="sec-big-letter">V</div><div><div class="sec-card-name">Verbal</div><div class="sec-card-meta">23 Qs per sectional · CR & RC</div></div></div>
+            <div class="sec-progress-row" id="dash-V-pools"></div>
           </div>
-        </div>
-        <div class="q-table">
-          <div class="q-table-head">
-            <div>ID</div><div>Question</div><div>Difficulty</div>
-            <div>Topic</div><div>Answer</div><div>Actions</div>
+          <div class="sec-card" onclick="nav(document.querySelector('[data-panel=sec-D]'))">
+            <div class="sec-card-top"><div class="sec-big-letter">DI</div><div><div class="sec-card-name">Data Insights</div><div class="sec-card-meta">20 Qs per sectional · DS & MSR</div></div></div>
+            <div class="sec-progress-row" id="dash-D-pools"></div>
           </div>
-          <div id="q-table-body"></div>
         </div>
       </div>
 
-      <!-- ADD QUESTION -->
-      <div id="panel-add-question" class="panel">
-        <div class="panel-title" id="add-panel-title">Add Question</div>
-        <div class="panel-sub">Paste a question block for auto-parse, or fill in the form manually</div>
+      <!-- ADD QUESTIONS -->
+      <div id="panel-add-q" class="panel">
+        <div class="panel-title">Add Questions</div>
+        <div class="panel-sub">Upload a doc/PDF for auto-extraction, or add manually. Questions go to an untagged pool — then assign them to sectionals.</div>
 
-        <!-- PASTE PARSER -->
-        <div class="form-card">
-          <div class="form-card-title">⚡ Quick Paste (Auto-Parse)</div>
-          <textarea class="paste-box" id="paste-box"
-            placeholder="Paste a question block here. Example format:
-
-88. The average of five numbers is 24. If four of the numbers are 18, 22, 28, and 30, what is the fifth number?
-A. 18
-B. 20
-C. 22
-D. 24
-E. 26
-The correct answer is C.
-Explanation: Sum = 5×24 = 120. Sum of known four = 98. Fifth = 22."></textarea>
-          <div style="display:flex;gap:10px;margin-top:12px">
-            <button class="btn btn-blue" id="btn-parse">Parse Question</button>
-            <button class="btn btn-outline" id="btn-clear-paste">Clear</button>
+        <!-- UPLOAD -->
+        <div class="upload-card">
+          <div class="upload-card-title">⚡ Upload Doc / PDF (Auto-Extract)</div>
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" id="file-input" accept=".docx,.doc,.pdf,.txt" onchange="handleFileUpload(this)">
+            <div class="upload-zone-icon">📄</div>
+            <div class="upload-zone-text">Drag & drop or click to upload</div>
+            <div class="upload-zone-sub">Supports .docx, .pdf, .txt — questions auto-parsed from the file</div>
           </div>
-          <div class="parse-msg" id="parse-msg"></div>
-          <div class="parse-preview" id="parse-preview"></div>
-        </div>
-
-        <!-- MANUAL FORM -->
-        <div class="form-card">
-          <div class="form-card-title" id="form-card-title">✏️ Manual Entry</div>
-          <input type="hidden" id="f-edit-id">
-          <div class="form-row">
-            <label class="form-label">Question Text <span class="req">*</span></label>
-            <textarea class="form-textarea" id="f-question" rows="3"
-              placeholder="Type the full question text here..."></textarea>
-          </div>
-          <div class="form-card-title" style="font-size:12px;font-weight:700;color:#555;margin-bottom:12px;padding:0;border:none">Answer Options</div>
-          <div class="opts-grid">
-            <div class="opt-wrap"><span class="opt-ltr">A.</span><input class="form-input" id="f-A" placeholder="Option A"></div>
-            <div class="opt-wrap"><span class="opt-ltr">B.</span><input class="form-input" id="f-B" placeholder="Option B"></div>
-            <div class="opt-wrap"><span class="opt-ltr">C.</span><input class="form-input" id="f-C" placeholder="Option C"></div>
-            <div class="opt-wrap"><span class="opt-ltr">D.</span><input class="form-input" id="f-D" placeholder="Option D"></div>
-            <div class="opt-wrap"><span class="opt-ltr">E.</span><input class="form-input" id="f-E" placeholder="Option E (optional)"></div>
-          </div>
-          <div class="form-row-3">
-            <div>
-              <label class="form-label">Correct Answer <span class="req">*</span></label>
-              <select class="form-select" id="f-answer">
-                <option>A</option><option>B</option><option>C</option>
-                <option>D</option><option>E</option>
+          <div class="upload-config">
+            <div class="form-group">
+              <label class="form-label">Default Section</label>
+              <select class="form-select" id="upload-section">
+                <option value="Q">Quantitative</option>
+                <option value="V">Verbal</option>
+                <option value="D">Data Insights</option>
               </select>
             </div>
-            <div>
-              <label class="form-label">Difficulty <span class="req">*</span></label>
+            <div class="form-group">
+              <label class="form-label">Default Difficulty</label>
+              <select class="form-select" id="upload-difficulty">
+                <option value="auto">Auto-Detect</option>
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Default Sectional</label>
+              <select class="form-select" id="upload-sectional">
+                <option value="">Untagged (assign later)</option>
+                <option value="1">Sectional 01</option>
+                <option value="2">Sectional 02</option>
+                <option value="3">Sectional 03</option>
+                <option value="4">Sectional 04</option>
+                <option value="5">Sectional 05</option>
+                <option value="6">Sectional 06</option>
+                <option value="7">Sectional 07</option>
+                <option value="8">Sectional 08</option>
+                <option value="9">Sectional 09</option>
+                <option value="10">Sectional 10</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
+            <button class="btn btn-teal" onclick="runFileExtraction()">Extract Questions from File</button>
+            <span style="font-size:12px;color:var(--muted)" id="upload-status"></span>
+          </div>
+          <div class="parse-result" id="parse-result">
+            <div class="parse-header">
+              <div class="parse-count" id="parse-count">0 questions parsed</div>
+              <div class="parse-actions">
+                <button class="btn btn-xs btn-outline" onclick="selectAllParsed(true)">Select All</button>
+                <button class="btn btn-xs btn-outline" onclick="selectAllParsed(false)">Deselect</button>
+                <button class="btn btn-xs btn-teal" onclick="importSelected()">Import Selected →</button>
+              </div>
+            </div>
+            <div class="parsed-q-list" id="parsed-q-list"></div>
+          </div>
+        </div>
+
+        <!-- PASTE PARSER -->
+        <div class="upload-card">
+          <div class="upload-card-title">📋 Paste & Auto-Parse</div>
+          <div class="upload-config" style="margin-bottom:12px">
+            <div class="form-group">
+              <label class="form-label">Section</label>
+              <select class="form-select" id="paste-section">
+                <option value="Q">Quantitative</option>
+                <option value="V">Verbal</option>
+                <option value="D">Data Insights</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Difficulty</label>
+              <select class="form-select" id="paste-difficulty">
+                <option value="auto">Auto-Detect</option>
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Assign to Sectional</label>
+              <select class="form-select" id="paste-sectional">
+                <option value="">Untagged</option>
+                <option value="1">Sectional 01</option><option value="2">Sectional 02</option>
+                <option value="3">Sectional 03</option><option value="4">Sectional 04</option>
+                <option value="5">Sectional 05</option><option value="6">Sectional 06</option>
+                <option value="7">Sectional 07</option><option value="8">Sectional 08</option>
+                <option value="9">Sectional 09</option><option value="10">Sectional 10</option>
+              </select>
+            </div>
+          </div>
+          <textarea class="form-textarea" id="paste-area" placeholder="Paste question block here:
+
+88. The average distance between the Sun and a certain planet...
+A. 7.1 × 10⁸
+B. 5.9 × 10⁹
+C. 1.6 × 10¹⁰
+D. 1.6 × 10¹¹
+E. 5.9 × 10¹¹
+The correct answer is B.
+Explanation: Divide 2.3×10¹⁴ by 3.9×10⁴..."></textarea>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-teal btn-sm" onclick="parsePaste()">Parse & Preview</button>
+            <button class="btn btn-outline btn-sm" onclick="g('paste-area').value=''">Clear</button>
+          </div>
+          <div id="paste-preview" style="margin-top:12px"></div>
+        </div>
+
+        <!-- MANUAL -->
+        <div class="manual-form">
+          <div class="manual-form-title">✏️ Manual Entry</div>
+          <input type="hidden" id="edit-id">
+          <div class="form-group" style="margin-bottom:12px">
+            <label class="form-label">Question Text <span style="color:var(--red)">*</span></label>
+            <textarea class="form-textarea" id="f-question" rows="3" placeholder="Type the full question text..."></textarea>
+          </div>
+          <div class="opts-grid">
+            <div class="opt-row"><span class="opt-ltr">A.</span><input class="form-input" id="f-A" placeholder="Option A"></div>
+            <div class="opt-row"><span class="opt-ltr">B.</span><input class="form-input" id="f-B" placeholder="Option B"></div>
+            <div class="opt-row"><span class="opt-ltr">C.</span><input class="form-input" id="f-C" placeholder="Option C"></div>
+            <div class="opt-row"><span class="opt-ltr">D.</span><input class="form-input" id="f-D" placeholder="Option D"></div>
+            <div class="opt-row"><span class="opt-ltr">E.</span><input class="form-input" id="f-E" placeholder="Option E (optional)"></div>
+          </div>
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label">Answer <span style="color:var(--red)">*</span></label>
+              <select class="form-select" id="f-answer">
+                <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Difficulty <span style="color:var(--red)">*</span></label>
               <select class="form-select" id="f-difficulty">
                 <option value="Easy">Easy</option>
                 <option value="Medium" selected>Medium</option>
                 <option value="Hard">Hard</option>
               </select>
             </div>
-            <div>
+            <div class="form-group">
+              <label class="form-label">Section <span style="color:var(--red)">*</span></label>
+              <select class="form-select" id="f-section">
+                <option value="Q">Quantitative</option>
+                <option value="V">Verbal</option>
+                <option value="D">Data Insights</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Assign to Sectional</label>
+              <select class="form-select" id="f-sectional">
+                <option value="">Untagged</option>
+                <option value="1">Sectional 01</option><option value="2">Sectional 02</option>
+                <option value="3">Sectional 03</option><option value="4">Sectional 04</option>
+                <option value="5">Sectional 05</option><option value="6">Sectional 06</option>
+                <option value="7">Sectional 07</option><option value="8">Sectional 08</option>
+                <option value="9">Sectional 09</option><option value="10">Sectional 10</option>
+              </select>
+            </div>
+            <div class="form-group">
               <label class="form-label">Topic</label>
               <input class="form-input" id="f-topic" placeholder="e.g. Arithmetic – Averages">
             </div>
           </div>
-          <div class="form-row">
+          <div class="form-group" style="margin-bottom:14px">
             <label class="form-label">Explanation</label>
-            <textarea class="form-textarea" id="f-explanation" rows="3"
-              placeholder="Optional explanation shown after the test..."></textarea>
+            <textarea class="form-textarea" id="f-explanation" rows="2" placeholder="Optional explanation shown after test..."></textarea>
           </div>
-          <div class="form-actions">
-            <button class="btn btn-blue" id="btn-save-q">Save Question</button>
-            <button class="btn btn-outline" id="btn-cancel-edit" style="display:none">Cancel Edit</button>
-            <button class="btn btn-outline" id="btn-reset-form">Reset Form</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-blue" onclick="saveQuestion()">Save Question</button>
+            <button class="btn btn-outline" id="cancel-edit-btn" style="display:none" onclick="cancelEdit()">Cancel Edit</button>
+            <button class="btn btn-outline" onclick="resetForm()">Reset</button>
           </div>
         </div>
       </div>
 
-      <!-- TESTS -->
-      <div id="panel-tests" class="panel">
-        <div class="panel-title">Manage Tests</div>
-        <div class="panel-sub">Create sectional tests and assign questions to each</div>
-        <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
-          <button class="btn btn-blue" id="btn-add-test">+ New Test</button>
+      <!-- QUESTION BANK -->
+      <div id="panel-bank" class="panel">
+        <div class="panel-title">Question Bank</div>
+        <div class="panel-sub">All questions — filter, edit, reassign to sectionals, or delete</div>
+        <div class="qbank-header">
+          <div class="filter-row">
+            <select class="filter-sel" id="bank-sec" onchange="renderBank()">
+              <option value="all">All Sections</option>
+              <option value="Q">Quantitative</option>
+              <option value="V">Verbal</option>
+              <option value="D">Data Insights</option>
+            </select>
+            <select class="filter-sel" id="bank-diff" onchange="renderBank()">
+              <option value="all">All Difficulties</option>
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+            <select class="filter-sel" id="bank-pool" onchange="renderBank()">
+              <option value="all">All Pools</option>
+              <option value="">Untagged</option>
+              <option value="1">Sectional 01</option><option value="2">Sectional 02</option>
+              <option value="3">Sectional 03</option><option value="4">Sectional 04</option>
+              <option value="5">Sectional 05</option><option value="6">Sectional 06</option>
+              <option value="7">Sectional 07</option><option value="8">Sectional 08</option>
+              <option value="9">Sectional 09</option><option value="10">Sectional 10</option>
+            </select>
+            <input class="search-input" id="bank-search" placeholder="Search questions..." oninput="renderBank()">
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline btn-sm" onclick="importJSON()">Import JSON</button>
+            <button class="btn btn-red btn-sm" onclick="clearAllQs()">Clear All</button>
+          </div>
         </div>
-        <div class="test-grid" id="test-grid"></div>
+        <div class="q-table">
+          <div class="q-table-head">
+            <div>Sec</div><div>Pool</div><div>Question</div>
+            <div>Difficulty</div><div>Topic</div><div>Ans</div><div>Sectional</div><div>Actions</div>
+          </div>
+          <div id="bank-body"></div>
+        </div>
+        <input type="file" id="json-import-file" accept=".json" style="display:none" onchange="handleJSONImport(this)">
+      </div>
+
+      <!-- SECTIONAL PANELS -->
+      <div id="panel-sec-Q" class="panel">
+        <div class="panel-title">Quantitative Sectionals</div>
+        <div class="panel-sub">Each sectional has its own question pool. Questions tagged here won't appear in other sectionals. Target: 21 questions per test (e.g. 7 Easy + 9 Medium + 5 Hard).</div>
+        <div class="sectional-grid" id="sgrid-Q"></div>
+        <div class="pool-editor" id="peditor-Q"></div>
+      </div>
+      <div id="panel-sec-V" class="panel">
+        <div class="panel-title">Verbal Sectionals</div>
+        <div class="panel-sub">Each sectional has its own question pool. Target: 23 questions per test (e.g. 7 Easy + 10 Medium + 6 Hard).</div>
+        <div class="sectional-grid" id="sgrid-V"></div>
+        <div class="pool-editor" id="peditor-V"></div>
+      </div>
+      <div id="panel-sec-D" class="panel">
+        <div class="panel-title">Data Insights Sectionals</div>
+        <div class="panel-sub">Each sectional has its own question pool. Target: 20 questions per test (e.g. 6 Easy + 9 Medium + 5 Hard).</div>
+        <div class="sectional-grid" id="sgrid-D"></div>
+        <div class="pool-editor" id="peditor-D"></div>
       </div>
 
       <!-- EXPORT -->
       <div id="panel-export" class="panel">
         <div class="panel-title">Export & Deploy</div>
-        <div class="panel-sub">Download your question bank and deploy to Vercel</div>
+        <div class="panel-sub">Download updated question files and deploy to Vercel</div>
 
-        <div class="export-section">
-          <div class="export-title">📥 Export questions.js</div>
-          <div class="export-desc">
-            Download an updated <strong>questions.js</strong> file with all your questions baked in.
-            Replace the existing one in your project folder, then redeploy to Vercel.
-            Your users will instantly see the new questions — no setup required.
-          </div>
-          <button class="btn btn-blue" id="btn-export-js">Download questions.js</button>
+        <div class="export-card">
+          <div class="export-card-title">📥 Export questions.js</div>
+          <div class="export-card-desc">Downloads a <code>questions.js</code> file with ALL questions and their sectional assignments baked in. Replace the file in your GitHub repo — Vercel auto-deploys in ~30 seconds.</div>
+          <button class="btn btn-blue" onclick="exportJS()">Download questions.js</button>
         </div>
 
-        <div class="export-section">
-          <div class="export-title">📦 Export questions.json (backup)</div>
-          <div class="export-desc">
-            Download a JSON backup of all questions. Use this to restore your question bank
-            on a new machine or share with a co-admin using the Import button in Questions tab.
-          </div>
-          <button class="btn btn-outline" id="btn-export-json">Download questions.json</button>
+        <div class="export-card">
+          <div class="export-card-title">💾 Backup (JSON)</div>
+          <div class="export-card-desc">Full backup of all questions. Use this to restore your question bank or share with a co-admin.</div>
+          <button class="btn btn-outline" onclick="exportJSON()">Download questions.json</button>
         </div>
 
-        <div class="export-section">
-          <div class="export-title">🚀 Deploy to Vercel — 3 Steps</div>
-          <div class="export-desc">
-            <strong>Step 1:</strong> Click "Download questions.js" above<br>
-            <strong>Step 2:</strong> Replace the <code>questions.js</code> file in your project folder<br>
-            <strong>Step 3:</strong> Push to GitHub — Vercel auto-deploys in ~30 seconds<br><br>
-            Your friends visit your Vercel URL and get the updated questions immediately.
+        <div class="export-card">
+          <div class="export-card-title">🚀 Deploy Steps</div>
+          <div class="export-card-desc">
+            1. Click "Download questions.js" above<br>
+            2. Replace <code>questions.js</code> in your GitHub repo<br>
+            3. Vercel auto-deploys in ~30 seconds<br>
+            4. Your users see the updated questions immediately
           </div>
         </div>
       </div>
 
-    </div><!-- /main-content -->
+    </div><!-- /main -->
   </div><!-- /admin-body -->
 </div><!-- /screen-admin -->
 
-<input type="file" id="json-import-file" accept=".json" style="display:none">
-<div class="toast" id="toast"></div>
+<!-- EDIT MODAL -->
+<div class="modal-ov" id="edit-modal" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">Edit Question</div>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="modal-body" id="edit-modal-body"></div>
+  </div>
+</div>
 
-<script src="questions.js"></script>
+<div class="toast info" id="toast"></div>
+
 <script>
 // ══════════════════════════════════════
 // CONFIG
 // ══════════════════════════════════════
-const ADMIN_PASSWORD = 'gmat2024'; // Change this!
+const ADMIN_PWD = 'gmat2024'; // Change this before deploying
+
+const SECTION_TARGETS = { Q:21, V:23, D:20 };
+const SECTION_NAMES   = { Q:'Quantitative', V:'Verbal', D:'Data Insights' };
 
 // ══════════════════════════════════════
 // STORAGE
 // ══════════════════════════════════════
-const Store = {
-  getQuestions() {
-    try {
-      const s = localStorage.getItem('gmat_questions');
-      if (s) { const p = JSON.parse(s); if (p&&p.length) return p; }
-    } catch(e) {}
-    return typeof PRELOADED_QUESTIONS !== 'undefined' ? [...PRELOADED_QUESTIONS] : [];
-  },
-  saveQuestions(qs) { localStorage.setItem('gmat_questions', JSON.stringify(qs)); },
-  getTests() {
-    try {
-      const s = localStorage.getItem('gmat_tests');
-      if (s) { const p = JSON.parse(s); if (p&&p.length) return p; }
-    } catch(e) {}
-    return [{id:'T1',name:'Sectional Test 1',questionIds:null}];
-  },
-  saveTests(ts) { localStorage.setItem('gmat_tests', JSON.stringify(ts)); },
-  addQuestion(q) {
-    const qs = this.getQuestions();
-    q.id = q.id || 'Q_'+Date.now()+'_'+Math.floor(Math.random()*1000);
-    qs.push(q); this.saveQuestions(qs); return q;
-  },
-  updateQuestion(id, updates) {
-    const qs = this.getQuestions();
-    const idx = qs.findIndex(q=>q.id===id);
-    if (idx>=0) { qs[idx]={...qs[idx],...updates}; this.saveQuestions(qs); return true; }
-    return false;
-  },
-  deleteQuestion(id) {
-    let qs = this.getQuestions();
-    qs = qs.filter(q=>q.id!==id);
-    this.saveQuestions(qs);
-    // Remove from all tests
-    const ts = this.getTests();
-    ts.forEach(t => { if(t.questionIds) t.questionIds=t.questionIds.filter(i=>i!==id); });
-    this.saveTests(ts);
+const DB = {
+  getQs()    { try{ return JSON.parse(localStorage.getItem('admin_questions')||'[]'); }catch(e){ return []; } },
+  saveQs(qs) { localStorage.setItem('admin_questions', JSON.stringify(qs)); },
+  add(q)     { const qs=this.getQs(); q.id=q.id||'Q_'+Date.now()+'_'+Math.floor(Math.random()*9999); qs.push(q); this.saveQs(qs); return q; },
+  update(id,upd){ const qs=this.getQs(); const i=qs.findIndex(x=>x.id===id); if(i>=0){qs[i]={...qs[i],...upd};this.saveQs(qs);return true;} return false; },
+  delete(id) { this.saveQs(this.getQs().filter(q=>q.id!==id)); },
+  counts()   {
+    const qs=this.getQs();
+    const tagged=qs.filter(q=>q.sectional).length;
+    return { total:qs.length, tagged, untagged:qs.length-tagged,
+      Q:qs.filter(q=>q.section==='Q').length,
+      V:qs.filter(q=>q.section==='V').length,
+      D:qs.filter(q=>q.section==='D').length };
   }
 };
 
 // ══════════════════════════════════════
 // LOGIN
 // ══════════════════════════════════════
-function tryLogin() {
-  const pwd = document.getElementById('pwd-input').value;
-  if (pwd === ADMIN_PASSWORD) {
-    document.getElementById('screen-login').style.display = 'none';
-    document.getElementById('screen-admin').classList.add('active');
+function tryLogin(){
+  const pwd=g('pwd').value;
+  if(pwd===ADMIN_PWD){
+    g('screen-login').style.display='none';
+    g('screen-admin').classList.add('active');
     refreshAll();
   } else {
-    document.getElementById('login-err').style.display = 'block';
-    document.getElementById('pwd-input').value = '';
+    g('login-err').style.display='block';
+    g('pwd').value='';
   }
 }
-
-document.getElementById('login-btn').addEventListener('click', tryLogin);
-document.getElementById('pwd-input').addEventListener('keydown', e => {
-  if (e.key==='Enter') tryLogin();
-});
-document.getElementById('btn-logout').addEventListener('click', () => {
-  document.getElementById('screen-admin').classList.remove('active');
-  document.getElementById('screen-login').style.display = 'flex';
-  document.getElementById('pwd-input').value = '';
-});
+function doLogout(){
+  g('screen-admin').classList.remove('active');
+  g('screen-login').style.display='flex';
+  g('pwd').value='';
+}
+g('pwd').addEventListener('keydown',e=>{ if(e.key==='Enter') tryLogin(); });
 
 // ══════════════════════════════════════
-// NAVIGATION
+// NAV
 // ══════════════════════════════════════
-document.querySelectorAll('.sidebar-item').forEach(item => {
-  item.addEventListener('click', () => {
-    document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
-    item.classList.add('active');
-    const panel = item.dataset.panel;
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    document.getElementById('panel-'+panel).classList.add('active');
-    if (panel==='dashboard')    refreshDashboard();
-    if (panel==='questions')    refreshQuestionList();
-    if (panel==='tests')        refreshTests();
-    if (panel==='add-question') resetForm();
-  });
-});
+function nav(el){
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  const panel=el.dataset.panel;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  g('panel-'+panel).classList.add('active');
+  if(panel==='dashboard')  refreshDashboard();
+  if(panel==='bank')       renderBank();
+  if(panel==='sec-Q')      renderSectionals('Q');
+  if(panel==='sec-V')      renderSectionals('V');
+  if(panel==='sec-D')      renderSectionals('D');
+}
 
 // ══════════════════════════════════════
 // DASHBOARD
 // ══════════════════════════════════════
-function refreshDashboard() {
-  const qs = Store.getQuestions();
-  const ts = Store.getTests();
-  document.getElementById('dash-total').textContent = qs.length;
-  document.getElementById('dash-easy').textContent  = qs.filter(q=>q.difficulty==='Easy').length;
-  document.getElementById('dash-med').textContent   = qs.filter(q=>q.difficulty==='Medium').length;
-  document.getElementById('dash-hard').textContent  = qs.filter(q=>q.difficulty==='Hard').length;
-  document.getElementById('dash-tests').textContent = ts.length;
-  const ready = ts.filter(t => {
-    const tqs = t.questionIds ? qs.filter(q=>t.questionIds.includes(q.id)) : qs;
-    return tqs.length >= 5;
-  }).length;
-  document.getElementById('dash-ready').textContent = ready;
-  document.getElementById('sb-q-count').textContent = qs.length;
+function refreshDashboard(){
+  const c=DB.counts();
+  g('d-total').textContent=c.total;
+  g('d-tagged').textContent=c.tagged;
+  g('d-untagged').textContent=c.untagged;
+  g('sb-total').textContent=c.total;
+  g('sb-Q').textContent=c.Q;
+  g('sb-V').textContent=c.V;
+  g('sb-D').textContent=c.D;
+  ['Q','V','D'].forEach(sec=>renderDashPools(sec));
+}
+
+function renderDashPools(sec){
+  const qs=DB.getQs().filter(q=>q.section===sec);
+  const wrap=g('dash-'+sec+'-pools');
+  wrap.innerHTML='';
+  [1,2,3,4,5].forEach(n=>{
+    const pool=qs.filter(q=>q.sectional==n).length;
+    const target=SECTION_TARGETS[sec];
+    const pct=Math.min(100,Math.round(pool/target*100));
+    const col=pct>=100?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+    const div=document.createElement('div');
+    div.className='sec-prog-item';
+    div.innerHTML=`<span class="sec-prog-num" style="color:${col}">${pool}</span><span class="sec-prog-lbl">S0${n}</span>`;
+    wrap.appendChild(div);
+  });
 }
 
 // ══════════════════════════════════════
-// QUESTION LIST
+// FILE UPLOAD & EXTRACTION
 // ══════════════════════════════════════
-function refreshQuestionList() {
-  const qs      = Store.getQuestions();
-  const diffF   = document.getElementById('filter-diff').value;
-  const topicF  = document.getElementById('filter-topic').value;
+let uploadedText='';
+let parsedQuestions=[];
 
-  // Populate topic filter
-  const topics  = [...new Set(qs.map(q=>q.topic).filter(Boolean))].sort();
-  const topicSel = document.getElementById('filter-topic');
-  const curTopic = topicSel.value;
-  topicSel.innerHTML = '<option value="all">All Topics</option>';
-  topics.forEach(t => {
-    const o = document.createElement('option');
-    o.value = t; o.textContent = t;
-    if (t===curTopic) o.selected = true;
-    topicSel.appendChild(o);
+function handleFileUpload(input){
+  const file=input.files[0];
+  if(!file) return;
+  g('upload-status').textContent='Reading '+file.name+'...';
+  const reader=new FileReader();
+  if(file.name.endsWith('.pdf')){
+    reader.onload=e=>{ uploadedText='[PDF uploaded - use paste method for PDFs]\n'+file.name; g('upload-status').textContent='PDF read. Click Extract to parse.'; };
+    reader.readAsText(file);
+  } else {
+    reader.onload=e=>{ uploadedText=e.target.result; g('upload-status').textContent='File loaded ('+file.name+'). Click Extract to parse.'; };
+    reader.readAsText(file);
+  }
+}
+
+function runFileExtraction(){
+  if(!uploadedText){ showToast('Please upload a file first.','error'); return; }
+  const sec=g('upload-section').value;
+  const diff=g('upload-difficulty').value;
+  const sectional=g('upload-sectional').value;
+  parsedQuestions=parseQuestionsFromText(uploadedText, sec, diff, sectional);
+  renderParsedList(parsedQuestions);
+}
+
+function parsePaste(){
+  const raw=g('paste-area').value.trim();
+  if(!raw){ showToast('Please paste some text first.','error'); return; }
+  const sec=g('paste-section').value;
+  const diff=g('paste-difficulty').value;
+  const sectional=g('paste-sectional').value;
+  const parsed=parseQuestionsFromText(raw, sec, diff, sectional);
+  if(!parsed.length){ showToast('No questions detected. Check format.','error'); return; }
+  // Show preview for paste
+  const wrap=g('paste-preview');
+  parsedQuestions=parsed;
+  wrap.innerHTML='';
+  const box=document.createElement('div');
+  box.className='parse-result show';
+  box.innerHTML=`<div class="parse-header"><div class="parse-count">${parsed.length} question(s) parsed</div><div class="parse-actions"><button class="btn btn-xs btn-outline" onclick="selectAllParsed(true)">Select All</button><button class="btn btn-xs btn-teal" onclick="importSelected()">Import →</button></div></div><div class="parsed-q-list" id="paste-q-list"></div>`;
+  wrap.appendChild(box);
+  renderParsedListInto(parsed,'paste-q-list');
+}
+
+// ── CORE PARSER ──
+function parseQuestionsFromText(text, defaultSec, defaultDiff, defaultSectional){
+  const questions=[];
+  // Split on answer line patterns
+  const ansPattern=/[Tt]he correct answer is\s+([A-E])[\.\s]/g;
+  const lines=text.split('\n');
+  
+  // Find blocks between question numbers
+  const qBlocks=[];
+  let currentBlock=[];
+  
+  for(const line of lines){
+    const stripped=line.trim();
+    // New question starts with number like "88." or "1."
+    const numMatch=stripped.match(/^(\d+)\.\s+.{10,}/);
+    if(numMatch && currentBlock.length>0){
+      qBlocks.push(currentBlock.join('\n'));
+      currentBlock=[line];
+    } else {
+      currentBlock.push(line);
+    }
+  }
+  if(currentBlock.length>0) qBlocks.push(currentBlock.join('\n'));
+
+  // Also try splitting by answer markers if no numbered blocks
+  let blocks=qBlocks.filter(b=>b.trim().length>20);
+  if(blocks.length<=1){
+    // Split by "The correct answer is X." pattern
+    const parts=text.split(/(?=(?:The correct answer is [A-E]\.?))/i);
+    if(parts.length>1) blocks=recombineBlocks(text);
+  }
+
+  blocks.forEach((block,idx)=>{
+    const q=parseOneBlock(block.trim(), defaultSec, defaultDiff, defaultSectional, idx);
+    if(q) questions.push(q);
   });
 
-  let filtered = qs;
-  if (diffF !== 'all')  filtered = filtered.filter(q=>q.difficulty===diffF);
-  if (topicF !== 'all') filtered = filtered.filter(q=>q.topic===topicF);
+  return questions;
+}
 
-  const body = document.getElementById('q-table-body');
-  if (filtered.length === 0) {
-    body.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">No questions found.</div></div>`;
+function recombineBlocks(text){
+  // Split text into chunks ending with "The correct answer is X."
+  const chunks=[];
+  const regex=/[\s\S]*?[Tt]he correct answer is [A-E]\.?[^\n]*/g;
+  let m;
+  while((m=regex.exec(text))!==null){
+    if(m[0].trim().length>30) chunks.push(m[0]);
+  }
+  return chunks.length?chunks:[text];
+}
+
+function parseOneBlock(block, sec, diffDefault, sectional, idx){
+  // Answer
+  const ansM=block.match(/[Tt]he correct answer is\s+([A-E])/i);
+  if(!ansM) return null;
+  const answer=ansM[1].toUpperCase();
+
+  // Options
+  const options={};
+  block.split('\n').forEach(line=>{
+    const m=line.trim().match(/^([A-E])[.)]\s+(.+)/);
+    if(m) options[m[1]]=m[2].trim();
+  });
+  if(Object.keys(options).length<2) return null;
+
+  // Question text (before first option)
+  let qText='';
+  const allLines=block.split('\n');
+  for(const line of allLines){
+    if(line.trim().match(/^[A-E][.)]\s+/)) break;
+    const cleaned=line.trim().replace(/^\d+\.\s*/,'').replace(/^[-–*]\s*/,'');
+    if(cleaned) qText+=(qText?' ':'')+cleaned;
+  }
+  if(!qText||qText.length<10) return null;
+
+  // Explanation
+  let explanation='';
+  const explM=block.match(/[Tt]he correct answer is [A-E][\.\s]+([\s\S]+)$/i);
+  if(explM) explanation=explM[1].trim().slice(0,800);
+
+  // Difficulty auto-detect
+  let difficulty=diffDefault;
+  if(difficulty==='auto'){
+    const blockLow=block.toLowerCase();
+    if(blockLow.includes('difficulty: hard')||blockLow.includes('- hard')) difficulty='Hard';
+    else if(blockLow.includes('difficulty: easy')||blockLow.includes('- easy')) difficulty='Easy';
+    else difficulty='Medium';
+  }
+
+  // Topic
+  const topicM=block.match(/(Arithmetic|Algebra|Geometry|Statistics|Number|Counting|Probability|Critical Reasoning|Reading|Data Sufficiency|Verbal|Assumption|Weaken|Strengthen|Inference)[^\n]{0,40}/i);
+  const topic=topicM?topicM[0].trim().slice(0,60):'';
+
+  return {
+    id:'Q_'+Date.now()+'_'+idx+'_'+Math.floor(Math.random()*999),
+    section:sec,
+    difficulty,
+    topic,
+    question:qText,
+    options,
+    answer,
+    explanation,
+    sectional:sectional||''
+  };
+}
+
+function renderParsedList(qs){
+  const wrap=g('parse-result');
+  wrap.classList.add('show');
+  g('parse-count').textContent=qs.length+' question(s) parsed';
+  renderParsedListInto(qs,'parsed-q-list');
+}
+
+function renderParsedListInto(qs, containerId){
+  const list=g(containerId);
+  if(!list) return;
+  list.innerHTML='';
+  if(!qs.length){
+    list.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No questions detected. Try the paste method with the format shown.</div>';
     return;
   }
-
-  body.innerHTML = '';
-  filtered.forEach(q => {
-    const row = document.createElement('div');
-    row.className = 'q-table-row';
-    const short = q.question.length>55 ? q.question.slice(0,55)+'…' : q.question;
-    row.innerHTML = `
-      <div class="tc" style="font-family:monospace;font-size:11px;color:#888">${q.id}</div>
-      <div class="tc bold" title="${q.question.replace(/"/g,'&quot;')}">${short}</div>
-      <div class="tc"><span class="dpill ${q.difficulty}">${q.difficulty}</span></div>
-      <div class="tc" style="font-size:12px;color:#666">${q.topic||'—'}</div>
-      <div class="tc" style="font-weight:700;color:#003865">${q.answer}</div>
-      <div class="tc">
-        <div class="action-btns">
-          <button class="btn-icon" onclick="editQuestion('${q.id}')">✏️ Edit</button>
-          <button class="btn-icon del" onclick="deleteQuestion('${q.id}')">🗑️</button>
+  qs.forEach((q,i)=>{
+    const item=document.createElement('div');
+    item.className='pq-item';
+    item.innerHTML=`
+      <input type="checkbox" class="pq-check" data-idx="${i}" checked>
+      <div class="pq-body">
+        <div class="pq-q">${q.question.slice(0,120)}${q.question.length>120?'…':''}</div>
+        <div class="pq-meta">
+          <span class="pq-tag ans">Ans: ${q.answer}</span>
+          <span class="pq-tag diff-${q.difficulty}">${q.difficulty}</span>
+          ${q.topic?`<span class="pq-tag topic">${q.topic}</span>`:''}
+          <span class="pq-tag" style="background:var(--teal-l);color:var(--teal-d)">${SECTION_NAMES[q.section]||q.section}</span>
+          ${q.sectional?`<span class="pq-tag" style="background:#e8f0f8;color:#003865">S${String(q.sectional).padStart(2,'0')}</span>`:''}
+          <select class="pq-edit-diff" onchange="parsedQuestions[${i}].difficulty=this.value">
+            <option ${q.difficulty==='Easy'?'selected':''}>Easy</option>
+            <option ${q.difficulty==='Medium'?'selected':''}>Medium</option>
+            <option ${q.difficulty==='Hard'?'selected':''}>Hard</option>
+          </select>
         </div>
       </div>`;
-    body.appendChild(row);
-  });
-
-  document.getElementById('sb-q-count').textContent = qs.length;
-}
-
-// Filters
-document.getElementById('filter-diff').addEventListener('change', refreshQuestionList);
-document.getElementById('filter-topic').addEventListener('change', refreshQuestionList);
-
-// ══════════════════════════════════════
-// ADD / EDIT QUESTION
-// ══════════════════════════════════════
-function resetForm() {
-  document.getElementById('f-edit-id').value = '';
-  document.getElementById('f-question').value = '';
-  ['A','B','C','D','E'].forEach(l=>document.getElementById('f-'+l).value='');
-  document.getElementById('f-answer').value = 'A';
-  document.getElementById('f-difficulty').value = 'Medium';
-  document.getElementById('f-topic').value = '';
-  document.getElementById('f-explanation').value = '';
-  document.getElementById('add-panel-title').textContent = 'Add Question';
-  document.getElementById('form-card-title').textContent = '✏️ Manual Entry';
-  document.getElementById('btn-cancel-edit').style.display = 'none';
-  document.getElementById('btn-save-q').textContent = 'Save Question';
-}
-
-function editQuestion(id) {
-  const qs = Store.getQuestions();
-  const q  = qs.find(x=>x.id===id);
-  if (!q) return;
-
-  // Switch to add panel
-  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
-  document.querySelector('[data-panel="add-question"]').classList.add('active');
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel-add-question').classList.add('active');
-
-  document.getElementById('f-edit-id').value     = q.id;
-  document.getElementById('f-question').value    = q.question;
-  ['A','B','C','D','E'].forEach(l=>{
-    document.getElementById('f-'+l).value = q.options[l]||'';
-  });
-  document.getElementById('f-answer').value     = q.answer;
-  document.getElementById('f-difficulty').value = q.difficulty;
-  document.getElementById('f-topic').value      = q.topic||'';
-  document.getElementById('f-explanation').value= q.explanation||'';
-  document.getElementById('add-panel-title').textContent  = 'Edit Question';
-  document.getElementById('form-card-title').textContent  = '✏️ Editing: '+q.id;
-  document.getElementById('btn-cancel-edit').style.display = 'inline-flex';
-  document.getElementById('btn-save-q').textContent = 'Update Question';
-  window.scrollTo(0,0);
-}
-
-function deleteQuestion(id) {
-  if (!confirm('Delete this question? It will also be removed from any tests.')) return;
-  Store.deleteQuestion(id);
-  refreshQuestionList();
-  refreshDashboard();
-  toast('Question deleted');
-}
-
-document.getElementById('btn-save-q').addEventListener('click', () => {
-  const question    = document.getElementById('f-question').value.trim();
-  const optA        = document.getElementById('f-A').value.trim();
-  const optB        = document.getElementById('f-B').value.trim();
-  if (!question||!optA||!optB) { toast('Question text and options A & B are required.'); return; }
-
-  const q = {
-    question,
-    options:{
-      A: optA,
-      B: optB,
-      C: document.getElementById('f-C').value.trim()||undefined,
-      D: document.getElementById('f-D').value.trim()||undefined,
-      E: document.getElementById('f-E').value.trim()||undefined
-    },
-    answer:      document.getElementById('f-answer').value,
-    difficulty:  document.getElementById('f-difficulty').value,
-    topic:       document.getElementById('f-topic').value.trim(),
-    explanation: document.getElementById('f-explanation').value.trim()
-  };
-  ['C','D','E'].forEach(l=>{ if(!q.options[l]) delete q.options[l]; });
-
-  const editId = document.getElementById('f-edit-id').value;
-  if (editId) {
-    Store.updateQuestion(editId, q);
-    toast('Question updated ✓');
-  } else {
-    Store.addQuestion(q);
-    toast('Question saved ✓');
-  }
-  resetForm();
-  refreshDashboard();
-});
-
-document.getElementById('btn-cancel-edit').addEventListener('click', resetForm);
-document.getElementById('btn-reset-form').addEventListener('click', resetForm);
-
-// ══════════════════════════════════════
-// PASTE PARSER
-// ══════════════════════════════════════
-function parseRaw(text) {
-  const t = text.trim();
-  const ansMatch = t.match(/[Tt]he correct answer is\s+([A-E])/i);
-  const answer = ansMatch ? ansMatch[1].toUpperCase() : null;
-
-  const options = {};
-  t.split('\n').forEach(line => {
-    const m = line.trim().match(/^([A-E])[.)]\s+(.+)/);
-    if (m) options[m[1]] = m[2].trim();
-  });
-
-  let questionText = '';
-  const lines = t.split('\n');
-  for (const line of lines) {
-    if (line.trim().match(/^[A-E][.)]\s+/)) break;
-    const cleaned = line.trim().replace(/^\d+\.\s*/,'').replace(/^[-–]\s*/,'');
-    if (cleaned) questionText += (questionText?' ':'')+cleaned;
-  }
-
-  const topicMatch = t.match(/(Arithmetic|Algebra|Geometry|Number|Counting|Probability)[^\n]{0,40}/i);
-  const topic = topicMatch ? topicMatch[0].trim() : '';
-
-  // Explanation: text after "The correct answer is X."
-  let explanation = '';
-  const explMatch = t.match(/[Tt]he correct answer is [A-E]\.\s*([\s\S]+)$/i);
-  if (explMatch) explanation = explMatch[1].trim().slice(0,800);
-
-  if (!questionText || Object.keys(options).length < 2 || !answer) return null;
-  return { question:questionText, options, answer, topic, explanation, difficulty:'Medium' };
-}
-
-document.getElementById('btn-parse').addEventListener('click', () => {
-  const raw     = document.getElementById('paste-box').value.trim();
-  const msg     = document.getElementById('parse-msg');
-  const preview = document.getElementById('parse-preview');
-
-  if (!raw) { showParseMsg('err','Please paste a question first.'); return; }
-  const q = parseRaw(raw);
-  if (!q) {
-    showParseMsg('err','Could not parse. Make sure options are "A. text" and answer line says "The correct answer is X."');
-    preview.style.display='none'; return;
-  }
-
-  // Show preview
-  preview.style.display = 'block';
-  preview.innerHTML = `
-    <div style="font-weight:700;margin-bottom:12px;color:#003865">Preview — confirm before saving</div>
-    <div class="preview-row"><span class="preview-lbl">Question:</span><span class="preview-val">${q.question}</span></div>
-    ${Object.entries(q.options).map(([l,v])=>`<div class="preview-row"><span class="preview-lbl">Option ${l}:</span><span class="preview-val">${v}</span></div>`).join('')}
-    <div class="preview-row"><span class="preview-lbl">Answer:</span><span class="preview-val" style="font-weight:700;color:#003865">${q.answer}</span></div>
-    <div class="preview-row"><span class="preview-lbl">Topic:</span><span class="preview-val">${q.topic||'—'}</span></div>
-    ${q.explanation?`<div class="preview-row"><span class="preview-lbl">Explanation:</span><span class="preview-val">${q.explanation.slice(0,120)}...</span></div>`:''}
-    <div style="margin-top:14px;display:flex;gap:8px">
-      <button class="btn btn-blue btn-sm" id="btn-confirm-parse">✓ Save to Bank</button>
-      <select class="filter-sel" id="parse-diff-sel">
-        <option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option>
-      </select>
-    </div>`;
-
-  document.getElementById('btn-confirm-parse').addEventListener('click', () => {
-    q.difficulty = document.getElementById('parse-diff-sel').value;
-    Store.addQuestion(q);
-    showParseMsg('ok',`✓ Saved! "${q.question.slice(0,60)}..." (${q.difficulty}, Answer: ${q.answer})`);
-    document.getElementById('paste-box').value = '';
-    preview.style.display = 'none';
-    refreshDashboard();
-    document.getElementById('sb-q-count').textContent = Store.getQuestions().length;
-    toast('Question added ✓');
-  });
-
-  showParseMsg('ok','Question parsed successfully. Review below and click Save.');
-});
-
-function showParseMsg(type, text) {
-  const el = document.getElementById('parse-msg');
-  el.className = `parse-msg ${type}`;
-  el.style.display = 'block';
-  el.textContent = text;
-}
-
-document.getElementById('btn-clear-paste').addEventListener('click', () => {
-  document.getElementById('paste-box').value = '';
-  document.getElementById('parse-msg').style.display = 'none';
-  document.getElementById('parse-preview').style.display = 'none';
-});
-
-// ══════════════════════════════════════
-// TESTS MANAGER
-// ══════════════════════════════════════
-function refreshTests() {
-  const tests = Store.getTests();
-  const qs    = Store.getQuestions();
-  const grid  = document.getElementById('test-grid');
-  grid.innerHTML = '';
-
-  tests.forEach(t => {
-    const tqs = t.questionIds
-      ? qs.filter(q=>t.questionIds.includes(q.id))
-      : qs;
-    const easy   = tqs.filter(q=>q.difficulty==='Easy').length;
-    const medium = tqs.filter(q=>q.difficulty==='Medium').length;
-    const hard   = tqs.filter(q=>q.difficulty==='Hard').length;
-
-    const card = document.createElement('div');
-    card.className = 'test-mgr-card';
-    card.innerHTML = `
-      <div class="test-mgr-name">${t.name}</div>
-      <div class="test-mgr-meta">
-        ${tqs.length} questions assigned · E:${easy} M:${medium} H:${hard}<br>
-        Status: <strong style="color:${tqs.length>=5?'#2e7d32':'#c62828'}">${tqs.length>=5?'Ready':'Needs more questions'}</strong>
-      </div>
-      <div class="test-mgr-actions">
-        <button class="btn btn-outline btn-sm" onclick="renameTest('${t.id}')">Rename</button>
-        <button class="btn btn-outline btn-sm" onclick="toggleAssign('${t.id}')">Assign Questions</button>
-        <button class="btn btn-red btn-sm" onclick="deleteTest('${t.id}')">Delete</button>
-      </div>
-      <div class="test-q-assign" id="assign-${t.id}" style="display:none">
-        <div class="test-q-assign-title">Assign questions to this test</div>
-        <label style="font-size:12px;color:#666;display:flex;align-items:center;gap:6px;margin-bottom:8px;cursor:pointer">
-          <input type="checkbox" id="all-q-${t.id}" ${!t.questionIds?'checked':''}
-            onchange="toggleAllQuestions('${t.id}',this.checked)"> Use all questions
-        </label>
-        <div class="q-assign-list" id="qlist-${t.id}"></div>
-        <button class="btn btn-blue btn-sm" style="margin-top:10px" onclick="saveAssignment('${t.id}')">Save Assignment</button>
-      </div>`;
-    grid.appendChild(card);
-  });
-}
-
-function toggleAssign(testId) {
-  const el = document.getElementById('assign-'+testId);
-  const open = el.style.display === 'block';
-  el.style.display = open ? 'none' : 'block';
-  if (!open) populateQList(testId);
-}
-
-function populateQList(testId) {
-  const qs   = Store.getQuestions();
-  const t    = Store.getTests().find(x=>x.id===testId);
-  const list = document.getElementById('qlist-'+testId);
-  list.innerHTML = '';
-  qs.forEach(q => {
-    const checked = !t.questionIds || t.questionIds.includes(q.id);
-    const item = document.createElement('div');
-    item.className = 'q-assign-item';
-    item.innerHTML = `
-      <input type="checkbox" id="qa-${testId}-${q.id}" ${checked?'checked':''}
-        data-qid="${q.id}">
-      <span class="q-assign-text" title="${q.question}">${q.question.slice(0,50)}...</span>
-      <span class="q-assign-diff dpill ${q.difficulty}">${q.difficulty}</span>`;
     list.appendChild(item);
   });
 }
 
-function toggleAllQuestions(testId, checked) {
-  document.querySelectorAll(`#qlist-${testId} input[type=checkbox]`).forEach(cb => {
-    cb.checked = checked;
+function selectAllParsed(sel){
+  document.querySelectorAll('.pq-check').forEach(c=>c.checked=sel);
+}
+
+function importSelected(){
+  const checks=document.querySelectorAll('.pq-check');
+  let count=0;
+  checks.forEach(c=>{
+    if(c.checked){
+      const idx=parseInt(c.dataset.idx);
+      DB.add(parsedQuestions[idx]);
+      count++;
+    }
+  });
+  refreshAll();
+  showToast(count+' question(s) imported ✓','success');
+  g('parse-result').classList.remove('show');
+  const pp=g('paste-preview');
+  if(pp) pp.innerHTML='';
+  parsedQuestions=[];
+}
+
+// ══════════════════════════════════════
+// MANUAL FORM
+// ══════════════════════════════════════
+function saveQuestion(){
+  const question=g('f-question').value.trim();
+  const optA=g('f-A').value.trim(), optB=g('f-B').value.trim();
+  if(!question||!optA||!optB){ showToast('Question text and at least A & B options are required.','error'); return; }
+
+  const q={
+    question, answer:g('f-answer').value,
+    difficulty:g('f-difficulty').value,
+    section:g('f-section').value,
+    sectional:g('f-sectional').value,
+    topic:g('f-topic').value.trim(),
+    explanation:g('f-explanation').value.trim(),
+    options:{
+      A:optA,B:optB,
+      C:g('f-C').value.trim()||undefined,
+      D:g('f-D').value.trim()||undefined,
+      E:g('f-E').value.trim()||undefined
+    }
+  };
+  ['C','D','E'].forEach(l=>{ if(!q.options[l]) delete q.options[l]; });
+
+  const editId=g('edit-id').value;
+  if(editId){ DB.update(editId,q); showToast('Question updated ✓','success'); }
+  else { DB.add(q); showToast('Question saved ✓','success'); }
+
+  resetForm(); refreshAll();
+}
+
+function resetForm(){
+  g('edit-id').value='';
+  ['f-question','f-A','f-B','f-C','f-D','f-E','f-topic','f-explanation'].forEach(id=>g(id).value='');
+  g('f-answer').value='A'; g('f-difficulty').value='Medium';
+  g('f-section').value='Q'; g('f-sectional').value='';
+  g('cancel-edit-btn').style.display='none';
+}
+
+function cancelEdit(){ resetForm(); }
+
+// ══════════════════════════════════════
+// QUESTION BANK
+// ══════════════════════════════════════
+function renderBank(){
+  const secF=g('bank-sec').value;
+  const diffF=g('bank-diff').value;
+  const poolF=g('bank-pool').value;
+  const search=g('bank-search').value.toLowerCase();
+
+  let qs=DB.getQs();
+  if(secF!=='all') qs=qs.filter(q=>q.section===secF);
+  if(diffF!=='all') qs=qs.filter(q=>q.difficulty===diffF);
+  if(poolF!=='all') qs=qs.filter(q=>(q.sectional||'')===(poolF));
+  if(search) qs=qs.filter(q=>q.question.toLowerCase().includes(search)||((q.topic||'').toLowerCase().includes(search)));
+
+  const body=g('bank-body');
+  if(!qs.length){
+    body.innerHTML='<div class="empty-state"><div class="ei">📭</div><div>No questions found.</div></div>';
+    return;
+  }
+  body.innerHTML='';
+  qs.forEach(q=>{
+    const row=document.createElement('div');
+    row.className='q-table-row';
+    const short=q.question.length>50?q.question.slice(0,50)+'…':q.question;
+    const poolLabel=q.sectional?'S'+String(q.sectional).padStart(2,'0'):'—';
+    row.innerHTML=`
+      <div class="tc"><span class="spill spill-${q.section}">${q.section}</span></div>
+      <div class="tc dim">${poolLabel}</div>
+      <div class="tc" title="${q.question.replace(/"/g,'')}">${short}</div>
+      <div class="tc"><span class="dpill ${q.difficulty}">${q.difficulty}</span></div>
+      <div class="tc dim">${(q.topic||'—').slice(0,20)}</div>
+      <div class="tc" style="font-weight:700;color:var(--teal)">${q.answer}</div>
+      <div class="tc">
+        <select style="font-size:11px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--white);font-family:'Inter',sans-serif" onchange="reassign('${q.id}','${q.section}',this.value)">
+          <option value="">Untagged</option>
+          ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}" ${q.sectional==n?'selected':''}>${'S'+String(n).padStart(2,'0')}</option>`).join('')}
+        </select>
+      </div>
+      <div class="tc">
+        <div class="action-btns">
+          <button class="btn-icon" onclick="openEditModal('${q.id}')">✏️</button>
+          <button class="btn-icon del" onclick="deleteQ('${q.id}')">🗑️</button>
+        </div>
+      </div>`;
+    body.appendChild(row);
   });
 }
 
-function saveAssignment(testId) {
-  const checks   = document.querySelectorAll(`#qlist-${testId} input[type=checkbox]`);
-  const allCheck = document.getElementById('all-q-'+testId);
-  const ts       = Store.getTests();
-  const idx      = ts.findIndex(t=>t.id===testId);
-  if (idx < 0) return;
+function reassign(id, section, sectional){
+  DB.update(id,{sectional});
+  refreshSidebarCounts();
+  showToast('Reassigned ✓','success');
+}
 
-  if (allCheck.checked) {
-    ts[idx].questionIds = null;
-  } else {
-    ts[idx].questionIds = [...checks].filter(c=>c.checked).map(c=>c.dataset.qid);
+function deleteQ(id){
+  if(!confirm('Delete this question?')) return;
+  DB.delete(id);
+  renderBank();
+  refreshAll();
+  showToast('Deleted','info');
+}
+
+function openEditModal(id){
+  const q=DB.getQs().find(x=>x.id===id);
+  if(!q) return;
+  const body=g('edit-modal-body');
+  body.innerHTML=`
+    <div style="margin-bottom:12px">
+      <label class="form-label">Question Text</label>
+      <textarea class="form-textarea" id="em-q" rows="3">${q.question}</textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div><label class="form-label">A</label><input class="form-input" id="em-A" value="${q.options.A||''}"></div>
+      <div><label class="form-label">B</label><input class="form-input" id="em-B" value="${q.options.B||''}"></div>
+      <div><label class="form-label">C</label><input class="form-input" id="em-C" value="${q.options.C||''}"></div>
+      <div><label class="form-label">D</label><input class="form-input" id="em-D" value="${q.options.D||''}"></div>
+      <div><label class="form-label">E (opt)</label><input class="form-input" id="em-E" value="${q.options.E||''}"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+      <div><label class="form-label">Answer</label>
+        <select class="form-select" id="em-ans">${['A','B','C','D','E'].map(l=>`<option ${q.answer===l?'selected':''}>${l}</option>`).join('')}</select>
+      </div>
+      <div><label class="form-label">Difficulty</label>
+        <select class="form-select" id="em-diff">${['Easy','Medium','Hard'].map(d=>`<option ${q.difficulty===d?'selected':''}>${d}</option>`).join('')}</select>
+      </div>
+      <div><label class="form-label">Section</label>
+        <select class="form-select" id="em-sec">${['Q','V','D'].map(s=>`<option value="${s}" ${q.section===s?'selected':''}>${SECTION_NAMES[s]}</option>`).join('')}</select>
+      </div>
+      <div><label class="form-label">Sectional</label>
+        <select class="form-select" id="em-sectional">
+          <option value="">Untagged</option>
+          ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}" ${q.sectional==n?'selected':''}>${'S'+String(n).padStart(2,'0')}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label class="form-label">Topic</label>
+      <input class="form-input" id="em-topic" value="${q.topic||''}">
+    </div>
+    <div style="margin-bottom:16px">
+      <label class="form-label">Explanation</label>
+      <textarea class="form-textarea" id="em-expl" rows="2">${q.explanation||''}</textarea>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-blue" onclick="saveEditModal('${q.id}')">Save Changes</button>
+      <button class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
+    </div>`;
+  g('edit-modal').classList.add('open');
+}
+
+function saveEditModal(id){
+  const upd={
+    question:g('em-q').value.trim(),
+    answer:g('em-ans').value,
+    difficulty:g('em-diff').value,
+    section:g('em-sec').value,
+    sectional:g('em-sectional').value,
+    topic:g('em-topic').value.trim(),
+    explanation:g('em-expl').value.trim(),
+    options:{
+      A:g('em-A').value.trim(),B:g('em-B').value.trim(),
+      C:g('em-C').value.trim()||undefined,D:g('em-D').value.trim()||undefined,E:g('em-E').value.trim()||undefined
+    }
+  };
+  ['C','D','E'].forEach(l=>{ if(!upd.options[l]) delete upd.options[l]; });
+  DB.update(id,upd);
+  closeEditModal();
+  renderBank();
+  refreshAll();
+  showToast('Question updated ✓','success');
+}
+
+function closeEditModal(){ g('edit-modal').classList.remove('open'); }
+
+// ══════════════════════════════════════
+// SECTIONAL MANAGER
+// ══════════════════════════════════════
+let selectedSectional={};
+
+function renderSectionals(sec){
+  const qs=DB.getQs().filter(q=>q.section===sec);
+  const grid=g('sgrid-'+sec);
+  grid.innerHTML='';
+  const target=SECTION_TARGETS[sec];
+
+  for(let n=1;n<=10;n++){
+    const pool=qs.filter(q=>q.sectional==n);
+    const easy=pool.filter(q=>q.difficulty==='Easy').length;
+    const med=pool.filter(q=>q.difficulty==='Medium').length;
+    const hard=pool.filter(q=>q.difficulty==='Hard').length;
+    const total=pool.length;
+    const pct=Math.min(100,Math.round(total/target*100));
+    const col=pct>=100?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+    const isSel=selectedSectional[sec]===n;
+
+    const card=document.createElement('div');
+    card.className='sectional-card'+(isSel?' selected':'');
+    card.innerHTML=`
+      <div class="sc-header"><div class="sc-num">${String(n).padStart(2,'0')}</div><div class="sc-name">Sectional</div></div>
+      <div class="sc-body">
+        <div class="sc-counts">
+          <div class="sc-count"><span class="sc-count-num" style="color:var(--green)">${easy}</span><span class="sc-count-lbl">Easy</span></div>
+          <div class="sc-count"><span class="sc-count-num" style="color:var(--amber)">${med}</span><span class="sc-count-lbl">Med</span></div>
+          <div class="sc-count"><span class="sc-count-num" style="color:var(--red)">${hard}</span><span class="sc-count-lbl">Hard</span></div>
+        </div>
+        <div class="prog-bar-wrap"><div class="prog-bar${pct<30?' red':''}" style="width:${pct}%"></div></div>
+        <div class="sc-total"><span style="color:${col}">${total}</span> / ${target} questions</div>
+      </div>`;
+    card.addEventListener('click',()=>openPoolEditor(sec,n));
+    grid.appendChild(card);
   }
-  Store.saveTests(ts);
-  refreshTests();
-  toast('Assignment saved ✓');
 }
 
-function renameTest(testId) {
-  const ts  = Store.getTests();
-  const t   = ts.find(x=>x.id===testId);
-  const name = prompt('Enter new name:', t.name);
-  if (!name||!name.trim()) return;
-  t.name = name.trim();
-  Store.saveTests(ts);
-  refreshTests();
+function openPoolEditor(sec,num){
+  selectedSectional[sec]=num;
+  renderSectionals(sec);
+
+  const allQs=DB.getQs();
+  // Questions available for this pool = same section, untagged OR already in this pool
+  const available=allQs.filter(q=>q.section===sec&&(!q.sectional||q.sectional==num));
+  const alreadyIn=allQs.filter(q=>q.section===sec&&q.sectional==num).map(q=>q.id);
+  const target=SECTION_TARGETS[sec];
+
+  const easy=alreadyIn.filter(id=>allQs.find(q=>q.id===id)?.difficulty==='Easy').length;
+  const med=alreadyIn.filter(id=>allQs.find(q=>q.id===id)?.difficulty==='Medium').length;
+  const hard=alreadyIn.filter(id=>allQs.find(q=>q.id===id)?.difficulty==='Hard').length;
+
+  const editor=g('peditor-'+sec);
+  editor.classList.add('show');
+  editor.innerHTML=`
+    <div class="pool-editor-title">Editing: ${SECTION_NAMES[sec]} — Sectional ${String(num).padStart(2,'0')}</div>
+    <div class="pool-editor-sub">Select questions to include in this pool. Questions assigned here won't appear in other sectionals. Target: ${target} questions.</div>
+    <div class="pool-target">
+      <div class="pool-target-item"><span class="pool-target-val easy-col" id="pe-easy">${easy}</span><div class="pool-target-lbl">Easy</div></div>
+      <div class="pool-target-item"><span class="pool-target-val med-col" id="pe-med">${med}</span><div class="pool-target-lbl">Medium</div></div>
+      <div class="pool-target-item"><span class="pool-target-val hard-col" id="pe-hard">${hard}</span><div class="pool-target-lbl">Hard</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="font-size:12px;color:var(--muted)">Showing questions from this section (untagged + already in this pool)</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-xs btn-outline" onclick="peSelectAll(true,'${sec}',${num})">Select All</button>
+        <button class="btn btn-xs btn-outline" onclick="peSelectAll(false,'${sec}',${num})">Clear</button>
+        <button class="btn btn-xs btn-teal" onclick="savePool('${sec}',${num})">Save Pool →</button>
+      </div>
+    </div>
+    <div class="pool-q-list" id="pool-list-${sec}-${num}"></div>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="btn btn-blue btn-sm" onclick="savePool('${sec}',${num})">Save Pool</button>
+      <button class="btn btn-outline btn-sm" onclick="closePoolEditor('${sec}')">Close</button>
+    </div>`;
+
+  // Populate list
+  const list=g('pool-list-'+sec+'-'+num);
+  if(!available.length){
+    list.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">No available questions for this section. Add questions first via "Add Questions".</div>';
+    return;
+  }
+  available.forEach(q=>{
+    const checked=alreadyIn.includes(q.id);
+    const item=document.createElement('div');
+    item.className='pool-q-item';
+    item.innerHTML=`
+      <input type="checkbox" data-qid="${q.id}" ${checked?'checked':''} onchange="updatePeCount('${sec}',${num})">
+      <div>
+        <div class="pool-q-text">${q.question.slice(0,100)}${q.question.length>100?'…':''}</div>
+        <div class="pool-q-tags">
+          <span class="pq-tag diff-${q.difficulty}">${q.difficulty}</span>
+          ${q.topic?`<span class="pq-tag topic">${q.topic.slice(0,30)}</span>`:''}
+          <span class="pq-tag ans">Ans: ${q.answer}</span>
+        </div>
+      </div>`;
+    list.appendChild(item);
+  });
 }
 
-function deleteTest(testId) {
-  if (!confirm('Delete this test?')) return;
-  let ts = Store.getTests();
-  ts = ts.filter(t=>t.id!==testId);
-  Store.saveTests(ts);
-  refreshTests();
-  refreshDashboard();
-  toast('Test deleted');
+function updatePeCount(sec,num){
+  const listEl=g('pool-list-'+sec+'-'+num);
+  if(!listEl) return;
+  const checked=[...listEl.querySelectorAll('input:checked')];
+  const allQs=DB.getQs();
+  let e=0,m=0,h=0;
+  checked.forEach(c=>{
+    const q=allQs.find(x=>x.id===c.dataset.qid);
+    if(q?.difficulty==='Easy') e++;
+    else if(q?.difficulty==='Medium') m++;
+    else if(q?.difficulty==='Hard') h++;
+  });
+  if(g('pe-easy')) g('pe-easy').textContent=e;
+  if(g('pe-med'))  g('pe-med').textContent=m;
+  if(g('pe-hard')) g('pe-hard').textContent=h;
 }
 
-document.getElementById('btn-add-test').addEventListener('click', () => {
-  const name = prompt('Enter test name:', 'Sectional Test ' + (Store.getTests().length+1));
-  if (!name||!name.trim()) return;
-  const ts = Store.getTests();
-  ts.push({id:'T'+Date.now(), name:name.trim(), questionIds:null});
-  Store.saveTests(ts);
-  refreshTests();
-  refreshDashboard();
-  toast('Test created ✓');
-});
+function peSelectAll(sel,sec,num){
+  const list=g('pool-list-'+sec+'-'+num);
+  if(!list) return;
+  list.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=sel);
+  updatePeCount(sec,num);
+}
+
+function savePool(sec,num){
+  const list=g('pool-list-'+sec+'-'+num);
+  if(!list){ showToast('Pool editor not open','error'); return; }
+  const qs=DB.getQs();
+  const checks=[...list.querySelectorAll('input[type=checkbox]')];
+
+  // First: remove this sectional tag from all questions in this section that could be in this pool
+  const toReset=qs.filter(q=>q.section===sec&&q.sectional==num);
+  toReset.forEach(q=>DB.update(q.id,{sectional:''}));
+
+  // Then: assign selected ones
+  let count=0;
+  checks.forEach(c=>{
+    if(c.checked){ DB.update(c.dataset.qid,{sectional:num}); count++; }
+  });
+
+  refreshAll();
+  renderSectionals(sec);
+  showToast(count+' questions saved to Sectional '+String(num).padStart(2,'0')+' ✓','success');
+}
+
+function closePoolEditor(sec){
+  selectedSectional[sec]=null;
+  const editor=g('peditor-'+sec);
+  editor.classList.remove('show');
+  editor.innerHTML='';
+  renderSectionals(sec);
+}
 
 // ══════════════════════════════════════
 // IMPORT / EXPORT
 // ══════════════════════════════════════
-document.getElementById('btn-export-json').addEventListener('click', () => {
-  const qs   = Store.getQuestions();
-  const blob = new Blob([JSON.stringify(qs,null,2)],{type:'application/json'});
-  dlFile(blob,'gmat_questions_backup.json');
-  toast('JSON backup downloaded ✓');
-});
+function importJSON(){ g('json-import-file').click(); }
 
-document.getElementById('btn-export-js').addEventListener('click', () => {
-  const qs  = Store.getQuestions();
-  const js  = `const PRELOADED_QUESTIONS = ${JSON.stringify(qs,null,2)};\n`;
-  const blob = new Blob([js],{type:'application/javascript'});
-  dlFile(blob,'questions.js');
-  toast('questions.js downloaded — replace in your project and redeploy ✓');
-});
-
-document.getElementById('btn-import-json').addEventListener('click', () => {
-  document.getElementById('json-import-file').click();
-});
-
-document.getElementById('json-import-file').addEventListener('change', e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const parsed = JSON.parse(ev.target.result);
-      if (!Array.isArray(parsed)) { toast('Invalid JSON — expected an array'); return; }
-      const qs = Store.getQuestions();
-      const existingIds = new Set(qs.map(q=>q.id));
-      let added = 0;
-      parsed.forEach(q => {
-        if (!q.question||!q.options||!q.answer) return;
-        if (existingIds.has(q.id)) return;
-        qs.push(q); existingIds.add(q.id); added++;
-      });
-      Store.saveQuestions(qs);
-      refreshDashboard(); refreshQuestionList();
-      toast(`Imported ${added} questions ✓`);
-    } catch(err) { toast('Failed to parse JSON file'); }
+function handleJSONImport(input){
+  const file=input.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const parsed=JSON.parse(e.target.result);
+      const arr=Array.isArray(parsed)?parsed:(parsed.questions||[]);
+      if(!arr.length){ showToast('No questions found in JSON','error'); return; }
+      const existing=new Set(DB.getQs().map(q=>q.id));
+      let added=0;
+      arr.forEach(q=>{ if(q.question&&q.options&&q.answer&&!existing.has(q.id)){ DB.add(q); added++; } });
+      refreshAll(); renderBank();
+      showToast(added+' questions imported ✓','success');
+    } catch(err){ showToast('Invalid JSON file','error'); }
   };
   reader.readAsText(file);
-  e.target.value = '';
-});
+  input.value='';
+}
 
-document.getElementById('btn-clear-bank').addEventListener('click', () => {
-  if (!confirm('Delete ALL questions from the bank? This cannot be undone.')) return;
-  Store.saveQuestions([]);
-  refreshQuestionList(); refreshDashboard();
-  toast('Question bank cleared');
-});
+function exportJS(){
+  const qs=DB.getQs();
+  const js=`const PRELOADED_QUESTIONS = ${JSON.stringify(qs,null,2)};\n`;
+  dlFile(new Blob([js],{type:'application/javascript'}),'questions.js');
+  showToast('questions.js downloaded — replace in GitHub repo and redeploy','success');
+}
 
-function dlFile(blob, name) {
-  const a   = document.createElement('a');
-  a.href    = URL.createObjectURL(blob);
-  a.download= name;
-  a.click();
-  URL.revokeObjectURL(a.href);
+function exportJSON(){
+  dlFile(new Blob([JSON.stringify(DB.getQs(),null,2)],{type:'application/json'}),'gmat_questions_backup.json');
+  showToast('Backup downloaded ✓','success');
+}
+
+function dlFile(blob,name){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);
 }
 
 // ══════════════════════════════════════
 // UTILS
 // ══════════════════════════════════════
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.display='block';
-  clearTimeout(window._tt);
-  window._tt=setTimeout(()=>t.style.display='none',3000);
+const g=id=>document.getElementById(id);
+
+function clearAllQs(){
+  if(!confirm('Delete ALL questions? This cannot be undone.')) return;
+  DB.saveQs([]);
+  refreshAll();
+  renderBank();
+  showToast('All questions deleted','info');
 }
 
-function refreshAll() {
+function refreshSidebarCounts(){
+  const c=DB.counts();
+  g('sb-total').textContent=c.total;
+  g('sb-Q').textContent=c.Q;
+  g('sb-V').textContent=c.V;
+  g('sb-D').textContent=c.D;
+}
+
+function refreshAll(){
+  refreshSidebarCounts();
   refreshDashboard();
-  refreshQuestionList();
 }
 
-refreshAll();
+let _tt;
+function showToast(msg,type='info'){
+  const t=g('toast');t.textContent=msg;t.className='toast '+type;t.style.display='block';
+  clearTimeout(_tt);_tt=setTimeout(()=>t.style.display='none',3500);
+}
+
+// Drag-drop on upload zone
+const uz=g('upload-zone');
+uz.addEventListener('dragover',e=>{ e.preventDefault();uz.classList.add('dragover'); });
+uz.addEventListener('dragleave',()=>uz.classList.remove('dragover'));
+uz.addEventListener('drop',e=>{
+  e.preventDefault();uz.classList.remove('dragover');
+  const file=e.dataTransfer.files[0];
+  if(file){ const dt=new DataTransfer();dt.items.add(file);g('file-input').files=dt.files;handleFileUpload(g('file-input')); }
+});
+
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeEditModal(); });
 </script>
 </body>
 </html>
