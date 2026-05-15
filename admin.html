@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMAT Admin Panel</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f0f2f5;color:#1a1a1a;min-height:100vh;font-size:14px}
+
+/* ── LOGIN ── */
+#screen-login{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#fff}
+.login-box{width:100%;max-width:400px;padding:48px 40px;border:1px solid #e0ddd8;border-radius:4px;text-align:center}
+.login-logo{display:inline-block;background:#003865;color:#fff;font-size:10px;font-weight:700;letter-spacing:3px;padding:6px 16px;border-radius:2px;margin-bottom:24px;text-transform:uppercase}
+.login-title{font-size:20px;font-weight:600;margin-bottom:6px;color:#1a1a1a}
+.login-sub{font-size:12px;color:#888;margin-bottom:28px}
+.login-input{width:100%;padding:11px 14px;border:1.5px solid #d0cfc8;border-radius:3px;font-size:14px;outline:none;margin-bottom:12px;font-family:Arial,sans-serif}
+.login-input:focus{border-color:#003865}
+.login-btn{width:100%;padding:12px;background:#003865;color:#fff;border:none;border-radius:3px;font-size:14px;font-weight:700;cursor:pointer}
+.login-btn:hover{background:#004d8a}
+.login-err{color:#c62828;font-size:12px;margin-top:10px;display:none}
+
+/* ── ADMIN LAYOUT ── */
+#screen-admin{display:none;min-height:100vh;flex-direction:column}
+#screen-admin.active{display:flex}
+
+.admin-header{background:#003865;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:52px;flex-shrink:0}
+.admin-header-left{font-size:14px;font-weight:700;letter-spacing:.5px}
+.admin-header-right{display:flex;align-items:center;gap:16px}
+.header-btn{font-size:12px;padding:6px 14px;border-radius:3px;cursor:pointer;border:none;font-weight:600}
+.header-btn.outline{background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff}
+.header-btn.outline:hover{border-color:#fff}
+.header-btn.danger{background:rgba(255,80,80,.2);border:1px solid rgba(255,100,100,.4);color:#ffb3b3}
+.header-btn.danger:hover{background:rgba(255,80,80,.3)}
+
+.admin-body{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;background:#fff;border-right:1px solid #e0ddd8;flex-shrink:0;padding:20px 0}
+.sidebar-section{padding:8px 20px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#999;margin-top:8px}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;font-size:13px;color:#444;transition:background .1s,color .1s;border-left:3px solid transparent}
+.sidebar-item:hover{background:#f5f6f8;color:#003865}
+.sidebar-item.active{background:#e8f0f8;color:#003865;font-weight:600;border-left-color:#003865}
+.sidebar-item .icon{font-size:15px;min-width:18px}
+.sidebar-badge{margin-left:auto;background:#e8f0f8;color:#003865;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+
+/* ── MAIN CONTENT ── */
+.main-content{flex:1;overflow-y:auto;padding:28px 32px}
+
+/* Panels */
+.panel{display:none}
+.panel.active{display:block}
+
+.panel-title{font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:4px}
+.panel-sub{font-size:12px;color:#888;margin-bottom:24px}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:#fff;border:1px solid #e0ddd8;border-radius:4px;padding:20px 22px}
+.stat-val{font-size:28px;font-weight:700;color:#003865;display:block}
+.stat-lbl{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+/* Question list */
+.q-list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+.q-filters{display:flex;gap:8px;flex-wrap:wrap}
+.filter-sel{padding:7px 12px;border:1.5px solid #d0cfc8;border-radius:3px;font-size:12px;background:#fff;outline:none;cursor:pointer;color:#333}
+.filter-sel:focus{border-color:#003865}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:background .15s}
+.btn-blue{background:#003865;color:#fff}.btn-blue:hover{background:#004d8a}
+.btn-outline{background:#fff;color:#003865;border:1.5px solid #003865}.btn-outline:hover{background:#e8f0f8}
+.btn-red{background:#c62828;color:#fff}.btn-red:hover{background:#b71c1c}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-green{background:#2e7d32;color:#fff}.btn-green:hover{background:#1b5e20}
+
+.q-table{background:#fff;border:1px solid #e0ddd8;border-radius:4px;overflow:hidden}
+.q-table-head{display:grid;grid-template-columns:48px 1fr 90px 90px 80px 100px;background:#003865;color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:10px 16px;gap:8px}
+.q-table-row{display:grid;grid-template-columns:48px 1fr 90px 90px 80px 100px;padding:12px 16px;gap:8px;border-bottom:1px solid #f0ede8;align-items:center;transition:background .1s}
+.q-table-row:last-child{border-bottom:none}
+.q-table-row:hover{background:#f8f9fb}
+.tc{font-size:13px;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tc.bold{font-weight:600;color:#1a1a1a}
+.dpill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:2px;display:inline-block}
+.dpill.Easy{background:#e8f5e8;color:#2e7d32}
+.dpill.Medium{background:#fff8e1;color:#f57f17}
+.dpill.Hard{background:#fce8e8;color:#c62828}
+.action-btns{display:flex;gap:6px}
+.btn-icon{background:transparent;border:1px solid #d0cfc8;border-radius:3px;padding:4px 8px;cursor:pointer;font-size:12px;color:#555;transition:all .1s}
+.btn-icon:hover{border-color:#003865;color:#003865}
+.btn-icon.del:hover{border-color:#c62828;color:#c62828}
+
+.empty-state{text-align:center;padding:60px 24px;color:#aaa}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-text{font-size:14px}
+
+/* Add / Edit question form */
+.form-card{background:#fff;border:1px solid #e0ddd8;border-radius:4px;padding:28px 32px;margin-bottom:20px}
+.form-card-title{font-size:14px;font-weight:700;color:#003865;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid #f0ede8}
+.form-row{margin-bottom:16px}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.form-label{display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#555;margin-bottom:5px}
+.form-label .req{color:#c62828}
+.form-input,.form-select,.form-textarea{width:100%;padding:9px 12px;border:1.5px solid #d0cfc8;border-radius:3px;font-size:14px;font-family:Georgia,serif;color:#1a1a1a;background:#fff;outline:none;transition:border-color .15s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:#003865}
+.form-select{font-family:Arial,sans-serif;font-size:13px}
+.form-textarea{min-height:80px;resize:vertical;line-height:1.6}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.opt-wrap{display:flex;align-items:center;gap:8px}
+.opt-ltr{font-weight:700;color:#003865;min-width:18px;font-size:14px}
+.form-actions{display:flex;gap:10px;padding-top:8px}
+
+/* Paste parser */
+.paste-box{width:100%;min-height:160px;border:1.5px solid #d0cfc8;border-radius:3px;padding:12px;font-family:'Courier New',monospace;font-size:12px;line-height:1.6;color:#333;background:#fafaf8;resize:vertical;outline:none}
+.paste-box:focus{border-color:#003865}
+.parse-msg{margin-top:12px;padding:12px 14px;border-radius:3px;font-size:13px;display:none}
+.parse-msg.ok{background:#e8f5e8;color:#2e7d32;border:1px solid #a5d6a7}
+.parse-msg.err{background:#fce8e8;color:#c62828;border:1px solid #ef9a9a}
+.parse-preview{background:#f8f9fb;border:1px solid #e0ddd8;border-radius:3px;padding:16px;margin-top:12px;display:none;font-size:13px}
+.preview-row{display:flex;gap:10px;margin-bottom:6px}
+.preview-lbl{font-weight:700;min-width:100px;color:#003865}
+.preview-val{color:#333;flex:1}
+
+/* Test manager */
+.test-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px}
+.test-mgr-card{background:#fff;border:1px solid #e0ddd8;border-radius:4px;padding:20px 22px}
+.test-mgr-name{font-size:15px;font-weight:700;color:#003865;margin-bottom:6px}
+.test-mgr-meta{font-size:12px;color:#888;margin-bottom:14px;line-height:1.6}
+.test-mgr-actions{display:flex;gap:8px;flex-wrap:wrap}
+.test-q-assign{margin-top:16px;padding-top:16px;border-top:1px solid #f0ede8}
+.test-q-assign-title{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#666;margin-bottom:10px}
+.q-assign-list{max-height:200px;overflow-y:auto;border:1px solid #e0ddd8;border-radius:3px}
+.q-assign-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #f5f5f5;font-size:12px;color:#333}
+.q-assign-item:last-child{border-bottom:none}
+.q-assign-item input[type=checkbox]{accent-color:#003865;cursor:pointer}
+.q-assign-text{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-assign-diff{font-size:10px;font-weight:600;min-width:50px}
+
+/* Export */
+.export-section{background:#fff;border:1px solid #e0ddd8;border-radius:4px;padding:24px 28px;margin-bottom:20px}
+.export-title{font-size:14px;font-weight:700;margin-bottom:6px}
+.export-desc{font-size:13px;color:#666;margin-bottom:16px;line-height:1.6}
+.code-block{background:#1a1a2e;color:#a8ff78;font-family:'Courier New',monospace;font-size:12px;padding:16px;border-radius:4px;white-space:pre-wrap;margin-bottom:12px;line-height:1.5}
+
+/* Toast */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;font-size:13px;padding:12px 24px;border-radius:4px;z-index:9999;display:none;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="screen-login">
+  <div class="login-box">
+    <div class="login-logo">GMAT Admin</div>
+    <h2 class="login-title">Admin Access</h2>
+    <p class="login-sub">Enter your password to manage questions and tests</p>
+    <input class="login-input" type="password" id="pwd-input" placeholder="Password" autocomplete="current-password">
+    <button class="login-btn" id="login-btn">Sign In →</button>
+    <div class="login-err" id="login-err">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="screen-admin" class="screen">
+
+  <div class="admin-header">
+    <div class="admin-header-left">GMAT Admin Panel</div>
+    <div class="admin-header-right">
+      <button class="header-btn outline" id="btn-view-site" onclick="window.open('index.html','_blank')">
+        View Site ↗
+      </button>
+      <button class="header-btn danger" id="btn-logout">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-section">Content</div>
+      <div class="sidebar-item active" data-panel="dashboard">
+        <span class="icon">📊</span> Dashboard
+      </div>
+      <div class="sidebar-item" data-panel="questions">
+        <span class="icon">📝</span> Questions
+        <span class="sidebar-badge" id="sb-q-count">0</span>
+      </div>
+      <div class="sidebar-item" data-panel="add-question">
+        <span class="icon">➕</span> Add Question
+      </div>
+      <div class="sidebar-section">Tests</div>
+      <div class="sidebar-item" data-panel="tests">
+        <span class="icon">🧪</span> Manage Tests
+      </div>
+      <div class="sidebar-section">Tools</div>
+      <div class="sidebar-item" data-panel="export">
+        <span class="icon">📦</span> Export / Deploy
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main-content">
+
+      <!-- DASHBOARD -->
+      <div id="panel-dashboard" class="panel active">
+        <div class="panel-title">Dashboard</div>
+        <div class="panel-sub">Overview of your question bank and tests</div>
+        <div class="stats-row">
+          <div class="stat-card"><span class="stat-val" id="dash-total">0</span><div class="stat-lbl">Total Questions</div></div>
+          <div class="stat-card"><span class="stat-val" id="dash-easy" style="color:#2e7d32">0</span><div class="stat-lbl">Easy</div></div>
+          <div class="stat-card"><span class="stat-val" id="dash-med" style="color:#f57f17">0</span><div class="stat-lbl">Medium</div></div>
+          <div class="stat-card"><span class="stat-val" id="dash-hard" style="color:#c62828">0</span><div class="stat-lbl">Hard</div></div>
+        </div>
+        <div class="stats-row" style="grid-template-columns:repeat(2,1fr)">
+          <div class="stat-card"><span class="stat-val" id="dash-tests">0</span><div class="stat-lbl">Sectional Tests</div></div>
+          <div class="stat-card"><span class="stat-val" id="dash-ready">0</span><div class="stat-lbl">Tests Ready (≥5 questions)</div></div>
+        </div>
+      </div>
+
+      <!-- QUESTIONS -->
+      <div id="panel-questions" class="panel">
+        <div class="panel-title">Question Bank</div>
+        <div class="panel-sub">All questions currently in your bank</div>
+        <div class="q-list-header">
+          <div class="q-filters">
+            <select class="filter-sel" id="filter-diff">
+              <option value="all">All Difficulties</option>
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+            <select class="filter-sel" id="filter-topic">
+              <option value="all">All Topics</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline btn-sm" id="btn-import-json">Import JSON</button>
+            <button class="btn btn-red btn-sm" id="btn-clear-bank">Clear All</button>
+          </div>
+        </div>
+        <div class="q-table">
+          <div class="q-table-head">
+            <div>ID</div><div>Question</div><div>Difficulty</div>
+            <div>Topic</div><div>Answer</div><div>Actions</div>
+          </div>
+          <div id="q-table-body"></div>
+        </div>
+      </div>
+
+      <!-- ADD QUESTION -->
+      <div id="panel-add-question" class="panel">
+        <div class="panel-title" id="add-panel-title">Add Question</div>
+        <div class="panel-sub">Paste a question block for auto-parse, or fill in the form manually</div>
+
+        <!-- PASTE PARSER -->
+        <div class="form-card">
+          <div class="form-card-title">⚡ Quick Paste (Auto-Parse)</div>
+          <textarea class="paste-box" id="paste-box"
+            placeholder="Paste a question block here. Example format:
+
+88. The average of five numbers is 24. If four of the numbers are 18, 22, 28, and 30, what is the fifth number?
+A. 18
+B. 20
+C. 22
+D. 24
+E. 26
+The correct answer is C.
+Explanation: Sum = 5×24 = 120. Sum of known four = 98. Fifth = 22."></textarea>
+          <div style="display:flex;gap:10px;margin-top:12px">
+            <button class="btn btn-blue" id="btn-parse">Parse Question</button>
+            <button class="btn btn-outline" id="btn-clear-paste">Clear</button>
+          </div>
+          <div class="parse-msg" id="parse-msg"></div>
+          <div class="parse-preview" id="parse-preview"></div>
+        </div>
+
+        <!-- MANUAL FORM -->
+        <div class="form-card">
+          <div class="form-card-title" id="form-card-title">✏️ Manual Entry</div>
+          <input type="hidden" id="f-edit-id">
+          <div class="form-row">
+            <label class="form-label">Question Text <span class="req">*</span></label>
+            <textarea class="form-textarea" id="f-question" rows="3"
+              placeholder="Type the full question text here..."></textarea>
+          </div>
+          <div class="form-card-title" style="font-size:12px;font-weight:700;color:#555;margin-bottom:12px;padding:0;border:none">Answer Options</div>
+          <div class="opts-grid">
+            <div class="opt-wrap"><span class="opt-ltr">A.</span><input class="form-input" id="f-A" placeholder="Option A"></div>
+            <div class="opt-wrap"><span class="opt-ltr">B.</span><input class="form-input" id="f-B" placeholder="Option B"></div>
+            <div class="opt-wrap"><span class="opt-ltr">C.</span><input class="form-input" id="f-C" placeholder="Option C"></div>
+            <div class="opt-wrap"><span class="opt-ltr">D.</span><input class="form-input" id="f-D" placeholder="Option D"></div>
+            <div class="opt-wrap"><span class="opt-ltr">E.</span><input class="form-input" id="f-E" placeholder="Option E (optional)"></div>
+          </div>
+          <div class="form-row-3">
+            <div>
+              <label class="form-label">Correct Answer <span class="req">*</span></label>
+              <select class="form-select" id="f-answer">
+                <option>A</option><option>B</option><option>C</option>
+                <option>D</option><option>E</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Difficulty <span class="req">*</span></label>
+              <select class="form-select" id="f-difficulty">
+                <option value="Easy">Easy</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Topic</label>
+              <input class="form-input" id="f-topic" placeholder="e.g. Arithmetic – Averages">
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Explanation</label>
+            <textarea class="form-textarea" id="f-explanation" rows="3"
+              placeholder="Optional explanation shown after the test..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-blue" id="btn-save-q">Save Question</button>
+            <button class="btn btn-outline" id="btn-cancel-edit" style="display:none">Cancel Edit</button>
+            <button class="btn btn-outline" id="btn-reset-form">Reset Form</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TESTS -->
+      <div id="panel-tests" class="panel">
+        <div class="panel-title">Manage Tests</div>
+        <div class="panel-sub">Create sectional tests and assign questions to each</div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+          <button class="btn btn-blue" id="btn-add-test">+ New Test</button>
+        </div>
+        <div class="test-grid" id="test-grid"></div>
+      </div>
+
+      <!-- EXPORT -->
+      <div id="panel-export" class="panel">
+        <div class="panel-title">Export & Deploy</div>
+        <div class="panel-sub">Download your question bank and deploy to Vercel</div>
+
+        <div class="export-section">
+          <div class="export-title">📥 Export questions.js</div>
+          <div class="export-desc">
+            Download an updated <strong>questions.js</strong> file with all your questions baked in.
+            Replace the existing one in your project folder, then redeploy to Vercel.
+            Your users will instantly see the new questions — no setup required.
+          </div>
+          <button class="btn btn-blue" id="btn-export-js">Download questions.js</button>
+        </div>
+
+        <div class="export-section">
+          <div class="export-title">📦 Export questions.json (backup)</div>
+          <div class="export-desc">
+            Download a JSON backup of all questions. Use this to restore your question bank
+            on a new machine or share with a co-admin using the Import button in Questions tab.
+          </div>
+          <button class="btn btn-outline" id="btn-export-json">Download questions.json</button>
+        </div>
+
+        <div class="export-section">
+          <div class="export-title">🚀 Deploy to Vercel — 3 Steps</div>
+          <div class="export-desc">
+            <strong>Step 1:</strong> Click "Download questions.js" above<br>
+            <strong>Step 2:</strong> Replace the <code>questions.js</code> file in your project folder<br>
+            <strong>Step 3:</strong> Push to GitHub — Vercel auto-deploys in ~30 seconds<br><br>
+            Your friends visit your Vercel URL and get the updated questions immediately.
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-content -->
+  </div><!-- /admin-body -->
+</div><!-- /screen-admin -->
+
+<input type="file" id="json-import-file" accept=".json" style="display:none">
+<div class="toast" id="toast"></div>
+
+<script src="questions.js"></script>
+<script>
+// ══════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════
+const ADMIN_PASSWORD = 'gmat2024'; // Change this!
+
+// ══════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════
+const Store = {
+  getQuestions() {
+    try {
+      const s = localStorage.getItem('gmat_questions');
+      if (s) { const p = JSON.parse(s); if (p&&p.length) return p; }
+    } catch(e) {}
+    return typeof PRELOADED_QUESTIONS !== 'undefined' ? [...PRELOADED_QUESTIONS] : [];
+  },
+  saveQuestions(qs) { localStorage.setItem('gmat_questions', JSON.stringify(qs)); },
+  getTests() {
+    try {
+      const s = localStorage.getItem('gmat_tests');
+      if (s) { const p = JSON.parse(s); if (p&&p.length) return p; }
+    } catch(e) {}
+    return [{id:'T1',name:'Sectional Test 1',questionIds:null}];
+  },
+  saveTests(ts) { localStorage.setItem('gmat_tests', JSON.stringify(ts)); },
+  addQuestion(q) {
+    const qs = this.getQuestions();
+    q.id = q.id || 'Q_'+Date.now()+'_'+Math.floor(Math.random()*1000);
+    qs.push(q); this.saveQuestions(qs); return q;
+  },
+  updateQuestion(id, updates) {
+    const qs = this.getQuestions();
+    const idx = qs.findIndex(q=>q.id===id);
+    if (idx>=0) { qs[idx]={...qs[idx],...updates}; this.saveQuestions(qs); return true; }
+    return false;
+  },
+  deleteQuestion(id) {
+    let qs = this.getQuestions();
+    qs = qs.filter(q=>q.id!==id);
+    this.saveQuestions(qs);
+    // Remove from all tests
+    const ts = this.getTests();
+    ts.forEach(t => { if(t.questionIds) t.questionIds=t.questionIds.filter(i=>i!==id); });
+    this.saveTests(ts);
+  }
+};
+
+// ══════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════
+function tryLogin() {
+  const pwd = document.getElementById('pwd-input').value;
+  if (pwd === ADMIN_PASSWORD) {
+    document.getElementById('screen-login').style.display = 'none';
+    document.getElementById('screen-admin').classList.add('active');
+    refreshAll();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+    document.getElementById('pwd-input').value = '';
+  }
+}
+
+document.getElementById('login-btn').addEventListener('click', tryLogin);
+document.getElementById('pwd-input').addEventListener('keydown', e => {
+  if (e.key==='Enter') tryLogin();
+});
+document.getElementById('btn-logout').addEventListener('click', () => {
+  document.getElementById('screen-admin').classList.remove('active');
+  document.getElementById('screen-login').style.display = 'flex';
+  document.getElementById('pwd-input').value = '';
+});
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+document.querySelectorAll('.sidebar-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+    item.classList.add('active');
+    const panel = item.dataset.panel;
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel-'+panel).classList.add('active');
+    if (panel==='dashboard')    refreshDashboard();
+    if (panel==='questions')    refreshQuestionList();
+    if (panel==='tests')        refreshTests();
+    if (panel==='add-question') resetForm();
+  });
+});
+
+// ══════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════
+function refreshDashboard() {
+  const qs = Store.getQuestions();
+  const ts = Store.getTests();
+  document.getElementById('dash-total').textContent = qs.length;
+  document.getElementById('dash-easy').textContent  = qs.filter(q=>q.difficulty==='Easy').length;
+  document.getElementById('dash-med').textContent   = qs.filter(q=>q.difficulty==='Medium').length;
+  document.getElementById('dash-hard').textContent  = qs.filter(q=>q.difficulty==='Hard').length;
+  document.getElementById('dash-tests').textContent = ts.length;
+  const ready = ts.filter(t => {
+    const tqs = t.questionIds ? qs.filter(q=>t.questionIds.includes(q.id)) : qs;
+    return tqs.length >= 5;
+  }).length;
+  document.getElementById('dash-ready').textContent = ready;
+  document.getElementById('sb-q-count').textContent = qs.length;
+}
+
+// ══════════════════════════════════════
+// QUESTION LIST
+// ══════════════════════════════════════
+function refreshQuestionList() {
+  const qs      = Store.getQuestions();
+  const diffF   = document.getElementById('filter-diff').value;
+  const topicF  = document.getElementById('filter-topic').value;
+
+  // Populate topic filter
+  const topics  = [...new Set(qs.map(q=>q.topic).filter(Boolean))].sort();
+  const topicSel = document.getElementById('filter-topic');
+  const curTopic = topicSel.value;
+  topicSel.innerHTML = '<option value="all">All Topics</option>';
+  topics.forEach(t => {
+    const o = document.createElement('option');
+    o.value = t; o.textContent = t;
+    if (t===curTopic) o.selected = true;
+    topicSel.appendChild(o);
+  });
+
+  let filtered = qs;
+  if (diffF !== 'all')  filtered = filtered.filter(q=>q.difficulty===diffF);
+  if (topicF !== 'all') filtered = filtered.filter(q=>q.topic===topicF);
+
+  const body = document.getElementById('q-table-body');
+  if (filtered.length === 0) {
+    body.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">No questions found.</div></div>`;
+    return;
+  }
+
+  body.innerHTML = '';
+  filtered.forEach(q => {
+    const row = document.createElement('div');
+    row.className = 'q-table-row';
+    const short = q.question.length>55 ? q.question.slice(0,55)+'…' : q.question;
+    row.innerHTML = `
+      <div class="tc" style="font-family:monospace;font-size:11px;color:#888">${q.id}</div>
+      <div class="tc bold" title="${q.question.replace(/"/g,'&quot;')}">${short}</div>
+      <div class="tc"><span class="dpill ${q.difficulty}">${q.difficulty}</span></div>
+      <div class="tc" style="font-size:12px;color:#666">${q.topic||'—'}</div>
+      <div class="tc" style="font-weight:700;color:#003865">${q.answer}</div>
+      <div class="tc">
+        <div class="action-btns">
+          <button class="btn-icon" onclick="editQuestion('${q.id}')">✏️ Edit</button>
+          <button class="btn-icon del" onclick="deleteQuestion('${q.id}')">🗑️</button>
+        </div>
+      </div>`;
+    body.appendChild(row);
+  });
+
+  document.getElementById('sb-q-count').textContent = qs.length;
+}
+
+// Filters
+document.getElementById('filter-diff').addEventListener('change', refreshQuestionList);
+document.getElementById('filter-topic').addEventListener('change', refreshQuestionList);
+
+// ══════════════════════════════════════
+// ADD / EDIT QUESTION
+// ══════════════════════════════════════
+function resetForm() {
+  document.getElementById('f-edit-id').value = '';
+  document.getElementById('f-question').value = '';
+  ['A','B','C','D','E'].forEach(l=>document.getElementById('f-'+l).value='');
+  document.getElementById('f-answer').value = 'A';
+  document.getElementById('f-difficulty').value = 'Medium';
+  document.getElementById('f-topic').value = '';
+  document.getElementById('f-explanation').value = '';
+  document.getElementById('add-panel-title').textContent = 'Add Question';
+  document.getElementById('form-card-title').textContent = '✏️ Manual Entry';
+  document.getElementById('btn-cancel-edit').style.display = 'none';
+  document.getElementById('btn-save-q').textContent = 'Save Question';
+}
+
+function editQuestion(id) {
+  const qs = Store.getQuestions();
+  const q  = qs.find(x=>x.id===id);
+  if (!q) return;
+
+  // Switch to add panel
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  document.querySelector('[data-panel="add-question"]').classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-add-question').classList.add('active');
+
+  document.getElementById('f-edit-id').value     = q.id;
+  document.getElementById('f-question').value    = q.question;
+  ['A','B','C','D','E'].forEach(l=>{
+    document.getElementById('f-'+l).value = q.options[l]||'';
+  });
+  document.getElementById('f-answer').value     = q.answer;
+  document.getElementById('f-difficulty').value = q.difficulty;
+  document.getElementById('f-topic').value      = q.topic||'';
+  document.getElementById('f-explanation').value= q.explanation||'';
+  document.getElementById('add-panel-title').textContent  = 'Edit Question';
+  document.getElementById('form-card-title').textContent  = '✏️ Editing: '+q.id;
+  document.getElementById('btn-cancel-edit').style.display = 'inline-flex';
+  document.getElementById('btn-save-q').textContent = 'Update Question';
+  window.scrollTo(0,0);
+}
+
+function deleteQuestion(id) {
+  if (!confirm('Delete this question? It will also be removed from any tests.')) return;
+  Store.deleteQuestion(id);
+  refreshQuestionList();
+  refreshDashboard();
+  toast('Question deleted');
+}
+
+document.getElementById('btn-save-q').addEventListener('click', () => {
+  const question    = document.getElementById('f-question').value.trim();
+  const optA        = document.getElementById('f-A').value.trim();
+  const optB        = document.getElementById('f-B').value.trim();
+  if (!question||!optA||!optB) { toast('Question text and options A & B are required.'); return; }
+
+  const q = {
+    question,
+    options:{
+      A: optA,
+      B: optB,
+      C: document.getElementById('f-C').value.trim()||undefined,
+      D: document.getElementById('f-D').value.trim()||undefined,
+      E: document.getElementById('f-E').value.trim()||undefined
+    },
+    answer:      document.getElementById('f-answer').value,
+    difficulty:  document.getElementById('f-difficulty').value,
+    topic:       document.getElementById('f-topic').value.trim(),
+    explanation: document.getElementById('f-explanation').value.trim()
+  };
+  ['C','D','E'].forEach(l=>{ if(!q.options[l]) delete q.options[l]; });
+
+  const editId = document.getElementById('f-edit-id').value;
+  if (editId) {
+    Store.updateQuestion(editId, q);
+    toast('Question updated ✓');
+  } else {
+    Store.addQuestion(q);
+    toast('Question saved ✓');
+  }
+  resetForm();
+  refreshDashboard();
+});
+
+document.getElementById('btn-cancel-edit').addEventListener('click', resetForm);
+document.getElementById('btn-reset-form').addEventListener('click', resetForm);
+
+// ══════════════════════════════════════
+// PASTE PARSER
+// ══════════════════════════════════════
+function parseRaw(text) {
+  const t = text.trim();
+  const ansMatch = t.match(/[Tt]he correct answer is\s+([A-E])/i);
+  const answer = ansMatch ? ansMatch[1].toUpperCase() : null;
+
+  const options = {};
+  t.split('\n').forEach(line => {
+    const m = line.trim().match(/^([A-E])[.)]\s+(.+)/);
+    if (m) options[m[1]] = m[2].trim();
+  });
+
+  let questionText = '';
+  const lines = t.split('\n');
+  for (const line of lines) {
+    if (line.trim().match(/^[A-E][.)]\s+/)) break;
+    const cleaned = line.trim().replace(/^\d+\.\s*/,'').replace(/^[-–]\s*/,'');
+    if (cleaned) questionText += (questionText?' ':'')+cleaned;
+  }
+
+  const topicMatch = t.match(/(Arithmetic|Algebra|Geometry|Number|Counting|Probability)[^\n]{0,40}/i);
+  const topic = topicMatch ? topicMatch[0].trim() : '';
+
+  // Explanation: text after "The correct answer is X."
+  let explanation = '';
+  const explMatch = t.match(/[Tt]he correct answer is [A-E]\.\s*([\s\S]+)$/i);
+  if (explMatch) explanation = explMatch[1].trim().slice(0,800);
+
+  if (!questionText || Object.keys(options).length < 2 || !answer) return null;
+  return { question:questionText, options, answer, topic, explanation, difficulty:'Medium' };
+}
+
+document.getElementById('btn-parse').addEventListener('click', () => {
+  const raw     = document.getElementById('paste-box').value.trim();
+  const msg     = document.getElementById('parse-msg');
+  const preview = document.getElementById('parse-preview');
+
+  if (!raw) { showParseMsg('err','Please paste a question first.'); return; }
+  const q = parseRaw(raw);
+  if (!q) {
+    showParseMsg('err','Could not parse. Make sure options are "A. text" and answer line says "The correct answer is X."');
+    preview.style.display='none'; return;
+  }
+
+  // Show preview
+  preview.style.display = 'block';
+  preview.innerHTML = `
+    <div style="font-weight:700;margin-bottom:12px;color:#003865">Preview — confirm before saving</div>
+    <div class="preview-row"><span class="preview-lbl">Question:</span><span class="preview-val">${q.question}</span></div>
+    ${Object.entries(q.options).map(([l,v])=>`<div class="preview-row"><span class="preview-lbl">Option ${l}:</span><span class="preview-val">${v}</span></div>`).join('')}
+    <div class="preview-row"><span class="preview-lbl">Answer:</span><span class="preview-val" style="font-weight:700;color:#003865">${q.answer}</span></div>
+    <div class="preview-row"><span class="preview-lbl">Topic:</span><span class="preview-val">${q.topic||'—'}</span></div>
+    ${q.explanation?`<div class="preview-row"><span class="preview-lbl">Explanation:</span><span class="preview-val">${q.explanation.slice(0,120)}...</span></div>`:''}
+    <div style="margin-top:14px;display:flex;gap:8px">
+      <button class="btn btn-blue btn-sm" id="btn-confirm-parse">✓ Save to Bank</button>
+      <select class="filter-sel" id="parse-diff-sel">
+        <option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard</option>
+      </select>
+    </div>`;
+
+  document.getElementById('btn-confirm-parse').addEventListener('click', () => {
+    q.difficulty = document.getElementById('parse-diff-sel').value;
+    Store.addQuestion(q);
+    showParseMsg('ok',`✓ Saved! "${q.question.slice(0,60)}..." (${q.difficulty}, Answer: ${q.answer})`);
+    document.getElementById('paste-box').value = '';
+    preview.style.display = 'none';
+    refreshDashboard();
+    document.getElementById('sb-q-count').textContent = Store.getQuestions().length;
+    toast('Question added ✓');
+  });
+
+  showParseMsg('ok','Question parsed successfully. Review below and click Save.');
+});
+
+function showParseMsg(type, text) {
+  const el = document.getElementById('parse-msg');
+  el.className = `parse-msg ${type}`;
+  el.style.display = 'block';
+  el.textContent = text;
+}
+
+document.getElementById('btn-clear-paste').addEventListener('click', () => {
+  document.getElementById('paste-box').value = '';
+  document.getElementById('parse-msg').style.display = 'none';
+  document.getElementById('parse-preview').style.display = 'none';
+});
+
+// ══════════════════════════════════════
+// TESTS MANAGER
+// ══════════════════════════════════════
+function refreshTests() {
+  const tests = Store.getTests();
+  const qs    = Store.getQuestions();
+  const grid  = document.getElementById('test-grid');
+  grid.innerHTML = '';
+
+  tests.forEach(t => {
+    const tqs = t.questionIds
+      ? qs.filter(q=>t.questionIds.includes(q.id))
+      : qs;
+    const easy   = tqs.filter(q=>q.difficulty==='Easy').length;
+    const medium = tqs.filter(q=>q.difficulty==='Medium').length;
+    const hard   = tqs.filter(q=>q.difficulty==='Hard').length;
+
+    const card = document.createElement('div');
+    card.className = 'test-mgr-card';
+    card.innerHTML = `
+      <div class="test-mgr-name">${t.name}</div>
+      <div class="test-mgr-meta">
+        ${tqs.length} questions assigned · E:${easy} M:${medium} H:${hard}<br>
+        Status: <strong style="color:${tqs.length>=5?'#2e7d32':'#c62828'}">${tqs.length>=5?'Ready':'Needs more questions'}</strong>
+      </div>
+      <div class="test-mgr-actions">
+        <button class="btn btn-outline btn-sm" onclick="renameTest('${t.id}')">Rename</button>
+        <button class="btn btn-outline btn-sm" onclick="toggleAssign('${t.id}')">Assign Questions</button>
+        <button class="btn btn-red btn-sm" onclick="deleteTest('${t.id}')">Delete</button>
+      </div>
+      <div class="test-q-assign" id="assign-${t.id}" style="display:none">
+        <div class="test-q-assign-title">Assign questions to this test</div>
+        <label style="font-size:12px;color:#666;display:flex;align-items:center;gap:6px;margin-bottom:8px;cursor:pointer">
+          <input type="checkbox" id="all-q-${t.id}" ${!t.questionIds?'checked':''}
+            onchange="toggleAllQuestions('${t.id}',this.checked)"> Use all questions
+        </label>
+        <div class="q-assign-list" id="qlist-${t.id}"></div>
+        <button class="btn btn-blue btn-sm" style="margin-top:10px" onclick="saveAssignment('${t.id}')">Save Assignment</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function toggleAssign(testId) {
+  const el = document.getElementById('assign-'+testId);
+  const open = el.style.display === 'block';
+  el.style.display = open ? 'none' : 'block';
+  if (!open) populateQList(testId);
+}
+
+function populateQList(testId) {
+  const qs   = Store.getQuestions();
+  const t    = Store.getTests().find(x=>x.id===testId);
+  const list = document.getElementById('qlist-'+testId);
+  list.innerHTML = '';
+  qs.forEach(q => {
+    const checked = !t.questionIds || t.questionIds.includes(q.id);
+    const item = document.createElement('div');
+    item.className = 'q-assign-item';
+    item.innerHTML = `
+      <input type="checkbox" id="qa-${testId}-${q.id}" ${checked?'checked':''}
+        data-qid="${q.id}">
+      <span class="q-assign-text" title="${q.question}">${q.question.slice(0,50)}...</span>
+      <span class="q-assign-diff dpill ${q.difficulty}">${q.difficulty}</span>`;
+    list.appendChild(item);
+  });
+}
+
+function toggleAllQuestions(testId, checked) {
+  document.querySelectorAll(`#qlist-${testId} input[type=checkbox]`).forEach(cb => {
+    cb.checked = checked;
+  });
+}
+
+function saveAssignment(testId) {
+  const checks   = document.querySelectorAll(`#qlist-${testId} input[type=checkbox]`);
+  const allCheck = document.getElementById('all-q-'+testId);
+  const ts       = Store.getTests();
+  const idx      = ts.findIndex(t=>t.id===testId);
+  if (idx < 0) return;
+
+  if (allCheck.checked) {
+    ts[idx].questionIds = null;
+  } else {
+    ts[idx].questionIds = [...checks].filter(c=>c.checked).map(c=>c.dataset.qid);
+  }
+  Store.saveTests(ts);
+  refreshTests();
+  toast('Assignment saved ✓');
+}
+
+function renameTest(testId) {
+  const ts  = Store.getTests();
+  const t   = ts.find(x=>x.id===testId);
+  const name = prompt('Enter new name:', t.name);
+  if (!name||!name.trim()) return;
+  t.name = name.trim();
+  Store.saveTests(ts);
+  refreshTests();
+}
+
+function deleteTest(testId) {
+  if (!confirm('Delete this test?')) return;
+  let ts = Store.getTests();
+  ts = ts.filter(t=>t.id!==testId);
+  Store.saveTests(ts);
+  refreshTests();
+  refreshDashboard();
+  toast('Test deleted');
+}
+
+document.getElementById('btn-add-test').addEventListener('click', () => {
+  const name = prompt('Enter test name:', 'Sectional Test ' + (Store.getTests().length+1));
+  if (!name||!name.trim()) return;
+  const ts = Store.getTests();
+  ts.push({id:'T'+Date.now(), name:name.trim(), questionIds:null});
+  Store.saveTests(ts);
+  refreshTests();
+  refreshDashboard();
+  toast('Test created ✓');
+});
+
+// ══════════════════════════════════════
+// IMPORT / EXPORT
+// ══════════════════════════════════════
+document.getElementById('btn-export-json').addEventListener('click', () => {
+  const qs   = Store.getQuestions();
+  const blob = new Blob([JSON.stringify(qs,null,2)],{type:'application/json'});
+  dlFile(blob,'gmat_questions_backup.json');
+  toast('JSON backup downloaded ✓');
+});
+
+document.getElementById('btn-export-js').addEventListener('click', () => {
+  const qs  = Store.getQuestions();
+  const js  = `const PRELOADED_QUESTIONS = ${JSON.stringify(qs,null,2)};\n`;
+  const blob = new Blob([js],{type:'application/javascript'});
+  dlFile(blob,'questions.js');
+  toast('questions.js downloaded — replace in your project and redeploy ✓');
+});
+
+document.getElementById('btn-import-json').addEventListener('click', () => {
+  document.getElementById('json-import-file').click();
+});
+
+document.getElementById('json-import-file').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      if (!Array.isArray(parsed)) { toast('Invalid JSON — expected an array'); return; }
+      const qs = Store.getQuestions();
+      const existingIds = new Set(qs.map(q=>q.id));
+      let added = 0;
+      parsed.forEach(q => {
+        if (!q.question||!q.options||!q.answer) return;
+        if (existingIds.has(q.id)) return;
+        qs.push(q); existingIds.add(q.id); added++;
+      });
+      Store.saveQuestions(qs);
+      refreshDashboard(); refreshQuestionList();
+      toast(`Imported ${added} questions ✓`);
+    } catch(err) { toast('Failed to parse JSON file'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+document.getElementById('btn-clear-bank').addEventListener('click', () => {
+  if (!confirm('Delete ALL questions from the bank? This cannot be undone.')) return;
+  Store.saveQuestions([]);
+  refreshQuestionList(); refreshDashboard();
+  toast('Question bank cleared');
+});
+
+function dlFile(blob, name) {
+  const a   = document.createElement('a');
+  a.href    = URL.createObjectURL(blob);
+  a.download= name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display='block';
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>t.style.display='none',3000);
+}
+
+function refreshAll() {
+  refreshDashboard();
+  refreshQuestionList();
+}
+
+refreshAll();
+</script>
+</body>
+</html>
