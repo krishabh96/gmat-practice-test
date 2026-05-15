@@ -3,587 +3,659 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GMAT Quant Practice</title>
+<title>Sasta GMAT Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
 <style>
+:root{--navy:#0F172A;--teal:#14B8A6;--teal-d:#0D9488;--bg:#F8FAFC;--white:#FFFFFF;--text:#111827;--muted:#6B7280;--border:#E5E7EB;--green:#22C55E;--green-d:#16A34A;--red:#EF4444;--shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.06);--shadow-lg:0 8px 32px rgba(15,23,42,0.14)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Georgia,serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh;font-size:15px}
-.screen{display:none;min-height:100vh;flex-direction:column}
-.screen.active{display:flex}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-size:15px;overflow-x:hidden}
 
-/* ── HOME ── */
-#screen-home{background:#fff;align-items:center;justify-content:center}
-.home-wrap{width:100%;max-width:660px;padding:60px 32px;text-align:center}
-.home-logo{display:inline-block;background:#003865;color:#fff;font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;padding:6px 16px;border-radius:2px;margin-bottom:28px;text-transform:uppercase}
-.home-title{font-size:26px;font-weight:normal;color:#1a1a1a;margin-bottom:6px}
-.home-sub{font-family:Arial,sans-serif;font-size:13px;color:#666;margin-bottom:44px}
-.test-card{background:#fff;border:2px solid #003865;border-radius:4px;padding:28px 32px;margin-bottom:16px;text-align:left;cursor:pointer;transition:background .15s,box-shadow .15s;position:relative}
-.test-card:hover{background:#f0f4f8;box-shadow:0 4px 16px rgba(0,56,101,.1)}
-.test-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.test-card-name{font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:#003865}
-.test-card-badge{font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:2px;background:#e8f0f8;color:#003865}
-.test-card-meta{font-family:Arial,sans-serif;font-size:12px;color:#555;line-height:1.7}
-.test-card-meta span{margin-right:16px}
-.test-card-meta span::before{content:'✓ ';color:#003865}
-.test-card.locked{border-color:#ccc;cursor:default;opacity:.6}
-.test-card.locked .test-card-name{color:#888}
-.lock-badge{position:absolute;top:14px;right:14px;font-size:16px}
-.no-questions-msg{font-family:Arial,sans-serif;font-size:13px;color:#999;margin-top:12px;padding:16px;background:#f8f7f4;border-radius:3px;border:1px solid #e8e6e0}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(15,23,42,0.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.07);height:64px;display:flex;align-items:center;padding:0 40px}
+.nav-inner{max-width:1200px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Playfair Display',serif;font-size:20px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:10px}
+.nav-badge{background:var(--teal);color:var(--navy);font-family:'Inter',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:4px}
+.nav-links{display:flex;align-items:center;gap:32px;list-style:none}
+.nav-links a{color:rgba(255,255,255,0.7);text-decoration:none;font-size:14px;transition:color .2s}
+.nav-links a:hover{color:#fff}
+.nav-cta{display:flex;align-items:center;gap:12px}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.85);padding:8px 20px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.5);color:#fff}
+.btn-teal{background:var(--teal);border:none;color:var(--navy);padding:8px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s}
+.btn-teal:hover{background:var(--teal-d)}
+.nav-username{color:rgba(255,255,255,0.85);font-size:14px;display:none}
 
-/* ── EXAM HEADER ── */
-.exam-header{background:#003865;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:52px;flex-shrink:0}
-.exam-header-left{font-family:Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px}
-.exam-header-center{font-family:Arial,sans-serif;font-size:13px;color:#c5d8e8}
-.exam-timer{font-family:'Courier New',monospace;font-size:16px;font-weight:700;background:rgba(255,255,255,.1);padding:4px 14px;border-radius:3px;letter-spacing:2px;min-width:80px;text-align:center}
-.exam-timer.urgent{color:#ffb3b3;background:rgba(255,80,80,.15)}
-.progress-bar-wrap{background:#d0cfc8;height:4px;flex-shrink:0}
-.progress-bar-fill{height:100%;background:#003865;transition:width .4s ease}
+/* HERO */
+.hero{min-height:100vh;background:var(--navy);display:flex;align-items:center;position:relative;overflow:hidden;padding:120px 40px 80px}
+.hero-grid{position:absolute;inset:0;opacity:0.04;background-image:linear-gradient(rgba(20,184,166,1) 1px,transparent 1px),linear-gradient(90deg,rgba(20,184,166,1) 1px,transparent 1px);background-size:60px 60px}
+.hero-glow{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(20,184,166,0.12) 0%,transparent 70%);top:-100px;right:-100px;pointer-events:none}
+.hero-inner{max-width:1200px;width:100%;margin:0 auto;display:grid;grid-template-columns:1fr 440px;gap:80px;align-items:center;position:relative;z-index:1}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(20,184,166,0.1);border:1px solid rgba(20,184,166,0.25);color:var(--teal);font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:100px;margin-bottom:24px}
+.tag-dot{width:6px;height:6px;background:var(--teal);border-radius:50%;animation:pdot 2s infinite}
+@keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.4)}}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(40px,5vw,64px);font-weight:700;color:#fff;line-height:1.1;margin-bottom:24px}
+.hero-title em{font-style:italic;color:var(--teal)}
+.hero-desc{font-size:17px;color:rgba(255,255,255,0.65);line-height:1.75;margin-bottom:40px;max-width:540px;font-weight:300}
+.hero-stats{display:flex;gap:40px;margin-bottom:40px}
+.stat-num{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--teal);display:block;line-height:1}
+.stat-lbl{font-size:12px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap}
+.btn-hero{background:var(--teal);color:var(--navy);border:none;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-hero:hover{background:var(--teal-d);transform:translateY(-1px)}
+.btn-hero-out{background:transparent;color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.15);padding:14px 32px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-hero-out:hover{border-color:rgba(255,255,255,0.4);color:#fff}
 
-/* ── TEST SCREEN ── */
-#screen-test{background:#f5f4f0}
-.test-body{flex:1;display:flex;max-width:1120px;width:100%;margin:0 auto;padding:28px 24px;gap:24px}
+/* AUTH CARD */
+.auth-card{background:var(--white);border-radius:20px;box-shadow:var(--shadow-lg);overflow:hidden}
+.auth-tabs{display:flex;border-bottom:1px solid var(--border)}
+.auth-tab{flex:1;padding:18px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:transparent;font-family:'Inter',sans-serif;transition:all .2s;position:relative}
+.auth-tab.active{color:var(--navy)}
+.auth-tab.active::after{content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:var(--teal);border-radius:2px}
+.auth-body{padding:28px 32px 32px}
+.auth-panel{display:none}.auth-panel.active{display:block}
+.auth-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
+.auth-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text);letter-spacing:.3px;margin-bottom:6px;text-transform:uppercase}
+.form-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text);background:var(--bg);outline:none;transition:border-color .2s,box-shadow .2s}
+.form-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(20,184,166,0.12);background:#fff}
+.form-input::placeholder{color:#aaa}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-err{font-size:12px;color:var(--red);margin-top:4px;display:none}
+.form-err.show{display:block}
+.btn-auth{width:100%;padding:13px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:8px;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px;position:relative}
+.btn-auth:hover{background:#1e293b}
+.btn-auth:disabled{opacity:.6;cursor:not-allowed}
+.btn-text-inner{transition:opacity .2s}
+.btn-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;position:absolute}
+.btn-auth.loading .btn-text-inner{opacity:0}
+.btn-auth.loading .btn-spinner{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.or-div{display:flex;align-items:center;gap:12px;margin:18px 0;font-size:12px;color:var(--muted)}
+.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:var(--border)}
+.btn-google{width:100%;padding:11px;background:#fff;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;color:var(--text);display:flex;align-items:center;justify-content:center;gap:10px;transition:border-color .2s,background .2s}
+.btn-google:hover{border-color:#999;background:var(--bg)}
+.gicon{width:18px;height:18px}
+.auth-note{font-size:11px;color:var(--muted);text-align:center;margin-top:16px;line-height:1.5}
+.auth-note a{color:var(--teal);text-decoration:none;cursor:pointer}
+.pwd-bars{display:flex;gap:4px;margin-top:6px}
+.pwd-bar{flex:1;height:3px;border-radius:2px;background:var(--border);transition:background .3s}
+.pwd-bar.weak{background:var(--red)}.pwd-bar.medium{background:#f59e0b}.pwd-bar.strong{background:var(--green)}
 
-.question-panel{flex:1.5;background:#fff;border:1px solid #d0cfc8;border-radius:3px;padding:32px 36px;min-height:480px}
-.q-meta{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid #e8e6e0}
-.q-num-badge{font-family:Arial,sans-serif;font-size:11px;font-weight:700;color:#003865;background:#e8f0f8;padding:3px 10px;border-radius:2px;letter-spacing:.5px}
-.q-diff-badge{font-family:Arial,sans-serif;font-size:11px;font-weight:600;padding:3px 10px;border-radius:2px}
-.q-diff-badge.Easy{background:#e8f5e8;color:#2e7d32}
-.q-diff-badge.Medium{background:#fff8e1;color:#f57f17}
-.q-diff-badge.Hard{background:#fce8e8;color:#c62828}
-.q-topic{font-family:Arial,sans-serif;font-size:11px;color:#999;margin-left:auto;max-width:200px;text-align:right}
-.question-text{font-size:15px;line-height:1.9;color:#1a1a1a;white-space:pre-wrap}
+/* Logged-in card */
+.card-loggedin{display:none;padding:36px 32px;text-align:center}
+.card-loggedin.active{display:block}
+.loggedin-avatar{width:64px;height:64px;border-radius:50%;background:var(--teal);color:var(--navy);font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.loggedin-name{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.loggedin-email{font-size:13px;color:var(--muted);margin-bottom:12px}
+.tier-badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:100px;background:rgba(34,197,94,.1);color:var(--green-d);border:1px solid rgba(34,197,94,.2);margin-bottom:24px}
+.btn-dashboard{width:100%;padding:14px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px;transition:background .2s}
+.btn-dashboard:hover{background:#1e293b}
+.btn-signout-card{width:100%;padding:11px;background:transparent;border:1.5px solid var(--border);color:var(--muted);border-radius:10px;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-signout-card:hover{border-color:#999;color:var(--text)}
 
-.options-panel{flex:1;background:#fff;border:1px solid #d0cfc8;border-radius:3px;padding:28px;display:flex;flex-direction:column;justify-content:space-between;min-width:280px}
-.options-title{font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888;margin-bottom:14px}
-.options-list{display:flex;flex-direction:column;gap:10px;flex:1}
-.option-row{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1.5px solid #d8d6cf;border-radius:3px;cursor:pointer;transition:border-color .1s,background .1s;background:#fafaf8}
-.option-row:hover{border-color:#003865;background:#f0f4f8}
-.option-row.selected{border-color:#003865;background:#e8f0f8}
-.option-letter{font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:#003865;min-width:20px;padding-top:1px}
-.option-text{font-size:14px;line-height:1.55;color:#1a1a1a;flex:1}
-.options-actions{display:flex;gap:10px;margin-top:20px;padding-top:18px;border-top:1px solid #e8e6e0}
-.btn-next{flex:1;font-family:Arial,sans-serif;font-size:13px;font-weight:700;padding:12px;background:#003865;color:#fff;border:none;border-radius:3px;cursor:pointer}
-.btn-next:hover{background:#004d8a}
-.btn-next:disabled{background:#aac2d8;cursor:not-allowed}
-.btn-skip{font-family:Arial,sans-serif;font-size:13px;font-weight:700;padding:12px 16px;background:transparent;border:1.5px solid #ccc;color:#666;border-radius:3px;cursor:pointer}
-.btn-skip:hover{border-color:#999;color:#333}
+/* SECTIONS */
+.section-about{padding:100px 40px;background:var(--white);border-top:1px solid var(--border)}
+.section-inner{max-width:1200px;margin:0 auto}
+.sec-tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+.sec-title{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,42px);font-weight:700;color:var(--navy);line-height:1.2;margin-bottom:20px;max-width:600px}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.about-text{font-size:16px;color:#374151;line-height:1.85}
+.about-text p{margin-bottom:18px}
+.hl{color:var(--teal-d);font-weight:600}
+.value-cards{display:flex;flex-direction:column;gap:20px}
+.value-card{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:24px 28px;display:flex;gap:18px;align-items:flex-start;transition:box-shadow .2s,border-color .2s}
+.value-card:hover{box-shadow:var(--shadow);border-color:rgba(20,184,166,.3)}
+.value-icon{width:44px;height:44px;background:rgba(20,184,166,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px}
+.value-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.value-desc{font-size:13px;color:var(--muted);line-height:1.6}
 
-/* ── RESULTS ── */
-#screen-results{background:#f5f4f0}
-.results-body{flex:1;max-width:840px;width:100%;margin:0 auto;padding:36px 24px 80px}
-.results-title{font-size:22px;font-weight:normal;margin-bottom:4px}
-.results-sub{font-family:Arial,sans-serif;font-size:13px;color:#666;margin-bottom:28px}
-.scorecard{background:#fff;border:1px solid #d0cfc8;border-radius:3px;padding:28px 32px;margin-bottom:20px;display:flex;gap:0;align-items:center}
-.score-main{flex:0 0 160px;text-align:center;border-right:1px solid #e8e6e0;padding-right:28px;margin-right:28px}
-.score-pct{font-family:Arial,sans-serif;font-size:52px;font-weight:700;color:#003865;line-height:1}
-.score-lbl{font-family:Arial,sans-serif;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
-.score-grid{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.score-stat{text-align:center}
-.score-val{font-family:Arial,sans-serif;font-size:24px;font-weight:700;display:block}
-.score-val.g{color:#2e7d32}.score-val.r{color:#c62828}.score-val.gr{color:#888}
-.score-stat-lbl{font-family:Arial,sans-serif;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px}
+.section-features{padding:100px 40px;background:var(--navy)}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:52px}
+.feat-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:32px 28px;transition:background .2s,border-color .2s}
+.feat-card:hover{background:rgba(255,255,255,.07);border-color:rgba(20,184,166,.3)}
+.feat-num{font-family:'Playfair Display',serif;font-size:48px;font-weight:700;color:var(--teal);line-height:1;margin-bottom:16px;opacity:.7}
+.feat-title{font-size:17px;font-weight:700;color:#fff;margin-bottom:10px}
+.feat-desc{font-size:14px;color:rgba(255,255,255,.55);line-height:1.7}
+.badge-free{display:inline-block;margin-top:16px;font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px;background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.2)}
+.badge-pro{display:inline-block;margin-top:16px;margin-left:6px;font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px;background:rgba(20,184,166,.15);color:var(--teal);border:1px solid rgba(20,184,166,.2)}
 
-/* Adaptive trail */
-.trail-card{background:#fff;border:1px solid #d0cfc8;border-radius:3px;padding:22px 28px;margin-bottom:20px}
-.card-title{font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#666;margin-bottom:14px}
-.trail-dots{display:flex;flex-wrap:wrap;gap:8px}
-.tdot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;font-size:10px;font-weight:700;color:#fff;cursor:default}
-.tdot.cE{background:#66bb6a}.tdot.cM{background:#42a5f5}.tdot.cH{background:#7e57c2}
-.tdot.wE{background:#ef9a9a}.tdot.wM{background:#90caf9}.tdot.wH{background:#ce93d8}
-.tdot.sk{background:#bbb}
-.trail-legend{display:flex;gap:20px;margin-top:12px;font-family:Arial,sans-serif;font-size:11px;color:#888}
-.trail-legend span{display:flex;align-items:center;gap:5px}
-.leg-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.section-pricing{padding:100px 40px;background:var(--bg)}
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:800px;margin:52px auto 0}
+.price-card{background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:36px 32px;position:relative;transition:box-shadow .2s}
+.price-card:hover{box-shadow:var(--shadow-lg)}
+.price-card.featured{border-color:var(--teal);border-width:2px}
+.price-popular{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--teal);color:var(--navy);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 16px;border-radius:100px;white-space:nowrap}
+.price-plan{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.price-amount{font-family:'Playfair Display',serif;font-size:48px;font-weight:700;color:var(--navy);line-height:1;margin-bottom:6px}
+.price-amount span{font-family:'Inter',sans-serif;font-size:18px;font-weight:400;color:var(--muted)}
+.price-desc{font-size:13px;color:var(--muted);margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid var(--border)}
+.price-feats{list-style:none;margin-bottom:32px}
+.price-feats li{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);padding:7px 0}
+.check{width:18px;height:18px;background:rgba(34,197,94,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:var(--green)}
+.lock{width:18px;height:18px;background:rgba(107,114,128,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:var(--muted)}
+.price-feats li.locked{color:var(--muted)}
+.btn-price{width:100%;padding:13px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;border:none}
+.btn-price-free{background:var(--bg);color:var(--navy);border:1.5px solid var(--border)}.btn-price-free:hover{border-color:var(--navy)}
+.btn-price-pro{background:var(--teal);color:var(--navy)}.btn-price-pro:hover{background:var(--teal-d)}
 
-/* Review table */
-.review-card{background:#fff;border:1px solid #d0cfc8;border-radius:3px;overflow:hidden;margin-bottom:24px}
-.review-head{display:grid;grid-template-columns:36px 1fr 72px 80px 64px 64px;background:#003865;color:#fff;font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:10px 20px;gap:8px}
-.review-row{display:grid;grid-template-columns:36px 1fr 72px 80px 64px 64px;padding:13px 20px;gap:8px;border-bottom:1px solid #f0ede8;align-items:start;cursor:pointer;transition:background .1s}
-.review-row:last-of-type{border-bottom:none}
-.review-row:hover{background:#f8f7f4}
-.review-row.cr{border-left:3px solid #2e7d32}
-.review-row.wr{border-left:3px solid #c62828}
-.review-row.sk{border-left:3px solid #bbb}
-.rc{font-family:Arial,sans-serif;font-size:13px;color:#333}
-.rc.qt{font-size:13px;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rpill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:2px;display:inline-block}
-.rpill.C{background:#e8f5e8;color:#2e7d32}.rpill.W{background:#fce8e8;color:#c62828}.rpill.S{background:#f0f0f0;color:#888}
-.dpill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:2px;display:inline-block}
-.dpill.Easy{background:#e8f5e8;color:#2e7d32}.dpill.Medium{background:#fff8e1;color:#f57f17}.dpill.Hard{background:#fce8e8;color:#c62828}
-.exp-panel{display:none;padding:18px 20px;background:#f8f7f4;border-top:1px solid #ebe8e2}
-.exp-q{font-size:14px;font-weight:bold;margin-bottom:12px;line-height:1.6;color:#1a1a1a;white-space:pre-wrap}
-.exp-opts{margin-bottom:14px}
-.exp-opt{font-family:Arial,sans-serif;font-size:13px;padding:3px 0;color:#333}
-.exp-opt.ca{color:#2e7d32;font-weight:700}.exp-opt.wa{color:#c62828;text-decoration:line-through}
-.exp-text{font-family:Arial,sans-serif;font-size:13px;line-height:1.75;color:#444;border-top:1px solid #e0ddd8;padding-top:12px;white-space:pre-wrap}
+footer{background:var(--navy);padding:60px 40px;border-top:1px solid rgba(255,255,255,.06)}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:60px}
+.footer-brand-name{font-family:'Playfair Display',serif;font-size:20px;color:#fff}
+.footer-brand p{font-size:14px;color:rgba(255,255,255,.45);line-height:1.7;margin-top:12px;max-width:280px}
+.footer-col-title{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:16px}
+.footer-links{list-style:none}
+.footer-links li{margin-bottom:10px}
+.footer-links a{font-size:14px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--teal)}
+.footer-bottom{max-width:1200px;margin:40px auto 0;padding-top:24px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between}
+.footer-bottom p{font-size:13px;color:rgba(255,255,255,.3)}
+.footer-bottom a{color:var(--teal);text-decoration:none}
 
-.results-actions{display:flex;gap:12px;margin-top:8px}
-.btn-primary{font-family:Arial,sans-serif;font-size:13px;font-weight:700;padding:13px 32px;background:#003865;color:#fff;border:none;border-radius:3px;cursor:pointer}
-.btn-primary:hover{background:#004d8a}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(15,23,42,.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:20px;width:100%;max-width:440px;box-shadow:var(--shadow-lg);overflow:hidden;animation:min .25s ease}
+@keyframes min{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.modal-hdr{background:var(--navy);padding:28px 32px 24px}
+.modal-logo{font-family:'Playfair Display',serif;font-size:18px;color:#fff;margin-bottom:4px}
+.modal-sub{font-size:13px;color:rgba(255,255,255,.5)}
+.modal-close{float:right;background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.6);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;margin-top:-4px;transition:background .15s}
+.modal-close:hover{background:rgba(255,255,255,.2)}
+.modal-body{padding:28px 32px 32px}
+.modal-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px}
+.modal-tab{flex:1;padding:12px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:transparent;font-family:'Inter',sans-serif;position:relative;transition:color .15s}
+.modal-tab.active{color:var(--navy)}
+.modal-tab.active::after{content:'';position:absolute;bottom:-1px;left:15%;right:15%;height:2px;background:var(--teal);border-radius:2px}
 
-/* ── TOAST ── */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;font-family:Arial,sans-serif;font-size:13px;padding:12px 24px;border-radius:4px;z-index:9999;display:none;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+/* SUCCESS */
+.success-ov{position:fixed;inset:0;z-index:300;background:rgba(15,23,42,.85);display:none;align-items:center;justify-content:center}
+.success-ov.open{display:flex}
+.success-box{background:#fff;border-radius:20px;padding:48px 40px;text-align:center;max-width:400px;width:100%;animation:min .3s ease}
+.success-icon{width:72px;height:72px;background:rgba(34,197,94,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px}
+.success-title{font-size:22px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.success-msg{font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.6}
+.btn-success{width:100%;padding:14px;background:var(--teal);color:var(--navy);border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-success:hover{background:var(--teal-d)}
 
-@media(max-width:700px){
-  .test-body{flex-direction:column;padding:16px}
-  .score-grid{grid-template-columns:repeat(2,1fr)}
-  .review-head,.review-row{grid-template-columns:28px 1fr 56px 70px 48px 48px;padding:10px 12px;font-size:11px}
-  .exam-header{padding:0 16px}
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);font-size:14px;padding:12px 24px;border-radius:10px;z-index:400;display:none;box-shadow:var(--shadow-lg);font-family:'Inter',sans-serif;white-space:nowrap}
+.toast.info{background:var(--navy);color:#fff;border:1px solid rgba(255,255,255,.1)}
+.toast.success{background:#052e16;color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.toast.error{background:#450a0a;color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:none}
+
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;gap:48px}
+  .auth-card{max-width:460px;margin:0 auto}
+  .about-grid{grid-template-columns:1fr;gap:48px}
+  .feat-grid{grid-template-columns:1fr 1fr}
+  .pricing-grid{grid-template-columns:1fr;max-width:420px}
+  .footer-inner{grid-template-columns:1fr;gap:36px}
+  nav,.hero,.section-about,.section-features,.section-pricing,footer{padding-left:20px;padding-right:20px}
+  .hero{padding-top:100px;padding-bottom:60px}
+  .nav-links{display:none}
+}
+@media(max-width:600px){
+  .feat-grid,.form-row-2{grid-template-columns:1fr}
+  .hero-stats{gap:24px}
 }
 </style>
 </head>
 <body>
 
-<!-- HOME -->
-<div id="screen-home" class="screen active">
-  <div class="home-wrap">
-    <div class="home-logo">GMAT Focus Edition</div>
-    <h1 class="home-title">Quantitative Reasoning</h1>
-    <p class="home-sub">Adaptive Problem Solving · Sectional Practice</p>
-    <div id="test-cards"></div>
-    <div class="no-questions-msg" id="no-q-msg" style="display:none">
-      No questions loaded yet. Ask the admin to add questions.
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">Sasta GMAT Prep <span class="nav-badge">Free</span></a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#tests">Tests</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+    </ul>
+    <div class="nav-cta">
+      <span class="nav-username" id="nav-uname"></span>
+      <button class="btn-ghost" id="nav-login-btn" onclick="openModal('login')">Log In</button>
+      <button class="btn-teal" id="nav-signup-btn" onclick="openModal('signup')">Get Started Free</button>
+      <button class="btn-teal" id="nav-dash-btn" style="display:none" onclick="window.location.href='dashboard.html'">Dashboard →</button>
+      <button class="btn-ghost" id="nav-signout-btn" style="display:none" onclick="handleSignOut()">Sign Out</button>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-tag"><span class="tag-dot"></span>Free Practice Available Now</div>
+      <h1 class="hero-title">GMAT Prep That<br>Doesn't Cost a<br><em>Fortune</em></h1>
+      <p class="hero-desc">Quality education should be accessible to everyone. Adaptive sectional tests designed to match the real GMAT — at a price that doesn't hold you back.</p>
+      <div class="hero-stats">
+        <div><span class="stat-num">30+</span><div class="stat-lbl">Sectional Tests</div></div>
+        <div><span class="stat-num">Free</span><div class="stat-lbl">To Start</div></div>
+        <div><span class="stat-num">3</span><div class="stat-lbl">Sections</div></div>
+      </div>
+      <div class="hero-actions">
+        <button class="btn-hero" id="hero-cta" onclick="openModal('signup')">Start Practising Free →</button>
+        <button class="btn-hero-out" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">Learn More</button>
+      </div>
+    </div>
+
+    <div class="auth-card" id="auth-card">
+      <div id="auth-loggedout">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
+          <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+        <div class="auth-body">
+          <div class="auth-panel active" id="panel-login">
+            <div class="auth-title">Welcome back</div>
+            <div class="auth-sub">Log in to continue your practice</div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" placeholder="you@example.com" id="li-email" autocomplete="email">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input class="form-input" type="password" placeholder="••••••••" id="li-pwd" autocomplete="current-password">
+              <div class="form-err" id="li-err"></div>
+            </div>
+            <button class="btn-auth" id="btn-li" onclick="handleLogin()">
+              <span class="btn-text-inner">Log In →</span><div class="btn-spinner"></div>
+            </button>
+            <div class="or-div">or</div>
+            <button class="btn-google" onclick="handleGoogleLogin()">
+              <svg class="gicon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              Continue with Google
+            </button>
+            <div class="auth-note"><a onclick="switchTab('signup')">No account? Sign up free</a></div>
+          </div>
+
+          <div class="auth-panel" id="panel-signup">
+            <div class="auth-title">Join for free</div>
+            <div class="auth-sub">Start practising in under a minute</div>
+            <div class="form-row-2">
+              <div class="form-group"><label class="form-label">First Name</label><input class="form-input" type="text" placeholder="Rahul" id="su-fname"></div>
+              <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" type="text" placeholder="Sharma" id="su-lname"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" placeholder="you@example.com" id="su-email" autocomplete="email">
+              <div class="form-err" id="su-email-err"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input class="form-input" type="password" placeholder="Min 8 characters" id="su-pwd" oninput="setPwdBars(this.value,'pb')" autocomplete="new-password">
+              <div class="pwd-bars"><div class="pwd-bar" id="pb1"></div><div class="pwd-bar" id="pb2"></div><div class="pwd-bar" id="pb3"></div><div class="pwd-bar" id="pb4"></div></div>
+              <div class="form-err" id="su-pwd-err"></div>
+            </div>
+            <button class="btn-auth" id="btn-su" onclick="handleSignup()">
+              <span class="btn-text-inner">Create Free Account →</span><div class="btn-spinner"></div>
+            </button>
+            <div class="or-div">or</div>
+            <button class="btn-google" onclick="handleGoogleLogin()">
+              <svg class="gicon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              Continue with Google
+            </button>
+            <div class="auth-note">
+              By signing up you agree to our <a href="#">Terms</a>.<br>
+              Already have an account? <a onclick="switchTab('login')">Log in</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-loggedin" id="auth-loggedin">
+        <div class="loggedin-avatar" id="card-av">R</div>
+        <div class="loggedin-name" id="card-name">Rahul</div>
+        <div class="loggedin-email" id="card-email">rahul@email.com</div>
+        <div class="tier-badge">Free Plan</div>
+        <button class="btn-dashboard" onclick="window.location.href='dashboard.html'">Go to Dashboard →</button>
+        <button class="btn-signout-card" onclick="handleSignOut()">Sign Out</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-about" id="about">
+  <div class="section-inner">
+    <div class="sec-tag">Our Story</div>
+    <h2 class="sec-title">Why We Built This</h2>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>I believe <span class="hl">quality education should be accessible to everyone.</span> Preparing for the GMAT can be expensive, and for many students, even practice materials and mock tests can feel out of reach. Not everyone can afford to spend $100 or more just for practice.</p>
+        <p>That is exactly why I built this platform — to offer <span class="hl">affordable sectional and full-length mock tests</span> for GMAT aspirants. The aim is simple: give students access to practice that feels close to the official GMAT style, without the heavy price tag.</p>
+        <p>This platform is growing step by step. Every test you take and every bit of feedback you share helps improve the page further. Your support will help expand the question bank and improve the quality of the tests.</p>
+        <p>If you are preparing for the GMAT, I hope this page becomes a useful, affordable, and reliable part of your journey. <span class="hl">Practice for free, grow with the platform.</span></p>
+      </div>
+      <div class="value-cards reveal">
+        <div class="value-card"><div class="value-icon">🎯</div><div><div class="value-title">GMAT-Style Questions</div><div class="value-desc">Questions designed to match the structure, tone, and difficulty of the real exam.</div></div></div>
+        <div class="value-card"><div class="value-icon">🤖</div><div><div class="value-title">Adaptive Difficulty</div><div class="value-desc">The test adapts in real-time based on your performance — just like the actual GMAT.</div></div></div>
+        <div class="value-card"><div class="value-icon">💰</div><div><div class="value-title">Genuinely Affordable</div><div class="value-desc">Free tests to start. Premium access at a fraction of what other platforms charge.</div></div></div>
+        <div class="value-card"><div class="value-icon">📈</div><div><div class="value-title">Detailed Analytics</div><div class="value-desc">Post-test review with explanations, accuracy by difficulty, and adaptive path visualisation.</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-features" id="tests">
+  <div class="section-inner">
+    <div class="sec-tag">What's Inside</div>
+    <h2 class="sec-title" style="color:#fff">Everything You Need to Prepare</h2>
+    <div class="feat-grid">
+      <div class="feat-card reveal"><div class="feat-num">Q</div><div class="feat-title">Quantitative Reasoning</div><div class="feat-desc">Problem Solving across Arithmetic, Algebra, Geometry and more. Adaptive difficulty engine included.</div><span class="badge-free">2 Free Tests</span><span class="badge-pro">8 Premium</span></div>
+      <div class="feat-card reveal"><div class="feat-num">V</div><div class="feat-title">Verbal Reasoning</div><div class="feat-desc">Critical Reasoning and Reading Comprehension — tackled systematically with full explanations.</div><span class="badge-free">2 Free Tests</span><span class="badge-pro">8 Premium</span></div>
+      <div class="feat-card reveal"><div class="feat-num">DI</div><div class="feat-title">Data Insights</div><div class="feat-desc">Data Sufficiency, Multi-Source Reasoning, Two-Part Analysis — built for the GMAT Focus format.</div><span class="badge-free">2 Free Tests</span><span class="badge-pro">8 Premium</span></div>
+      <div class="feat-card reveal"><div class="feat-num">⏱</div><div class="feat-title">45-Minute Timer</div><div class="feat-desc">Real exam timing conditions on every sectional. Build time management before the actual test.</div><span class="badge-free">All Tests</span></div>
+      <div class="feat-card reveal"><div class="feat-num">📊</div><div class="feat-title">Full Review & Analytics</div><div class="feat-desc">Adaptive path, accuracy by difficulty, time per question, and every explanation after the test.</div><span class="badge-free">All Tests</span></div>
+      <div class="feat-card reveal"><div class="feat-num">🧪</div><div class="feat-title">Full Mocks <small style="font-size:12px;opacity:.6">(Coming Soon)</small></div><div class="feat-desc">Full-length timed GMAT mocks combining all three sections — a true end-to-end simulation.</div><span class="badge-pro">Premium</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section-pricing" id="pricing">
+  <div class="section-inner" style="text-align:center">
+    <div class="sec-tag">Pricing</div>
+    <h2 class="sec-title" style="margin:0 auto 12px">Simple, Honest Pricing</h2>
+    <p style="color:var(--muted);font-size:15px;max-width:460px;margin:0 auto">No hidden fees. Start free and upgrade only when you're ready.</p>
+    <div class="pricing-grid">
+      <div class="price-card reveal">
+        <div class="price-plan">Free</div>
+        <div class="price-amount">₹0 <span>/ forever</span></div>
+        <div class="price-desc">Start practising today, no card required.</div>
+        <ul class="price-feats">
+          <li><span class="check">✓</span>2 Quant sectional tests</li>
+          <li><span class="check">✓</span>2 Verbal sectional tests</li>
+          <li><span class="check">✓</span>2 DI sectional tests</li>
+          <li><span class="check">✓</span>Full review + explanations</li>
+          <li><span class="check">✓</span>Adaptive difficulty engine</li>
+          <li class="locked"><span class="lock">🔒</span>Full mock tests</li>
+          <li class="locked"><span class="lock">🔒</span>8 more tests per section</li>
+        </ul>
+        <button class="btn-price btn-price-free" onclick="openModal('signup')">Get Started Free</button>
+      </div>
+      <div class="price-card featured reveal">
+        <div class="price-popular">Most Popular</div>
+        <div class="price-plan">Premium</div>
+        <div class="price-amount">₹299 <span>/ month</span></div>
+        <div class="price-desc">Full access to every test and every feature.</div>
+        <ul class="price-feats">
+          <li><span class="check">✓</span>Everything in Free</li>
+          <li><span class="check">✓</span>10 Quant sectional tests</li>
+          <li><span class="check">✓</span>10 Verbal sectional tests</li>
+          <li><span class="check">✓</span>10 DI sectional tests</li>
+          <li><span class="check">✓</span>Full mock tests (coming soon)</li>
+          <li><span class="check">✓</span>Cancel anytime</li>
+        </ul>
+        <button class="btn-price btn-price-pro" onclick="openModal('signup')">Start Free Trial</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-brand-name">Sasta GMAT Prep</div>
+      <p>Affordable, adaptive GMAT practice for every aspirant. Practice for free, grow with the platform.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Practice</div>
+      <ul class="footer-links">
+        <li><a href="#">Quant Sectionals</a></li>
+        <li><a href="#">Verbal Sectionals</a></li>
+        <li><a href="#">Data Insights</a></li>
+        <li><a href="#">Full Mocks (Soon)</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Platform</div>
+      <ul class="footer-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Sasta GMAT Prep. Built for GMAT aspirants everywhere.</p>
+    <p>Questions? <a href="mailto:hello@sastagmat.com">hello@sastagmat.com</a></p>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-logo">Sasta GMAT Prep</div>
+      <div class="modal-sub">Affordable GMAT practice for everyone</div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="m-tab-li" onclick="switchModal('login')">Log In</button>
+        <button class="modal-tab" id="m-tab-su" onclick="switchModal('signup')">Sign Up</button>
+      </div>
+      <div id="m-panel-li">
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="you@example.com" id="m-li-email" autocomplete="email"></div>
+        <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" placeholder="••••••••" id="m-li-pwd" autocomplete="current-password"><div class="form-err" id="m-li-err"></div></div>
+        <button class="btn-auth" id="m-btn-li" onclick="handleModalLogin()"><span class="btn-text-inner">Log In →</span><div class="btn-spinner"></div></button>
+        <div class="or-div">or</div>
+        <button class="btn-google" onclick="handleGoogleLogin()"><svg class="gicon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Continue with Google</button>
+        <div class="auth-note"><a onclick="switchModal('signup')">No account? Sign up free</a></div>
+      </div>
+      <div id="m-panel-su" style="display:none">
+        <div class="form-row-2">
+          <div class="form-group"><label class="form-label">First Name</label><input class="form-input" type="text" placeholder="Rahul" id="m-fname"></div>
+          <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" type="text" placeholder="Sharma" id="m-lname"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="you@example.com" id="m-su-email" autocomplete="email"><div class="form-err" id="m-su-err"></div></div>
+        <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" placeholder="Min 8 characters" id="m-su-pwd" oninput="setPwdBars(this.value,'pb2')" autocomplete="new-password"><div class="pwd-bars"><div class="pwd-bar" id="pb21"></div><div class="pwd-bar" id="pb22"></div><div class="pwd-bar" id="pb23"></div><div class="pwd-bar" id="pb24"></div></div></div>
+        <button class="btn-auth" id="m-btn-su" onclick="handleModalSignup()"><span class="btn-text-inner">Create Free Account →</span><div class="btn-spinner"></div></button>
+        <div class="or-div">or</div>
+        <button class="btn-google" onclick="handleGoogleLogin()"><svg class="gicon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Continue with Google</button>
+        <div class="auth-note">By signing up you agree to our <a href="#">Terms</a>. <a onclick="switchModal('login')">Already have an account?</a></div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- TEST -->
-<div id="screen-test" class="screen">
-  <div class="exam-header">
-    <div class="exam-header-left">GMAT · Quantitative Reasoning</div>
-    <div class="exam-header-center" id="test-prog-lbl">Question 1 of 21</div>
-    <div class="exam-timer" id="test-timer">45:00</div>
-  </div>
-  <div class="progress-bar-wrap">
-    <div class="progress-bar-fill" id="prog-bar" style="width:0%"></div>
-  </div>
-  <div class="test-body">
-    <div class="question-panel">
-      <div class="q-meta">
-        <div class="q-num-badge" id="q-num">Q1</div>
-        <div class="q-diff-badge Medium" id="q-diff">Medium</div>
-        <div class="q-topic" id="q-topic"></div>
-      </div>
-      <div class="question-text" id="q-text"></div>
-    </div>
-    <div class="options-panel">
-      <div>
-        <div class="options-title">Select one answer</div>
-        <div class="options-list" id="opts-list"></div>
-      </div>
-      <div class="options-actions">
-        <button class="btn-skip" id="btn-skip">Skip</button>
-        <button class="btn-next" id="btn-next" disabled>Next →</button>
-      </div>
-    </div>
+<!-- SUCCESS -->
+<div class="success-ov" id="success-ov">
+  <div class="success-box">
+    <div class="success-icon">✅</div>
+    <div class="success-title" id="success-title">Welcome aboard!</div>
+    <div class="success-msg" id="success-msg">Your account is ready. Check your email to confirm it, then log in and start practising.</div>
+    <button class="btn-success" onclick="document.getElementById('success-ov').classList.remove('open')">Got it →</button>
   </div>
 </div>
 
-<!-- RESULTS -->
-<div id="screen-results" class="screen">
-  <div class="exam-header">
-    <div class="exam-header-left">GMAT · Quantitative Reasoning</div>
-    <div class="exam-header-center">Sectional Test Complete</div>
-    <div class="exam-timer" style="font-size:12px;letter-spacing:0">Results</div>
-  </div>
-  <div class="results-body">
-    <h2 class="results-title">Your Performance</h2>
-    <p class="results-sub" id="res-sub"></p>
+<div class="toast info" id="toast"></div>
 
-    <div class="scorecard">
-      <div class="score-main">
-        <div class="score-pct" id="res-pct">—</div>
-        <div class="score-lbl">Accuracy</div>
-      </div>
-      <div class="score-grid">
-        <div class="score-stat"><span class="score-val g" id="res-correct">0</span><span class="score-stat-lbl">Correct</span></div>
-        <div class="score-stat"><span class="score-val r" id="res-wrong">0</span><span class="score-stat-lbl">Wrong</span></div>
-        <div class="score-stat"><span class="score-val gr" id="res-skip">0</span><span class="score-stat-lbl">Skipped</span></div>
-        <div class="score-stat"><span class="score-val" id="res-time">—</span><span class="score-stat-lbl">Avg/Q</span></div>
-      </div>
-    </div>
-
-    <div class="trail-card">
-      <div class="card-title">Adaptive Path — click any dot to see the question</div>
-      <div class="trail-dots" id="trail-dots"></div>
-      <div class="trail-legend">
-        <span><span class="leg-dot" style="background:#42a5f5"></span>Medium correct</span>
-        <span><span class="leg-dot" style="background:#7e57c2"></span>Hard correct</span>
-        <span><span class="leg-dot" style="background:#66bb6a"></span>Easy correct</span>
-        <span><span class="leg-dot" style="background:#c62828;opacity:.5"></span>Wrong</span>
-        <span><span class="leg-dot" style="background:#bbb"></span>Skipped</span>
-      </div>
-    </div>
-
-    <div class="review-card">
-      <div class="review-head">
-        <div>#</div><div>Question</div><div>Result</div>
-        <div>Difficulty</div><div>Yours</div><div>Correct</div>
-      </div>
-      <div id="review-rows"></div>
-    </div>
-
-    <div class="results-actions">
-      <button class="btn-primary" id="btn-home">← Back to Home</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script src="questions.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ── ADAPTIVE ENGINE ──
-const Adaptive = {
-  diff: 'Medium',
-  last2: [],
-  used: new Set(),
-  pools: {Easy:[],Medium:[],Hard:[]},
+const SUPA_URL = 'https://uavoffiwmocvvymtrsat.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhdm9mZml3bW9jdnZ5bXRyc2F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MjkxMjAsImV4cCI6MjA5NDQwNTEyMH0.YSob4QEO0lIZl9GNdjEKS4RHFSB7yhc7eLekV6PuWAY';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-  init(testQuestions) {
-    // testQuestions: array of questions assigned to this test
-    // Shuffle each pool
-    const byDiff = {Easy:[],Medium:[],Hard:[]};
-    testQuestions.forEach(q => byDiff[q.difficulty] && byDiff[q.difficulty].push(q));
-    this.pools.Easy   = shuffle(byDiff.Easy);
-    this.pools.Medium = shuffle(byDiff.Medium);
-    this.pools.Hard   = shuffle(byDiff.Hard);
-    this.diff = 'Medium';
-    this.last2 = [];
-    this.used = new Set();
-  },
+// ── AUTH STATE ──
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) setLoggedIn(session.user);
 
-  update(result) {
-    if (result === 'skip') return;
-    this.last2.push(result);
-    if (this.last2.length > 2) this.last2.shift();
-    const l = this.last2;
-    if (l.length === 2 && l[0]==='correct' && l[1]==='correct') {
-      if (this.diff==='Easy')   this.diff='Medium';
-      else if (this.diff==='Medium') this.diff='Hard';
-    } else if (l.length === 2 && l[0]==='wrong' && l[1]==='wrong') {
-      if (this.diff==='Hard')   this.diff='Medium';
-      else if (this.diff==='Medium') this.diff='Easy';
-    }
-  },
-
-  next() {
-    let q = this._pick(this.diff);
-    if (q) return q;
-    const fallback = this.diff==='Hard' ? ['Medium','Easy'] :
-                     this.diff==='Easy' ? ['Medium','Hard'] : ['Hard','Easy'];
-    for (const d of fallback) { q = this._pick(d); if (q) return q; }
-    return null;
-  },
-
-  _pick(d) {
-    const avail = this.pools[d].filter(q => !this.used.has(q.id));
-    if (!avail.length) return null;
-    this.used.add(avail[0].id);
-    return avail[0];
-  }
-};
-
-// ── TEST STATE ──
-const Test = {
-  entries: [],   // {q, selected, result, time}
-  idx: 0,
-  total: 21,
-  secsLeft: 45*60,
-  interval: null,
-  qStart: null,
-  sel: null,
-  testId: null,
-
-  start(testId, questions) {
-    this.testId   = testId;
-    this.entries  = [];
-    this.idx      = 0;
-    this.secsLeft = 45*60;
-    this.sel      = null;
-    clearInterval(this.interval);
-
-    Adaptive.init(questions);
-    const first = Adaptive.next();
-    if (!first) { toast('Not enough questions for this test.'); return; }
-    this.entries.push({q:first, selected:null, result:null, time:0});
-
-    showScreen('test');
-    this.renderQ();
-    this.startTimer();
-  },
-
-  renderQ() {
-    const e = this.entries[this.idx];
-    const q = e.q;
-    document.getElementById('test-prog-lbl').textContent = `Question ${this.idx+1} of ${this.total}`;
-    document.getElementById('prog-bar').style.width = (this.idx/this.total*100)+'%';
-    document.getElementById('q-num').textContent = `Q${this.idx+1}`;
-    const db = document.getElementById('q-diff');
-    db.textContent = q.difficulty; db.className = `q-diff-badge ${q.difficulty}`;
-    document.getElementById('q-topic').textContent = q.topic || '';
-    document.getElementById('q-text').textContent = q.question;
-
-    const ol = document.getElementById('opts-list');
-    ol.innerHTML = '';
-    ['A','B','C','D','E'].forEach(l => {
-      if (!q.options[l]) return;
-      const row = document.createElement('div');
-      row.className = 'option-row';
-      row.dataset.l = l;
-      row.innerHTML = `<span class="option-letter">${l}.</span><span class="option-text">${q.options[l]}</span>`;
-      row.addEventListener('click', () => this.pick(l));
-      ol.appendChild(row);
-    });
-
-    this.sel = null;
-    document.getElementById('btn-next').disabled = true;
-    this.qStart = Date.now();
-  },
-
-  pick(l) {
-    this.sel = l;
-    document.querySelectorAll('.option-row').forEach(r =>
-      r.classList.toggle('selected', r.dataset.l === l));
-    document.getElementById('btn-next').disabled = false;
-  },
-
-  advance(skip=false) {
-    const e = this.entries[this.idx];
-    e.time = Math.round((Date.now()-this.qStart)/1000);
-    if (skip) {
-      e.selected = null; e.result = 'skip';
-      Adaptive.update('skip');
-    } else {
-      e.selected = this.sel;
-      e.result = this.sel === e.q.answer ? 'correct' : 'wrong';
-      Adaptive.update(e.result);
-    }
-    this.idx++;
-    if (this.idx >= this.total) { this.end(); return; }
-    const next = Adaptive.next();
-    if (!next) { this.end(); return; }
-    this.entries.push({q:next, selected:null, result:null, time:0});
-    this.renderQ();
-  },
-
-  startTimer() {
-    const el = document.getElementById('test-timer');
-    this.interval = setInterval(() => {
-      this.secsLeft--;
-      const m = Math.floor(this.secsLeft/60), s = this.secsLeft%60;
-      el.textContent = `${m}:${String(s).padStart(2,'0')}`;
-      if (this.secsLeft <= 300) el.classList.add('urgent');
-      if (this.secsLeft <= 0) { clearInterval(this.interval); this.end(); }
-    }, 1000);
-  },
-
-  end() {
-    clearInterval(this.interval);
-    document.getElementById('prog-bar').style.width = '100%';
-    this.renderResults();
-    showScreen('results');
-  },
-
-  renderResults() {
-    const es = this.entries;
-    const correct = es.filter(e=>e.result==='correct').length;
-    const wrong   = es.filter(e=>e.result==='wrong').length;
-    const skip    = es.filter(e=>e.result==='skip').length;
-    const total   = es.length;
-    const pct     = total ? Math.round(correct/total*100) : 0;
-    const avgT    = total ? Math.round(es.reduce((s,e)=>s+e.time,0)/total) : 0;
-    const elapsed = 45*60 - this.secsLeft;
-    const em = Math.floor(elapsed/60), esec = elapsed%60;
-
-    document.getElementById('res-pct').textContent     = pct+'%';
-    document.getElementById('res-correct').textContent = correct;
-    document.getElementById('res-wrong').textContent   = wrong;
-    document.getElementById('res-skip').textContent    = skip;
-    document.getElementById('res-time').textContent    = avgT+'s';
-    document.getElementById('res-sub').textContent     =
-      `${total} questions · ${em}m ${esec}s elapsed · Adaptive difficulty`;
-
-    // Trail
-    const td = document.getElementById('trail-dots');
-    td.innerHTML = '';
-    es.forEach((e,i) => {
-      const d = document.createElement('div');
-      const d0 = e.q.difficulty[0]; // E M H
-      let cls = e.result==='skip' ? 'sk' :
-                e.result==='correct' ? `c${d0}` : `w${d0}`;
-      d.className = `tdot ${cls}`;
-      d.textContent = d0;
-      d.title = `Q${i+1}: ${e.q.difficulty} · ${e.result==='skip'?'skipped':e.result}`;
-      d.addEventListener('click', () => {
-        // Scroll to review row
-        const row = document.getElementById(`rrow-${i}`);
-        if (row) { row.scrollIntoView({behavior:'smooth',block:'center'}); row.click(); }
-      });
-      td.appendChild(d);
-    });
-
-    // Review rows
-    const rr = document.getElementById('review-rows');
-    rr.innerHTML = '';
-    es.forEach((e,i) => {
-      const cls  = e.result==='correct'?'cr':e.result==='wrong'?'wr':'sk';
-      const pill = e.result==='correct'?'<span class="rpill C">✓ Correct</span>':
-                   e.result==='wrong'  ?'<span class="rpill W">✗ Wrong</span>':
-                                        '<span class="rpill S">— Skip</span>';
-      const dp   = `<span class="dpill ${e.q.difficulty}">${e.q.difficulty}</span>`;
-      const qShort = e.q.question.length>55 ? e.q.question.slice(0,55)+'…' : e.q.question;
-
-      const row = document.createElement('div');
-      row.className = `review-row ${cls}`;
-      row.id = `rrow-${i}`;
-      row.innerHTML = `
-        <div class="rc">${i+1}</div>
-        <div class="rc qt" title="${e.q.question.replace(/"/g,'')}">${qShort}</div>
-        <div class="rc">${pill}</div>
-        <div class="rc">${dp}</div>
-        <div class="rc">${e.selected||'—'}</div>
-        <div class="rc">${e.q.answer}</div>`;
-
-      // Expand panel
-      const exp = document.createElement('div');
-      exp.className = 'exp-panel';
-
-      const qDiv = document.createElement('div');
-      qDiv.className = 'exp-q';
-      qDiv.textContent = e.q.question;
-
-      const optsDiv = document.createElement('div');
-      optsDiv.className = 'exp-opts';
-      ['A','B','C','D','E'].forEach(l => {
-        if (!e.q.options[l]) return;
-        const line = document.createElement('div');
-        line.className = 'exp-opt' +
-          (l===e.q.answer ? ' ca' : l===e.selected&&l!==e.q.answer ? ' wa' : '');
-        line.textContent = `${l}. ${e.q.options[l]}`;
-        optsDiv.appendChild(line);
-      });
-
-      const explDiv = document.createElement('div');
-      explDiv.className = 'exp-text';
-      explDiv.textContent = e.q.explanation
-        ? `Explanation:\n${e.q.explanation}`
-        : `The correct answer is ${e.q.answer}.`;
-
-      exp.appendChild(qDiv);
-      exp.appendChild(optsDiv);
-      exp.appendChild(explDiv);
-
-      let open = false;
-      row.addEventListener('click', () => {
-        open = !open;
-        exp.style.display = open ? 'block' : 'none';
-      });
-
-      rr.appendChild(row);
-      rr.appendChild(exp);
-    });
-  }
-};
-
-// ── QUESTION STORE ──
-function getQuestions() {
-  // First try localStorage (admin-added), then fall back to preloaded
-  try {
-    const stored = localStorage.getItem('gmat_questions');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (parsed && parsed.length > 0) return parsed;
-    }
-  } catch(e) {}
-  return typeof PRELOADED_QUESTIONS !== 'undefined' ? PRELOADED_QUESTIONS : [];
-}
-
-function getTests() {
-  try {
-    const stored = localStorage.getItem('gmat_tests');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (parsed && parsed.length > 0) return parsed;
-    }
-  } catch(e) {}
-  // Default: one test with all preloaded questions
-  return [{id:'T1', name:'Sectional Test 1', questionIds: null}]; // null = use all
-}
-
-// ── HOME RENDER ──
-function renderHome() {
-  const tests    = getTests();
-  const allQs    = getQuestions();
-  const wrap     = document.getElementById('test-cards');
-  const noQMsg   = document.getElementById('no-q-msg');
-  wrap.innerHTML = '';
-
-  if (allQs.length === 0) {
-    noQMsg.style.display = 'block'; return;
-  }
-  noQMsg.style.display = 'none';
-
-  tests.forEach((t, idx) => {
-    // Get questions for this test
-    const qs = t.questionIds
-      ? allQs.filter(q => t.questionIds.includes(q.id))
-      : allQs;
-
-    const enough = qs.length >= 5;
-    const card   = document.createElement('div');
-    card.className = 'test-card' + (enough ? '' : ' locked');
-
-    const easy   = qs.filter(q=>q.difficulty==='Easy').length;
-    const medium = qs.filter(q=>q.difficulty==='Medium').length;
-    const hard   = qs.filter(q=>q.difficulty==='Hard').length;
-
-    card.innerHTML = `
-      <div class="test-card-top">
-        <div class="test-card-name">${t.name}</div>
-        <div class="test-card-badge">${enough ? 'Adaptive' : 'Coming Soon'}</div>
-      </div>
-      <div class="test-card-meta">
-        <span>21 Questions</span>
-        <span>45 Minutes</span>
-        <span>Easy ${easy} · Medium ${medium} · Hard ${hard}</span>
-      </div>`;
-
-    if (!enough) {
-      const lock = document.createElement('div');
-      lock.className = 'lock-badge'; lock.textContent = '🔒';
-      card.appendChild(lock);
-    } else {
-      card.addEventListener('click', () => Test.start(t.id, qs));
-    }
-    wrap.appendChild(card);
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) setLoggedIn(session.user);
+    if (event === 'SIGNED_OUT') setLoggedOut();
   });
 }
 
-// ── UTILS ──
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-'+name).classList.add('active');
-  window.scrollTo(0,0);
-}
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.display = 'block';
-  clearTimeout(window._tt);
-  window._tt = setTimeout(()=>t.style.display='none', 3000);
-}
-function shuffle(a) {
-  const b=[...a];
-  for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}
-  return b;
+function setLoggedIn(user) {
+  const name = user.user_metadata?.full_name || user.email.split('@')[0];
+  const initials = name.slice(0,2).toUpperCase();
+
+  // Nav
+  document.getElementById('nav-login-btn').style.display  = 'none';
+  document.getElementById('nav-signup-btn').style.display = 'none';
+  document.getElementById('nav-dash-btn').style.display   = 'inline-flex';
+  document.getElementById('nav-signout-btn').style.display= 'inline-block';
+  document.getElementById('nav-uname').style.display      = 'inline';
+  document.getElementById('nav-uname').textContent        = name.split(' ')[0];
+
+  // Hero CTA
+  const cta = document.getElementById('hero-cta');
+  cta.textContent = 'Go to Dashboard →';
+  cta.onclick = () => window.location.href = 'dashboard.html';
+
+  // Card
+  document.getElementById('auth-loggedout').style.display = 'none';
+  document.getElementById('auth-loggedin').classList.add('active');
+  document.getElementById('card-av').textContent    = initials;
+  document.getElementById('card-name').textContent  = name;
+  document.getElementById('card-email').textContent = user.email;
 }
 
-// ── EVENTS ──
-document.getElementById('btn-next').addEventListener('click', () => Test.advance(false));
-document.getElementById('btn-skip').addEventListener('click', () => Test.advance(true));
-document.getElementById('btn-home').addEventListener('click', () => { renderHome(); showScreen('home'); });
+function setLoggedOut() {
+  document.getElementById('nav-login-btn').style.display  = 'inline-block';
+  document.getElementById('nav-signup-btn').style.display = 'inline-flex';
+  document.getElementById('nav-dash-btn').style.display   = 'none';
+  document.getElementById('nav-signout-btn').style.display= 'none';
+  document.getElementById('nav-uname').style.display      = 'none';
+  const cta = document.getElementById('hero-cta');
+  cta.textContent = 'Start Practising Free →';
+  cta.onclick = () => openModal('signup');
+  document.getElementById('auth-loggedout').style.display = 'block';
+  document.getElementById('auth-loggedin').classList.remove('active');
+}
 
-// ── INIT ──
-renderHome();
+// ── LOGIN ──
+async function handleLogin() {
+  const email = g('li-email').value.trim();
+  const pwd   = g('li-pwd').value;
+  if (!email || !pwd) { showErr('li-err','Please enter your email and password.'); return; }
+  setLoad('btn-li', true);
+  const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  setLoad('btn-li', false);
+  if (error) { showErr('li-err', error.message==='Invalid login credentials' ? 'Incorrect email or password.' : error.message); }
+  else { closeModal(); toast('Welcome back! 👋','success'); setTimeout(()=>window.location.href='dashboard.html',1200); }
+}
+
+// ── SIGNUP ──
+async function handleSignup() {
+  const fname = g('su-fname').value.trim();
+  const lname = g('su-lname').value.trim();
+  const email = g('su-email').value.trim();
+  const pwd   = g('su-pwd').value;
+  if (!validEmail(email)) { showErr('su-email-err','Please enter a valid email.'); return; }
+  if (pwd.length < 8)     { showErr('su-pwd-err','Password must be at least 8 characters.'); return; }
+  setLoad('btn-su', true);
+  const { error } = await sb.auth.signUp({ email, password: pwd, options: { data: { full_name: (fname+' '+lname).trim() } } });
+  setLoad('btn-su', false);
+  if (error) { showErr('su-email-err', error.message); }
+  else { g('success-title').textContent = 'Welcome'+(fname?', '+fname:'')+'! 🎉'; g('success-ov').classList.add('open'); }
+}
+
+// ── MODAL LOGIN ──
+async function handleModalLogin() {
+  const email = g('m-li-email').value.trim();
+  const pwd   = g('m-li-pwd').value;
+  if (!email || !pwd) { showErr('m-li-err','Please fill in both fields.'); return; }
+  setLoad('m-btn-li', true);
+  const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  setLoad('m-btn-li', false);
+  if (error) { showErr('m-li-err', error.message==='Invalid login credentials'?'Incorrect email or password.':error.message); }
+  else { closeModal(); toast('Welcome back! 👋','success'); setTimeout(()=>window.location.href='dashboard.html',1200); }
+}
+
+// ── MODAL SIGNUP ──
+async function handleModalSignup() {
+  const fname = g('m-fname').value.trim();
+  const lname = g('m-lname').value.trim();
+  const email = g('m-su-email').value.trim();
+  const pwd   = g('m-su-pwd').value;
+  if (!validEmail(email)) { showErr('m-su-err','Please enter a valid email.'); return; }
+  if (pwd.length < 8)     { showErr('m-su-err','Password must be at least 8 characters.'); return; }
+  setLoad('m-btn-su', true);
+  const { error } = await sb.auth.signUp({ email, password: pwd, options: { data: { full_name: (fname+' '+lname).trim() } } });
+  setLoad('m-btn-su', false);
+  if (error) { showErr('m-su-err', error.message); }
+  else { closeModal(); g('success-title').textContent = 'Welcome'+(fname?', '+fname:'')+'! 🎉'; g('success-ov').classList.add('open'); }
+}
+
+// ── GOOGLE ──
+async function handleGoogleLogin() {
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/dashboard.html' }
+  });
+  if (error) toast('Google sign-in failed: '+error.message, 'error');
+}
+
+// ── SIGN OUT ──
+async function handleSignOut() {
+  await sb.auth.signOut();
+  toast('Signed out successfully','info');
+}
+
+// ── UI HELPERS ──
+const g = id => document.getElementById(id);
+
+function switchTab(t) {
+  g('tab-login').classList.toggle('active',t==='login');
+  g('tab-signup').classList.toggle('active',t==='signup');
+  g('panel-login').classList.toggle('active',t==='login');
+  g('panel-signup').classList.toggle('active',t==='signup');
+}
+function openModal(t) { g('modal-overlay').classList.add('open'); switchModal(t); }
+function closeModal()  { g('modal-overlay').classList.remove('open'); }
+function switchModal(t) {
+  g('m-tab-li').classList.toggle('active',t==='login');
+  g('m-tab-su').classList.toggle('active',t==='signup');
+  g('m-panel-li').style.display = t==='login'  ? 'block' : 'none';
+  g('m-panel-su').style.display = t==='signup' ? 'block' : 'none';
+}
+function setLoad(id, on) {
+  const b = g(id); if(!b) return;
+  b.classList.toggle('loading', on); b.disabled = on;
+}
+function showErr(id, msg) {
+  const el = g(id); if(!el) return;
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 5000);
+}
+let _tt;
+function toast(msg, type='info') {
+  const t = g('toast'); t.textContent=msg; t.className='toast '+type; t.style.display='block';
+  clearTimeout(_tt); _tt=setTimeout(()=>t.style.display='none',3500);
+}
+function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function setPwdBars(v, p) {
+  let s=0;
+  if(v.length>=8)s++; if(v.length>=12)s++;
+  if(/[A-Z]/.test(v)&&/[0-9]/.test(v))s++;
+  if(/[^A-Za-z0-9]/.test(v))s++;
+  const c=s<=1?'weak':s<=2?'medium':'strong';
+  for(let i=1;i<=4;i++){const b=g(p+i);if(b)b.className='pwd-bar '+(i<=s?c:'');}
+}
+
+// Enter key
+document.addEventListener('DOMContentLoaded', () => {
+  g('li-pwd').addEventListener('keydown', e=>{ if(e.key==='Enter') handleLogin(); });
+  g('m-li-pwd').addEventListener('keydown', e=>{ if(e.key==='Enter') handleModalLogin(); });
+});
+
+// Scroll reveal
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// Keyboard
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+initAuth();
 </script>
 </body>
 </html>

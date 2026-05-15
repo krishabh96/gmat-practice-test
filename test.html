@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMAT Quant Practice — Sasta GMAT Prep</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh;font-size:15px}
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+
+/* HOME */
+#screen-home{background:#fff;align-items:center;justify-content:center}
+.home-wrap{width:100%;max-width:660px;padding:60px 32px;text-align:center}
+.home-logo{display:inline-block;background:#003865;color:#fff;font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;padding:6px 16px;border-radius:2px;margin-bottom:28px;text-transform:uppercase}
+.home-title{font-size:26px;font-weight:normal;color:#1a1a1a;margin-bottom:6px}
+.home-sub{font-family:Arial,sans-serif;font-size:13px;color:#666;margin-bottom:16px}
+.home-user{font-family:Arial,sans-serif;font-size:13px;color:#003865;font-weight:600;margin-bottom:32px;padding:10px 20px;background:#e8f0f8;border-radius:6px;display:inline-block}
+.test-card{background:#fff;border:2px solid #003865;border-radius:4px;padding:28px 32px;margin-bottom:16px;text-align:left;cursor:pointer;transition:background .15s,box-shadow .15s}
+.test-card:hover{background:#f0f4f8;box-shadow:0 4px 16px rgba(0,56,101,.1)}
+.test-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.test-card-name{font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:#003865}
+.test-card-badge{font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:2px;background:#e8f0f8;color:#003865}
+.test-card-meta{font-family:Arial,sans-serif;font-size:12px;color:#555;line-height:1.7}
+.test-card-meta span{margin-right:16px}
+.test-card-meta span::before{content:'✓ ';color:#003865}
+.home-footer{margin-top:24px;display:flex;gap:12px;justify-content:center}
+.btn-sm-link{font-family:Arial,sans-serif;font-size:13px;color:#003865;background:transparent;border:1px solid #d0cfc8;padding:8px 18px;border-radius:3px;cursor:pointer;text-decoration:none;transition:border-color .15s}
+.btn-sm-link:hover{border-color:#003865}
+
+/* EXAM HEADER */
+.exam-header{background:#003865;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:52px;flex-shrink:0}
+.exam-header-left{font-family:Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px}
+.exam-header-center{font-family:Arial,sans-serif;font-size:13px;color:#c5d8e8}
+.exam-timer{font-family:'Courier New',monospace;font-size:16px;font-weight:700;background:rgba(255,255,255,.1);padding:4px 14px;border-radius:3px;letter-spacing:2px;min-width:80px;text-align:center}
+.exam-timer.urgent{color:#ffb3b3;background:rgba(255,80,80,.15)}
+.progress-bar-wrap{background:#d0cfc8;height:4px;flex-shrink:0}
+.progress-bar-fill{height:100%;background:#003865;transition:width .4s ease}
+
+/* TEST */
+#screen-test{background:#f5f4f0}
+.test-body{flex:1;display:flex;max-width:1120px;width:100%;margin:0 auto;padding:28px 24px;gap:24px}
+.question-panel{flex:1.5;background:#fff;border:1px solid #d0cfc8;border-radius:3px;padding:32px 36px;min-height:480px}
+.q-meta{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid #e8e6e0}
+.q-num-badge{font-family:Arial,sans-serif;font-size:11px;font-weight:700;color:#003865;background:#e8f0f8;padding:3px 10px;border-radius:2px;letter-spacing:.5px}
+.q-diff-badge{font-family:Arial,sans-serif;font-size:11px;font-weight:600;padding:3px 10px;border-radius:2px}
+.q-diff-badge.Easy{background:#e8f5e8;color:#2e7d32}
+.q-diff-badge.Medium{background:#fff8e1;color:#f57f17}
+.q-diff-badge.Hard{background:#fce8e8;color:#c62828}
+.q-topic{font-family:Arial,sans-serif;font-size:11px;color:#999;margin-left:auto;max-width:200px;text-align:right}
+.question-text{font-size:15px;line-height:1.9;color:#1a1a1a;white-space:pre-wrap}
+.options-panel{flex:1;background:#fff;border:1px solid #d0cfc8;border-radius:3px;padding:28px;display:flex;flex-direction:column;justify-content:space-between;min-width:280px}
+.options-title{font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888;margin-bottom:14px}
+.options-list{display:flex;flex-direction:column;gap:10px;flex:1}
+.option-row{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1.5px solid #d8d6cf;border-radius:3px;cursor:pointer;transition:border-color .1s,background .1s;background:#fafaf8}
+.option-row:hover{border-color:#003865;background:#f0f4f8}
+.option-row.selected{border-color:#003865;background:#e8f0f8}
+.option-letter{font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:#003865;min-width:20px;padding-top:1px}
+.option-text{font-size:14px;line-height:1.55;color:#1a1a1a;flex:1}
+.options-actions{display:flex;gap:10px;margin-top:20px;padding-top:18px;border-top:1px solid #e8e6e0}
+.btn-next{flex:1;font-family:Arial,sans-serif;font-size:13px;font-weight:700;padding:12px;background:#003865;color:#fff;border:none;border-radius:3px;cursor:pointer;transition:background .15s}
+.btn-next:hover{background:#004d8a}
+.btn-next:disabled{background:#aac2d8;cursor:not-allowed}
+.btn-skip{font-family:Arial,sans-serif;font-size:13px;font-weight:700;padding:12px 16px;background:transparent;border:1.5px solid #ccc;color:#666;border-radius:3px;cursor:pointer;transition:all .15s}
+.btn-skip:hover{border-color:#999;color:#333}
+
+/* RESULTS */
+#screen-results{background:#f5f4f0}
+.results-body{flex:1;max-width:840px;width:100%;margin:0 auto;padding:36px 24px 80px}
+.results-title{font-size:22px;font-weight:normal;margin-bottom:4px}
+.results-sub{font-family:Arial,sans-serif;font-size:13px;color:#666;margin-bottom:28px}
+.scorecard{background:#fff;border:1px solid #d0cfc8;border-radius:3px;padding:28px 32px;margin-bottom:20px;display:flex;gap:0;align-items:center}
+.score-main{flex:0 0 160px;text-align:center;border-right:1px solid #e8e6e0;padding-right:28px;margin-right:28px}
+.score-pct{font-family:Arial,sans-serif;font-size:52px;font-weight:700;color:#003865;line-height:1}
+.score-lbl{font-family:Arial,sans-serif;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.score-grid{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.score-stat{text-align:center}
+.score-val{font-family:Arial,sans-serif;font-size:24px;font-weight:700;display:block}
+.score-val.g{color:#2e7d32}.score-val.r{color:#c62828}.score-val.gr{color:#888}
+.score-stat-lbl{font-family:Arial,sans-serif;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px}
+.trail-card{background:#fff;border:1px solid #d0cfc8;border-radius:3px;padding:22px 28px;margin-bottom:20px}
+.card-title{font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#666;margin-bottom:14px}
+.trail-dots{display:flex;flex-wrap:wrap;gap:8px}
+.tdot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;font-size:10px;font-weight:700;color:#fff;cursor:pointer;transition:transform .15s}
+.tdot:hover{transform:scale(1.15)}
+.tdot.cE{background:#66bb6a}.tdot.cM{background:#42a5f5}.tdot.cH{background:#7e57c2}
+.tdot.wE{background:#ef9a9a}.tdot.wM{background:#90caf9}.tdot.wH{background:#ce93d8}
+.tdot.sk{background:#bbb}
+.trail-legend{display:flex;gap:16px;margin-top:12px;font-family:Arial,sans-serif;font-size:11px;color:#888;flex-wrap:wrap}
+.trail-legend span{display:flex;align-items:center;gap:5px}
+.leg-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.review-card{background:#fff;border:1px solid #d0cfc8;border-radius:3px;overflow:hidden;margin-bottom:24px}
+.review-head{display:grid;grid-template-columns:36px 1fr 80px 80px 60px 60px;background:#003865;color:#fff;font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:10px 20px;gap:8px}
+.review-row{display:grid;grid-template-columns:36px 1fr 80px 80px 60px 60px;padding:13px 20px;gap:8px;border-bottom:1px solid #f0ede8;align-items:start;cursor:pointer;transition:background .1s}
+.review-row:last-of-type{border-bottom:none}
+.review-row:hover{background:#f8f7f4}
+.review-row.cr{border-left:3px solid #2e7d32}
+.review-row.wr{border-left:3px solid #c62828}
+.review-row.sk{border-left:3px solid #bbb}
+.rc{font-family:Arial,sans-serif;font-size:13px;color:#333}
+.rc.qt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rpill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:2px;display:inline-block}
+.rpill.C{background:#e8f5e8;color:#2e7d32}.rpill.W{background:#fce8e8;color:#c62828}.rpill.S{background:#f0f0f0;color:#888}
+.dpill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:2px;display:inline-block}
+.dpill.Easy{background:#e8f5e8;color:#2e7d32}.dpill.Medium{background:#fff8e1;color:#f57f17}.dpill.Hard{background:#fce8e8;color:#c62828}
+.exp-panel{display:none;padding:18px 20px;background:#f8f7f4;border-top:1px solid #ebe8e2}
+.exp-q{font-size:14px;font-weight:bold;margin-bottom:12px;line-height:1.6;color:#1a1a1a;white-space:pre-wrap}
+.exp-opts{margin-bottom:14px}
+.exp-opt{font-family:Arial,sans-serif;font-size:13px;padding:3px 0;color:#333}
+.exp-opt.ca{color:#2e7d32;font-weight:700}.exp-opt.wa{color:#c62828;text-decoration:line-through}
+.exp-text{font-family:Arial,sans-serif;font-size:13px;line-height:1.75;color:#444;border-top:1px solid #e0ddd8;padding-top:12px;white-space:pre-wrap}
+.results-actions{display:flex;gap:12px;margin-top:8px}
+.btn-primary{font-family:Arial,sans-serif;font-size:13px;font-weight:700;padding:13px 32px;background:#003865;color:#fff;border:none;border-radius:3px;cursor:pointer;transition:background .15s}
+.btn-primary:hover{background:#004d8a}
+.btn-secondary{font-family:Arial,sans-serif;font-size:13px;font-weight:500;padding:13px 32px;background:transparent;color:#003865;border:1.5px solid #003865;border-radius:3px;cursor:pointer;transition:all .15s}
+.btn-secondary:hover{background:#e8f0f8}
+
+/* AUTH LOADING */
+#auth-loading{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px;font-family:Arial,sans-serif;font-size:14px;color:#666}
+.loading-spinner{width:32px;height:32px;border:3px solid #e8e6e0;border-top-color:#003865;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;font-family:Arial,sans-serif;font-size:13px;padding:12px 24px;border-radius:4px;z-index:9999;display:none;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+
+@media(max-width:700px){
+  .test-body{flex-direction:column;padding:16px}
+  .score-grid{grid-template-columns:repeat(2,1fr)}
+  .review-head,.review-row{grid-template-columns:28px 1fr 60px 70px 44px 44px;padding:10px 12px;font-size:11px}
+  .exam-header{padding:0 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- Auth loading overlay -->
+<div id="auth-loading">
+  <div class="loading-spinner"></div>
+  <div>Checking your session...</div>
+</div>
+
+<!-- HOME -->
+<div id="screen-home" class="screen">
+  <div class="home-wrap">
+    <div class="home-logo">GMAT Focus Edition</div>
+    <h1 class="home-title">Quantitative Reasoning</h1>
+    <p class="home-sub">Adaptive Problem Solving · Sectional Practice</p>
+    <div class="home-user" id="home-user-greeting">Welcome!</div>
+    <div id="test-cards"></div>
+    <div class="home-footer">
+      <a class="btn-sm-link" href="dashboard.html">← Dashboard</a>
+      <button class="btn-sm-link" onclick="handleSignOut()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- TEST -->
+<div id="screen-test" class="screen">
+  <div class="exam-header">
+    <div class="exam-header-left">GMAT · Quantitative Reasoning</div>
+    <div class="exam-header-center" id="test-prog-lbl">Question 1 of 21</div>
+    <div class="exam-timer" id="test-timer">45:00</div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="prog-bar" style="width:0%"></div>
+  </div>
+  <div class="test-body">
+    <div class="question-panel">
+      <div class="q-meta">
+        <div class="q-num-badge" id="q-num">Q1</div>
+        <div class="q-diff-badge Medium" id="q-diff">Medium</div>
+        <div class="q-topic" id="q-topic"></div>
+      </div>
+      <div class="question-text" id="q-text"></div>
+    </div>
+    <div class="options-panel">
+      <div>
+        <div class="options-title">Select one answer</div>
+        <div class="options-list" id="opts-list"></div>
+      </div>
+      <div class="options-actions">
+        <button class="btn-skip" id="btn-skip">Skip</button>
+        <button class="btn-next" id="btn-next" disabled>Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="screen-results" class="screen">
+  <div class="exam-header">
+    <div class="exam-header-left">GMAT · Quantitative Reasoning</div>
+    <div class="exam-header-center">Sectional Test Complete</div>
+    <div class="exam-timer" style="font-size:12px;letter-spacing:0">Results</div>
+  </div>
+  <div class="results-body">
+    <h2 class="results-title">Your Performance</h2>
+    <p class="results-sub" id="res-sub"></p>
+    <div class="scorecard">
+      <div class="score-main">
+        <div class="score-pct" id="res-pct">—</div>
+        <div class="score-lbl">Accuracy</div>
+      </div>
+      <div class="score-grid">
+        <div class="score-stat"><span class="score-val g" id="res-correct">0</span><span class="score-stat-lbl">Correct</span></div>
+        <div class="score-stat"><span class="score-val r" id="res-wrong">0</span><span class="score-stat-lbl">Wrong</span></div>
+        <div class="score-stat"><span class="score-val gr" id="res-skip">0</span><span class="score-stat-lbl">Skipped</span></div>
+        <div class="score-stat"><span class="score-val" id="res-time">—</span><span class="score-stat-lbl">Avg/Q</span></div>
+      </div>
+    </div>
+    <div class="trail-card">
+      <div class="card-title">Adaptive Path — click any dot to expand</div>
+      <div class="trail-dots" id="trail-dots"></div>
+      <div class="trail-legend">
+        <span><span class="leg-dot" style="background:#42a5f5"></span>Medium correct</span>
+        <span><span class="leg-dot" style="background:#7e57c2"></span>Hard correct</span>
+        <span><span class="leg-dot" style="background:#66bb6a"></span>Easy correct</span>
+        <span><span class="leg-dot" style="background:#ef9a9a"></span>Wrong</span>
+        <span><span class="leg-dot" style="background:#bbb"></span>Skipped</span>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-head">
+        <div>#</div><div>Question</div><div>Result</div>
+        <div>Difficulty</div><div>Yours</div><div>Correct</div>
+      </div>
+      <div id="review-rows"></div>
+    </div>
+    <div class="results-actions">
+      <button class="btn-primary" id="btn-home">← Back to Tests</button>
+      <button class="btn-secondary" onclick="window.location.href='dashboard.html'">Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="questions.js"></script>
+<script>
+// ── SUPABASE + AUTH GUARD ──
+const SUPA_URL = 'https://uavoffiwmocvvymtrsat.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhdm9mZml3bW9jdnZ5bXRyc2F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MjkxMjAsImV4cCI6MjA5NDQwNTEyMH0.YSob4QEO0lIZl9GNdjEKS4RHFSB7yhc7eLekV6PuWAY';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let currentUser = null;
+
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    window.location.href = 'index.html';
+    return;
+  }
+  currentUser = session.user;
+  const name = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
+  document.getElementById('home-user-greeting').textContent = 'Welcome back, ' + name.split(' ')[0] + '!';
+  document.getElementById('auth-loading').style.display = 'none';
+  renderHome();
+  showScreen('home');
+}
+
+async function handleSignOut() {
+  await sb.auth.signOut();
+  window.location.href = 'index.html';
+}
+
+// ── ADAPTIVE ENGINE ──
+const Adaptive = {
+  diff:'Medium', last2:[], used:new Set(),
+  pools:{Easy:[],Medium:[],Hard:[]},
+
+  init(qs) {
+    const byDiff = {Easy:[],Medium:[],Hard:[]};
+    qs.forEach(q => byDiff[q.difficulty] && byDiff[q.difficulty].push(q));
+    this.pools.Easy   = shuffle(byDiff.Easy);
+    this.pools.Medium = shuffle(byDiff.Medium);
+    this.pools.Hard   = shuffle(byDiff.Hard);
+    this.diff='Medium'; this.last2=[]; this.used=new Set();
+  },
+
+  update(result) {
+    if(result==='skip') return;
+    this.last2.push(result);
+    if(this.last2.length>2) this.last2.shift();
+    const l=this.last2;
+    if(l.length===2&&l[0]==='correct'&&l[1]==='correct'){
+      if(this.diff==='Easy') this.diff='Medium';
+      else if(this.diff==='Medium') this.diff='Hard';
+    } else if(l.length===2&&l[0]==='wrong'&&l[1]==='wrong'){
+      if(this.diff==='Hard') this.diff='Medium';
+      else if(this.diff==='Medium') this.diff='Easy';
+    }
+  },
+
+  next() {
+    let q=this._pick(this.diff);
+    if(q) return q;
+    const fb=this.diff==='Hard'?['Medium','Easy']:this.diff==='Easy'?['Medium','Hard']:['Hard','Easy'];
+    for(const d of fb){q=this._pick(d);if(q)return q;}
+    return null;
+  },
+
+  _pick(d) {
+    const avail=this.pools[d].filter(q=>!this.used.has(q.id));
+    if(!avail.length) return null;
+    this.used.add(avail[0].id);
+    return avail[0];
+  }
+};
+
+// ── TEST STATE ──
+const Test = {
+  entries:[], idx:0, total:21,
+  secsLeft:45*60, interval:null,
+  qStart:null, sel:null,
+
+  start(questions) {
+    this.entries=[]; this.idx=0;
+    this.secsLeft=45*60; this.sel=null;
+    clearInterval(this.interval);
+    Adaptive.init(questions);
+    const first=Adaptive.next();
+    if(!first){toast('Not enough questions.');return;}
+    this.entries.push({q:first,selected:null,result:null,time:0});
+    showScreen('test');
+    this.renderQ();
+    this.startTimer();
+  },
+
+  renderQ() {
+    const e=this.entries[this.idx], q=e.q;
+    document.getElementById('test-prog-lbl').textContent=`Question ${this.idx+1} of ${this.total}`;
+    document.getElementById('prog-bar').style.width=(this.idx/this.total*100)+'%';
+    document.getElementById('q-num').textContent=`Q${this.idx+1}`;
+    const db=document.getElementById('q-diff');
+    db.textContent=q.difficulty; db.className=`q-diff-badge ${q.difficulty}`;
+    document.getElementById('q-topic').textContent=q.topic||'';
+    document.getElementById('q-text').textContent=q.question;
+    const ol=document.getElementById('opts-list');
+    ol.innerHTML='';
+    ['A','B','C','D','E'].forEach(l=>{
+      if(!q.options[l]) return;
+      const row=document.createElement('div');
+      row.className='option-row'; row.dataset.l=l;
+      row.innerHTML=`<span class="option-letter">${l}.</span><span class="option-text">${q.options[l]}</span>`;
+      row.addEventListener('click',()=>this.pick(l));
+      ol.appendChild(row);
+    });
+    this.sel=null;
+    document.getElementById('btn-next').disabled=true;
+    this.qStart=Date.now();
+  },
+
+  pick(l) {
+    this.sel=l;
+    document.querySelectorAll('.option-row').forEach(r=>r.classList.toggle('selected',r.dataset.l===l));
+    document.getElementById('btn-next').disabled=false;
+  },
+
+  advance(skip=false) {
+    const e=this.entries[this.idx];
+    e.time=Math.round((Date.now()-this.qStart)/1000);
+    if(skip){e.selected=null;e.result='skip';Adaptive.update('skip');}
+    else{e.selected=this.sel;e.result=this.sel===e.q.answer?'correct':'wrong';Adaptive.update(e.result);}
+    this.idx++;
+    if(this.idx>=this.total){this.end();return;}
+    const next=Adaptive.next();
+    if(!next){this.end();return;}
+    this.entries.push({q:next,selected:null,result:null,time:0});
+    this.renderQ();
+  },
+
+  startTimer() {
+    const el=document.getElementById('test-timer');
+    this.interval=setInterval(()=>{
+      this.secsLeft--;
+      const m=Math.floor(this.secsLeft/60),s=this.secsLeft%60;
+      el.textContent=`${m}:${String(s).padStart(2,'0')}`;
+      if(this.secsLeft<=300) el.classList.add('urgent');
+      if(this.secsLeft<=0){clearInterval(this.interval);this.end();}
+    },1000);
+  },
+
+  end() {
+    clearInterval(this.interval);
+    document.getElementById('prog-bar').style.width='100%';
+    this.renderResults();
+    showScreen('results');
+  },
+
+  renderResults() {
+    const es=this.entries;
+    const correct=es.filter(e=>e.result==='correct').length;
+    const wrong=es.filter(e=>e.result==='wrong').length;
+    const skip=es.filter(e=>e.result==='skip').length;
+    const total=es.length;
+    const pct=total?Math.round(correct/total*100):0;
+    const avgT=total?Math.round(es.reduce((s,e)=>s+e.time,0)/total):0;
+    const elapsed=45*60-this.secsLeft;
+    const em=Math.floor(elapsed/60),esec=elapsed%60;
+
+    document.getElementById('res-pct').textContent=pct+'%';
+    document.getElementById('res-correct').textContent=correct;
+    document.getElementById('res-wrong').textContent=wrong;
+    document.getElementById('res-skip').textContent=skip;
+    document.getElementById('res-time').textContent=avgT+'s';
+    document.getElementById('res-sub').textContent=`${total} questions · ${em}m ${esec}s elapsed · Adaptive difficulty`;
+
+    // Trail
+    const td=document.getElementById('trail-dots');
+    td.innerHTML='';
+    es.forEach((e,i)=>{
+      const d=document.createElement('div');
+      const d0=e.q.difficulty[0];
+      let cls=e.result==='skip'?'sk':e.result==='correct'?`c${d0}`:`w${d0}`;
+      d.className=`tdot ${cls}`;
+      d.textContent=d0;
+      d.title=`Q${i+1}: ${e.q.difficulty} · ${e.result}`;
+      d.addEventListener('click',()=>{
+        const row=document.getElementById(`rrow-${i}`);
+        if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.click();}
+      });
+      td.appendChild(d);
+    });
+
+    // Review rows
+    const rr=document.getElementById('review-rows');
+    rr.innerHTML='';
+    es.forEach((e,i)=>{
+      const cls=e.result==='correct'?'cr':e.result==='wrong'?'wr':'sk';
+      const pill=e.result==='correct'?'<span class="rpill C">✓ Correct</span>':
+                 e.result==='wrong'  ?'<span class="rpill W">✗ Wrong</span>':
+                                      '<span class="rpill S">— Skip</span>';
+      const dp=`<span class="dpill ${e.q.difficulty}">${e.q.difficulty}</span>`;
+      const qShort=e.q.question.length>55?e.q.question.slice(0,55)+'…':e.q.question;
+
+      const row=document.createElement('div');
+      row.className=`review-row ${cls}`; row.id=`rrow-${i}`;
+      row.innerHTML=`<div class="rc">${i+1}</div>
+        <div class="rc qt" title="${e.q.question.replace(/"/g,'')}">${qShort}</div>
+        <div class="rc">${pill}</div><div class="rc">${dp}</div>
+        <div class="rc">${e.selected||'—'}</div>
+        <div class="rc">${e.q.answer}</div>`;
+
+      const exp=document.createElement('div');
+      exp.className='exp-panel';
+      const qDiv=document.createElement('div');
+      qDiv.className='exp-q'; qDiv.textContent=e.q.question;
+      const optsDiv=document.createElement('div');
+      optsDiv.className='exp-opts';
+      ['A','B','C','D','E'].forEach(l=>{
+        if(!e.q.options[l]) return;
+        const line=document.createElement('div');
+        line.className='exp-opt'+(l===e.q.answer?' ca':l===e.selected&&l!==e.q.answer?' wa':'');
+        line.textContent=`${l}. ${e.q.options[l]}`;
+        optsDiv.appendChild(line);
+      });
+      const explDiv=document.createElement('div');
+      explDiv.className='exp-text';
+      explDiv.textContent=e.q.explanation?`Explanation:\n${e.q.explanation}`:`The correct answer is ${e.q.answer}.`;
+
+      exp.appendChild(qDiv); exp.appendChild(optsDiv); exp.appendChild(explDiv);
+
+      let open=false;
+      row.addEventListener('click',()=>{open=!open;exp.style.display=open?'block':'none';});
+      rr.appendChild(row); rr.appendChild(exp);
+    });
+  }
+};
+
+// ── HOME ──
+function renderHome() {
+  const allQs = typeof PRELOADED_QUESTIONS!=='undefined' ? PRELOADED_QUESTIONS : [];
+  const wrap=document.getElementById('test-cards');
+  wrap.innerHTML='';
+
+  if(allQs.length===0){
+    wrap.innerHTML='<p style="font-family:Arial,sans-serif;font-size:13px;color:#999;padding:20px;background:#f8f7f4;border-radius:3px">No questions loaded yet.</p>';
+    return;
+  }
+
+  const tests=[
+    {id:'T1',name:'Sectional Test 1'},
+    {id:'T2',name:'Sectional Test 2'},
+  ];
+
+  tests.forEach((t,idx)=>{
+    const easy=allQs.filter(q=>q.difficulty==='Easy').length;
+    const medium=allQs.filter(q=>q.difficulty==='Medium').length;
+    const hard=allQs.filter(q=>q.difficulty==='Hard').length;
+    const card=document.createElement('div');
+    card.className='test-card';
+    card.innerHTML=`<div class="test-card-top">
+      <div class="test-card-name">${t.name}</div>
+      <div class="test-card-badge">Adaptive</div>
+    </div>
+    <div class="test-card-meta">
+      <span>21 Questions</span>
+      <span>45 Minutes</span>
+      <span>E:${easy} M:${medium} H:${hard}</span>
+    </div>`;
+    card.addEventListener('click',()=>Test.start(allQs));
+    wrap.appendChild(card);
+  });
+}
+
+// ── UTILS ──
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  window.scrollTo(0,0);
+}
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>t.style.display='none',3000);
+}
+function shuffle(a){
+  const b=[...a];
+  for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}
+  return b;
+}
+
+// ── EVENTS ──
+document.getElementById('btn-next').addEventListener('click',()=>Test.advance(false));
+document.getElementById('btn-skip').addEventListener('click',()=>Test.advance(true));
+document.getElementById('btn-home').addEventListener('click',()=>{renderHome();showScreen('home');});
+
+// ── INIT ──
+initAuth();
+</script>
+</body>
+</html>
