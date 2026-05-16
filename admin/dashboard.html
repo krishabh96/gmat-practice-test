@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Admin</title>
+<style id="shared-styles"></style>
+<style>
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-box{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+.stat-val{font-family:'Playfair Display',serif;font-size:30px;color:var(--navy);display:block;line-height:1;margin-bottom:4px}
+.stat-val.teal{color:var(--teal)}.stat-val.green{color:var(--green)}.stat-val.amber{color:var(--amber)}
+.stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.sec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.sec-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:box-shadow .2s,border-color .2s;text-decoration:none;display:block}
+.sec-card:hover{box-shadow:var(--shadow);border-color:var(--teal)}
+.sec-card-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sec-letter{font-family:'Playfair Display',serif;font-size:28px;color:var(--teal);line-height:1}
+.sec-name{font-size:14px;font-weight:700;color:var(--navy)}
+.sec-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.pool-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:12px}
+.pool-item{background:var(--bg);border-radius:6px;padding:6px 4px;text-align:center;border:1px solid var(--border)}
+.pool-num{font-size:13px;font-weight:700;display:block}
+.pool-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.prog-wrap{height:4px;background:var(--border);border-radius:2px;margin-top:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;background:var(--teal)}
+.quick-links{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.quick-link{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:box-shadow .2s,border-color .2s}
+.quick-link:hover{box-shadow:var(--shadow);border-color:var(--teal)}
+.ql-icon{font-size:22px}
+.ql-label{font-size:13px;font-weight:600;color:var(--navy)}
+.ql-sub{font-size:11px;color:var(--muted);margin-top:2px}
+</style>
+</head>
+<body>
+<div id="topbar-wrap"></div>
+<div class="page">
+  <div class="page-title">Dashboard</div>
+  <div class="page-sub">Question bank overview and sectional pool status</div>
+
+  <div class="stat-row">
+    <div class="stat-box"><span class="stat-val teal" id="d-total">0</span><div class="stat-lbl">Total Questions</div></div>
+    <div class="stat-box"><span class="stat-val green" id="d-tagged">0</span><div class="stat-lbl">Tagged to Sectionals</div></div>
+    <div class="stat-box"><span class="stat-val amber" id="d-untagged">0</span><div class="stat-lbl">Untagged (Pool)</div></div>
+    <div class="stat-box"><span class="stat-val" id="d-pools">0/30</span><div class="stat-lbl">Pools with Questions</div></div>
+  </div>
+
+  <div class="sec-grid">
+    <a class="sec-card" href="sectionals.html?sec=Q">
+      <div class="sec-card-top">
+        <div class="sec-letter">Q</div>
+        <div><div class="sec-name">Quantitative</div><div class="sec-meta">21 questions · Problem Solving</div></div>
+      </div>
+      <div><span style="font-size:12px;font-weight:700;color:var(--navy)" id="sec-Q-count">0</span> <span style="font-size:11px;color:var(--muted)">questions</span></div>
+      <div class="pool-row" id="pool-row-Q"></div>
+    </a>
+    <a class="sec-card" href="sectionals.html?sec=V">
+      <div class="sec-card-top">
+        <div class="sec-letter">V</div>
+        <div><div class="sec-name">Verbal</div><div class="sec-meta">23 questions · CR & RC</div></div>
+      </div>
+      <div><span style="font-size:12px;font-weight:700;color:var(--navy)" id="sec-V-count">0</span> <span style="font-size:11px;color:var(--muted)">questions</span></div>
+      <div class="pool-row" id="pool-row-V"></div>
+    </a>
+    <a class="sec-card" href="sectionals.html?sec=D">
+      <div class="sec-card-top">
+        <div class="sec-letter">DI</div>
+        <div><div class="sec-name">Data Insights</div><div class="sec-meta">20 questions · DS & MSR</div></div>
+      </div>
+      <div><span style="font-size:12px;font-weight:700;color:var(--navy)" id="sec-D-count">0</span> <span style="font-size:11px;color:var(--muted)">questions</span></div>
+      <div class="pool-row" id="pool-row-D"></div>
+    </a>
+  </div>
+
+  <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">Quick Actions</div>
+  <div class="quick-links">
+    <a class="quick-link" href="questions.html"><div class="ql-icon">➕</div><div><div class="ql-label">Add Questions</div><div class="ql-sub">Upload doc or paste</div></div></a>
+    <a class="quick-link" href="bank.html"><div class="ql-icon">🗃️</div><div><div class="ql-label">Question Bank</div><div class="ql-sub">Browse, edit, delete</div></div></a>
+    <a class="quick-link" href="sectionals.html"><div class="ql-icon">🧩</div><div><div class="ql-label">Manage Pools</div><div class="ql-sub">Assign to sectionals</div></div></a>
+    <a class="quick-link" href="export.html"><div class="ql-icon">📦</div><div><div class="ql-label">Export & Deploy</div><div class="ql-sub">Download questions.js</div></div></a>
+  </div>
+</div>
+<div class="toast info" id="toast"></div>
+<script src="admin-shared.js"></script>
+<script>
+if(!checkAuth()) throw new Error('Not authenticated');
+document.getElementById('shared-styles').textContent = SHARED_STYLES;
+document.getElementById('topbar-wrap').innerHTML = renderTopbar('dashboard');
+
+function render(){
+  const qs = DB.getQs();
+  const c = DB.counts();
+  const set = (id,v) => { const el=g(id); if(el) el.textContent=v; };
+  set('d-total', c.total);
+  set('d-tagged', c.tagged);
+  set('d-untagged', c.untagged);
+
+  // Count pools with at least 1 question
+  let filledPools = 0;
+  ['Q','V','D'].forEach(sec => {
+    for(let n=1;n<=10;n++){
+      if(qs.filter(q=>q.section===sec&&q.sectional==n).length > 0) filledPools++;
+    }
+  });
+  set('d-pools', filledPools + '/30');
+
+  ['Q','V','D'].forEach(sec => {
+    const secQs = qs.filter(q=>q.section===sec);
+    set('sec-'+sec+'-count', secQs.length);
+    const row = g('pool-row-'+sec);
+    if(!row) return;
+    row.innerHTML = '';
+    for(let n=1;n<=10;n++){
+      const pool = secQs.filter(q=>q.sectional==n).length;
+      const target = SECTION_TARGETS[sec];
+      const pct = Math.min(100, Math.round(pool/target*100));
+      const col = pct>=100?'#22C55E':pct>=50?'#F59E0B':'#EF4444';
+      const item = document.createElement('div');
+      item.className = 'pool-item';
+      item.innerHTML = `<span class="pool-num" style="color:${col}">${pool}</span><span class="pool-lbl">S${String(n).padStart(2,'0')}</span><div class="prog-wrap"><div class="prog-fill" style="width:${pct}%;background:${col}"></div></div>`;
+      row.appendChild(item);
+    }
+  });
+}
+render();
+</script>
+</body>
+</html>

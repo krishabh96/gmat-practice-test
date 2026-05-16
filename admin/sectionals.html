@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sectionals — Admin</title>
+<style id="shared-styles"></style>
+<style>
+/* SECTION TABS */
+.sec-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px}
+.sec-tab{padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:transparent;font-family:'Inter',sans-serif;transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-2px;display:flex;align-items:center;gap:8px}
+.sec-tab:hover{color:var(--text)}
+.sec-tab.active{color:var(--navy);border-bottom-color:var(--teal)}
+.sec-tab-letter{font-family:'Playfair Display',serif;font-size:20px;color:var(--teal);line-height:1}
+.sec-panel{display:none}.sec-panel.active{display:block}
+
+/* SECTIONAL GRID */
+.sectional-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.sc-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:box-shadow .2s,border-color .2s}
+.sc-card:hover{box-shadow:var(--shadow);border-color:var(--teal)}
+.sc-card.selected{border-color:var(--teal);box-shadow:0 0 0 3px rgba(20,184,166,.15)}
+.sc-hdr{padding:12px 14px 8px;background:var(--navy)}
+.sc-num{font-family:'Playfair Display',serif;font-size:22px;color:#fff;line-height:1}
+.sc-name{font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px}
+.sc-body{padding:10px 14px 12px}
+.sc-counts{display:flex;gap:6px;margin-bottom:6px}
+.sc-count{flex:1;text-align:center}
+.sc-count-num{font-size:14px;font-weight:700;display:block}
+.sc-count-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.sc-bar-wrap{height:4px;background:var(--border);border-radius:2px;margin-bottom:6px;overflow:hidden}
+.sc-bar{height:100%;border-radius:2px;transition:width .4s ease}
+.sc-total{font-size:11px;color:var(--muted);text-align:center}
+.sc-total strong{color:var(--navy)}
+
+/* POOL EDITOR */
+.pool-editor{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:none}
+.pool-editor.show{display:block}
+.pe-header{background:linear-gradient(135deg,var(--navy) 0%,#1e293b 100%);padding:18px 22px;display:flex;align-items:center;justify-content:space-between}
+.pe-title{font-size:15px;font-weight:700;color:#fff}
+.pe-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:2px}
+.pe-close{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.pe-close:hover{background:rgba(255,255,255,.2)}
+.pe-body{padding:18px 22px}
+.pe-targets{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin-bottom:16px}
+.pe-target{text-align:center}
+.pe-target-val{font-family:'Playfair Display',serif;font-size:24px;display:block;line-height:1}
+.pe-target-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+
+/* POOL FILTER & LIST */
+.pool-filter-bar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.pool-search{padding:7px 11px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;background:var(--white);outline:none;font-family:'Inter',sans-serif;width:180px;transition:border-color .2s}
+.pool-search:focus{border-color:var(--teal)}
+.pool-list{border:1px solid var(--border);border-radius:8px;overflow:hidden;max-height:420px;overflow-y:auto}
+.pool-item{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);font-size:12px;transition:background .1s}
+.pool-item:last-child{border-bottom:none}
+.pool-item:hover{background:var(--bg)}
+.pool-item.in-pool{background:rgba(20,184,166,.04)}
+.pool-item input{accent-color:var(--teal);cursor:pointer;flex-shrink:0;margin-top:2px;width:14px;height:14px}
+.pool-item-body{flex:1;min-width:0}
+.pool-item-q{color:var(--text);line-height:1.5;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pool-item-tags{display:flex;gap:5px;flex-wrap:wrap}
+.pe-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg);flex-wrap:wrap;gap:10px}
+.pe-footer-left{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="topbar-wrap"></div>
+<div class="page">
+  <div class="page-title">Sectional Pools</div>
+  <div class="page-sub">Assign questions to sectional pools. Questions tagged to one pool won't appear in others — no repeats guaranteed.</div>
+
+  <div class="sec-tabs">
+    <button class="sec-tab active" id="stab-Q" onclick="switchSec('Q',this)">
+      <span class="sec-tab-letter">Q</span> Quantitative <span style="font-size:11px;color:var(--muted)">(21 per test)</span>
+    </button>
+    <button class="sec-tab" id="stab-V" onclick="switchSec('V',this)">
+      <span class="sec-tab-letter">V</span> Verbal <span style="font-size:11px;color:var(--muted)">(23 per test)</span>
+    </button>
+    <button class="sec-tab" id="stab-D" onclick="switchSec('D',this)">
+      <span class="sec-tab-letter">DI</span> Data Insights <span style="font-size:11px;color:var(--muted)">(20 per test)</span>
+    </button>
+  </div>
+
+  <div class="sec-panel active" id="sec-panel-Q">
+    <div class="sectional-grid" id="sgrid-Q"></div>
+    <div class="pool-editor" id="peditor-Q"></div>
+  </div>
+  <div class="sec-panel" id="sec-panel-V">
+    <div class="sectional-grid" id="sgrid-V"></div>
+    <div class="pool-editor" id="peditor-V"></div>
+  </div>
+  <div class="sec-panel" id="sec-panel-D">
+    <div class="sectional-grid" id="sgrid-D"></div>
+    <div class="pool-editor" id="peditor-D"></div>
+  </div>
+</div>
+<div class="toast info" id="toast"></div>
+
+<script src="admin-shared.js"></script>
+<script>
+if(!checkAuth()) throw new Error();
+document.getElementById('shared-styles').textContent = SHARED_STYLES;
+document.getElementById('topbar-wrap').innerHTML = renderTopbar('sectionals');
+
+let activeSec = 'Q';
+let selectedPool = {};
+
+function switchSec(sec, btn){
+  document.querySelectorAll('.sec-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sec-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  g('sec-panel-'+sec).classList.add('active');
+  activeSec = sec;
+  renderGrid(sec);
+}
+
+function renderGrid(sec){
+  const qs = DB.getQs().filter(q=>q.section===sec);
+  const target = SECTION_TARGETS[sec];
+  const grid = g('sgrid-'+sec);
+  grid.innerHTML = '';
+
+  for(let n=1; n<=10; n++){
+    const pool = qs.filter(q=>q.sectional==n);
+    const easy   = pool.filter(q=>q.difficulty==='Easy').length;
+    const med    = pool.filter(q=>q.difficulty==='Medium').length;
+    const hard   = pool.filter(q=>q.difficulty==='Hard').length;
+    const total  = pool.length;
+    const pct    = Math.min(100, Math.round(total/target*100));
+    const col    = pct>=100?'#22C55E':pct>=50?'#F59E0B':'#EF4444';
+    const isSel  = selectedPool[sec] === n;
+
+    const card = document.createElement('div');
+    card.className = 'sc-card' + (isSel?' selected':'');
+    card.innerHTML = `
+      <div class="sc-hdr">
+        <div class="sc-num">${String(n).padStart(2,'0')}</div>
+        <div class="sc-name">Sectional</div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-counts">
+          <div class="sc-count"><span class="sc-count-num" style="color:#22C55E">${easy}</span><span class="sc-count-lbl">E</span></div>
+          <div class="sc-count"><span class="sc-count-num" style="color:#F59E0B">${med}</span><span class="sc-count-lbl">M</span></div>
+          <div class="sc-count"><span class="sc-count-num" style="color:#EF4444">${hard}</span><span class="sc-count-lbl">H</span></div>
+        </div>
+        <div class="sc-bar-wrap"><div class="sc-bar" style="width:${pct}%;background:${col}"></div></div>
+        <div class="sc-total"><strong style="color:${col}">${total}</strong> / ${target}</div>
+      </div>`;
+    card.addEventListener('click', () => openEditor(sec, n));
+    grid.appendChild(card);
+  }
+}
+
+function openEditor(sec, num){
+  selectedPool[sec] = num;
+  renderGrid(sec);
+
+  const allQs   = DB.getQs();
+  const target  = SECTION_TARGETS[sec];
+  // Available: same section + (untagged OR already in this pool)
+  const available = allQs.filter(q => q.section===sec && (!q.sectional || q.sectional==num));
+  const inPool    = new Set(allQs.filter(q=>q.section===sec&&q.sectional==num).map(q=>q.id));
+
+  const editor = g('peditor-'+sec);
+  editor.classList.add('show');
+  editor.innerHTML = `
+    <div class="pe-header">
+      <div>
+        <div class="pe-title">${SECTION_NAMES[sec]} — Sectional ${String(num).padStart(2,'0')}</div>
+        <div class="pe-sub">Select questions for this pool · Target: ${target} questions</div>
+      </div>
+      <button class="pe-close" onclick="closeEditor('${sec}')">✕</button>
+    </div>
+    <div class="pe-body">
+      <div class="pe-targets">
+        <div class="pe-target">
+          <span class="pe-target-val" style="color:#22C55E" id="pe-e-${sec}">0</span>
+          <span class="pe-target-lbl">Easy selected</span>
+        </div>
+        <div class="pe-target">
+          <span class="pe-target-val" style="color:#F59E0B" id="pe-m-${sec}">0</span>
+          <span class="pe-target-lbl">Medium selected</span>
+        </div>
+        <div class="pe-target">
+          <span class="pe-target-val" style="color:#EF4444" id="pe-h-${sec}">0</span>
+          <span class="pe-target-lbl">Hard selected</span>
+        </div>
+        <div class="pe-target">
+          <span class="pe-target-val" style="color:var(--navy)" id="pe-t-${sec}">0</span>
+          <span class="pe-target-lbl">Total / ${target}</span>
+        </div>
+      </div>
+      <div class="pool-filter-bar">
+        <input class="pool-search" id="pool-search-${sec}" placeholder="Search questions..." oninput="filterPoolList('${sec}','${num}')">
+        <select class="form-select" style="width:auto;padding:7px 10px;font-size:12px" id="pool-diff-filter-${sec}" onchange="filterPoolList('${sec}','${num}')">
+          <option value="all">All Difficulties</option>
+          <option value="Easy">Easy</option>
+          <option value="Medium">Medium</option>
+          <option value="Hard">Hard</option>
+        </select>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn btn-xs btn-outline" onclick="poolSelectAll(true,'${sec}','${num}')">Select All</button>
+          <button class="btn btn-xs btn-outline" onclick="poolSelectAll(false,'${sec}','${num}')">Clear All</button>
+        </div>
+      </div>
+      <div class="pool-list" id="pool-list-${sec}-${num}"></div>
+    </div>
+    <div class="pe-footer">
+      <div class="pe-footer-left" id="pe-avail-${sec}">
+        ${available.length} questions available · ${inPool.size} currently in pool
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-blue" onclick="savePool('${sec}',${num})">💾 Save Pool</button>
+        <button class="btn btn-outline" onclick="closeEditor('${sec}')">Cancel</button>
+      </div>
+    </div>`;
+
+  renderPoolList(sec, num, available, inPool);
+  updatePeCounts(sec, num);
+
+  // Scroll to editor
+  editor.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function renderPoolList(sec, num, available, inPool, search='', diffF='all'){
+  const list = g('pool-list-'+sec+'-'+num);
+  if(!list) return;
+
+  let filtered = available;
+  if(search) filtered = filtered.filter(q =>
+    q.question.toLowerCase().includes(search) || (q.topic||'').toLowerCase().includes(search)
+  );
+  if(diffF !== 'all') filtered = filtered.filter(q => q.difficulty === diffF);
+
+  list.innerHTML = '';
+  if(!filtered.length){
+    list.innerHTML = `<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">
+      No questions available. <a href="questions.html" style="color:var(--teal)">Add questions first →</a>
+    </div>`;
+    return;
+  }
+
+  filtered.forEach(q => {
+    const checked = inPool.has(q.id);
+    const item = document.createElement('div');
+    item.className = 'pool-item' + (checked?' in-pool':'');
+    item.innerHTML = `
+      <input type="checkbox" data-qid="${q.id}" ${checked?'checked':''}
+        onchange="updatePeCounts('${sec}',${num})">
+      <div class="pool-item-body">
+        <div class="pool-item-q" title="${q.question.replace(/"/g,'').replace(/\n/g,' ')}">${q.question.replace(/\n/g,' ').slice(0,100)}${q.question.length>100?'…':''}</div>
+        <div class="pool-item-tags">
+          <span class="dpill ${q.difficulty}">${q.difficulty}</span>
+          ${q.topic?`<span style="font-size:10px;color:var(--muted);padding:2px 6px;background:var(--bg);border-radius:4px;border:1px solid var(--border)">${q.topic.slice(0,30)}</span>`:''}
+          <span style="font-size:10px;color:var(--teal-d);padding:2px 6px">Ans: ${q.answer}</span>
+        </div>
+      </div>`;
+    list.appendChild(item);
+  });
+}
+
+function filterPoolList(sec, num){
+  const search = (g('pool-search-'+sec)||{value:''}).value.toLowerCase();
+  const diffF  = (g('pool-diff-filter-'+sec)||{value:'all'}).value;
+  const allQs  = DB.getQs();
+  const available = allQs.filter(q=>q.section===sec&&(!q.sectional||q.sectional==num));
+  const inPool = new Set(allQs.filter(q=>q.section===sec&&q.sectional==num).map(q=>q.id));
+  renderPoolList(sec, num, available, inPool, search, diffF);
+}
+
+function poolSelectAll(sel, sec, num){
+  const list = g('pool-list-'+sec+'-'+num);
+  if(!list) return;
+  list.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=sel);
+  updatePeCounts(sec, num);
+}
+
+function updatePeCounts(sec, num){
+  const list = g('pool-list-'+sec+'-'+num);
+  if(!list) return;
+  const allQs = DB.getQs();
+  const checked = [...list.querySelectorAll('input:checked')];
+  let e=0,m=0,h=0;
+  checked.forEach(c=>{
+    const q = allQs.find(x=>x.id===c.dataset.qid);
+    if(!q) return;
+    if(q.difficulty==='Easy')   e++;
+    else if(q.difficulty==='Medium') m++;
+    else if(q.difficulty==='Hard')   h++;
+  });
+  const set=(id,v)=>{ const el=g(id); if(el) el.textContent=v; };
+  set('pe-e-'+sec, e);
+  set('pe-m-'+sec, m);
+  set('pe-h-'+sec, h);
+  set('pe-t-'+sec, e+m+h);
+}
+
+function savePool(sec, num){
+  const list = g('pool-list-'+sec+'-'+num);
+  if(!list){ showToast('Pool editor not open','error'); return; }
+
+  const qs = DB.getQs();
+  const checks = [...list.querySelectorAll('input[type=checkbox]')];
+
+  // Remove this pool tag from all questions currently in it
+  qs.filter(q=>q.section===sec&&q.sectional==num)
+    .forEach(q=>DB.update(q.id,{sectional:''}));
+
+  // Assign checked ones
+  let count = 0;
+  checks.forEach(c=>{
+    if(c.checked){ DB.update(c.dataset.qid,{sectional:String(num)}); count++; }
+  });
+
+  renderGrid(sec);
+  closeEditor(sec);
+  showToast(count+' questions saved to Sectional '+String(num).padStart(2,'0')+' ✓','success');
+}
+
+function closeEditor(sec){
+  selectedPool[sec] = null;
+  const editor = g('peditor-'+sec);
+  editor.classList.remove('show');
+  editor.innerHTML = '';
+  renderGrid(sec);
+}
+
+// Check URL param for direct section
+const urlSec = new URLSearchParams(window.location.search).get('sec');
+if(urlSec && ['Q','V','D'].includes(urlSec)){
+  const btn = g('stab-'+urlSec);
+  if(btn) switchSec(urlSec, btn);
+} else {
+  renderGrid('Q');
+}
+</script>
+</body>
+</html>

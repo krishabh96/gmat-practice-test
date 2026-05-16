@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Export — Admin</title>
+<style id="shared-styles"></style>
+<style>
+.export-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
+.export-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.export-icon{font-size:32px;margin-bottom:12px}
+.export-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.export-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:16px}
+.export-card.primary{border-color:var(--teal);border-width:2px}
+.steps-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:18px}
+.step-row{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)}
+.step-row:last-child{border-bottom:none}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body{flex:1}
+.step-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.6}
+code{background:var(--bg);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-family:'Courier New',monospace;font-size:12px;color:var(--navy)}
+.status-table{width:100%;border-collapse:collapse;margin-top:16px}
+.status-table th{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);padding:8px 12px;text-align:left;background:var(--bg);border:1px solid var(--border)}
+.status-table td{font-size:13px;padding:10px 12px;border:1px solid var(--border);color:var(--text)}
+.status-ok{color:#22C55E;font-weight:700}
+.status-warn{color:#F59E0B;font-weight:700}
+.status-bad{color:#EF4444;font-weight:700}
+</style>
+</head>
+<body>
+<div id="topbar-wrap"></div>
+<div class="page">
+  <div class="page-title">Export & Deploy</div>
+  <div class="page-sub">Download updated files and deploy to Vercel. Your users see changes in ~30 seconds.</div>
+
+  <!-- STATUS -->
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-title">📊 Export Status</div>
+    <table class="status-table" id="status-table"></table>
+  </div>
+
+  <div class="export-grid">
+    <div class="export-card primary">
+      <div class="export-icon">📥</div>
+      <div class="export-title">Download questions.js</div>
+      <div class="export-desc">
+        Downloads the main question bank file with all questions and sectional assignments baked in.
+        Replace <code>questions.js</code> in your GitHub repo — Vercel auto-deploys in ~30 seconds.
+        <br><br>
+        <strong style="color:var(--navy)">This is the main deploy file.</strong> Do this every time you add or change questions.
+      </div>
+      <button class="btn btn-teal" onclick="exportJS()">⬇ Download questions.js</button>
+    </div>
+
+    <div class="export-card">
+      <div class="export-icon">💾</div>
+      <div class="export-title">Backup JSON</div>
+      <div class="export-desc">
+        Full backup of all questions as a JSON file. Use this to:
+        <br>• Restore your bank if browser data is cleared
+        <br>• Share with a co-admin
+        <br>• Import into another browser
+        <br><br>
+        Keep a backup on your desktop after every session.
+      </div>
+      <button class="btn btn-outline" onclick="exportJSON()">⬇ Download questions.json</button>
+    </div>
+  </div>
+
+  <div class="steps-card">
+    <div class="card-title" style="margin-bottom:0;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:4px">🚀 Deploy to Vercel — Step by Step</div>
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Click "Download questions.js" above</div>
+        <div class="step-desc">The file downloads to your computer with all questions baked in.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Go to your GitHub repo</div>
+        <div class="step-desc">Open <code>github.com/yourusername/gmat-practice-test</code> in your browser.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Replace questions.js</div>
+        <div class="step-desc">Click <code>questions.js</code> in your repo → Edit (pencil icon) → delete all content → paste new content. Or drag-and-drop the file via Add File → Upload files.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Commit the change</div>
+        <div class="step-desc">Scroll down → click <strong>Commit changes</strong>. Vercel detects the change automatically.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Done — live in ~30 seconds</div>
+        <div class="step-desc">Visit <code>gmat-practice-test.vercel.app</code> — your users will see the updated questions immediately.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast info" id="toast"></div>
+
+<script src="admin-shared.js"></script>
+<script>
+if(!checkAuth()) throw new Error();
+document.getElementById('shared-styles').textContent = SHARED_STYLES;
+document.getElementById('topbar-wrap').innerHTML = renderTopbar('export');
+
+function renderStatus(){
+  const qs = DB.getQs();
+  const c  = DB.counts();
+  const rows = [];
+
+  ['Q','V','D'].forEach(sec => {
+    const target = SECTION_TARGETS[sec];
+    for(let n=1;n<=10;n++){
+      const pool = qs.filter(q=>q.section===sec&&q.sectional==n).length;
+      const pct  = Math.round(pool/target*100);
+      const statusClass = pct>=100?'status-ok':pct>0?'status-warn':'status-bad';
+      const statusText  = pct>=100?'✓ Ready':pct>0?`${pool}/${target} — incomplete`:`Empty`;
+      rows.push(`<tr>
+        <td><span class="spill spill-${sec}">${sec}</span> ${SECTION_NAMES[sec]}</td>
+        <td>Sectional ${String(n).padStart(2,'0')}</td>
+        <td>${pool} questions</td>
+        <td class="${statusClass}">${statusText}</td>
+      </tr>`);
+    }
+  });
+
+  g('status-table').innerHTML = `
+    <thead><tr>
+      <th>Section</th><th>Sectional</th><th>Questions</th><th>Status</th>
+    </tr></thead>
+    <tbody>${rows.join('')}</tbody>`;
+}
+
+function exportJS(){
+  const qs = DB.getQs();
+  if(!qs.length){ showToast('No questions to export.','error'); return; }
+  const js = `const PRELOADED_QUESTIONS = ${JSON.stringify(qs, null, 2)};\n`;
+  dlFile(new Blob([js],{type:'application/javascript'}), 'questions.js');
+  showToast(`Exported ${qs.length} questions → questions.js ✓`, 'success');
+}
+
+function exportJSON(){
+  const qs = DB.getQs();
+  if(!qs.length){ showToast('No questions to export.','error'); return; }
+  dlFile(new Blob([JSON.stringify(qs,null,2)],{type:'application/json'}), 'gmat_questions_backup.json');
+  showToast('Backup downloaded ✓','success');
+}
+
+renderStatus();
+</script>
+</body>
+</html>

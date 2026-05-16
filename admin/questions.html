@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Questions — Admin</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style id="shared-styles"></style>
+<style>
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:36px 24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#fafaf8}
+.upload-zone:hover,.upload-zone.over{border-color:var(--teal);background:rgba(20,184,166,0.04)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone-icon{font-size:36px;margin-bottom:10px}
+.upload-zone-text{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.upload-zone-sub{font-size:12px;color:var(--muted)}
+.upload-config{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px}
+
+/* PARSED LIST */
+.parsed-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.parsed-count{font-size:14px;font-weight:700;color:var(--navy)}
+.parsed-list{border:1px solid var(--border);border-radius:8px;overflow:hidden;max-height:500px;overflow-y:auto;background:var(--white)}
+.pq-item{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;transition:background .1s}
+.pq-item:last-child{border-bottom:none}
+.pq-item:hover{background:#f8f9fb}
+.pq-check{flex-shrink:0;margin-top:3px;width:15px;height:15px;accent-color:var(--teal);cursor:pointer}
+.pq-body{flex:1;min-width:0}
+.pq-q{font-size:13px;color:var(--text);line-height:1.5;margin-bottom:6px;white-space:pre-wrap}
+.pq-opts{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.pq-opt{font-size:11px;padding:2px 7px;border-radius:4px;background:var(--bg);border:1px solid var(--border);color:var(--muted)}
+.pq-opt.correct{background:#e8f5e8;color:#2e7d32;border-color:#a5d6a7;font-weight:700}
+.pq-tags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.pq-expl{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5;background:var(--bg);padding:6px 8px;border-radius:4px;border-left:3px solid var(--teal)}
+.pq-diff-sel{font-size:11px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--white);cursor:pointer;font-family:'Inter',sans-serif;outline:none}
+.pq-diff-sel:focus{border-color:var(--teal)}
+
+/* MANUAL FORM */
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.opt-row{display:flex;align-items:center;gap:8px}
+.opt-ltr{font-weight:700;color:var(--teal);min-width:18px;font-size:14px}
+
+/* PROGRESS */
+.extract-progress{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;margin-top:12px;display:none}
+.extract-progress.show{display:block}
+.ep-text{font-size:13px;color:var(--navy);font-weight:600;margin-bottom:8px}
+.ep-bar-wrap{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.ep-bar{height:100%;background:var(--teal);border-radius:3px;transition:width .3s ease;width:0%}
+.ep-sub{font-size:11px;color:var(--muted);margin-top:6px}
+
+/* TABS */
+.method-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:20px;gap:0}
+.method-tab{padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:transparent;font-family:'Inter',sans-serif;transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-2px}
+.method-tab:hover{color:var(--text)}
+.method-tab.active{color:var(--navy);border-bottom-color:var(--teal)}
+.method-panel{display:none}.method-panel.active{display:block}
+</style>
+</head>
+<body>
+<div id="topbar-wrap"></div>
+<div class="page">
+  <div class="page-title">Add Questions</div>
+  <div class="page-sub">Upload a doc/PDF, paste text, or enter manually. Questions extract with full answers and explanations.</div>
+
+  <div class="method-tabs">
+    <button class="method-tab active" onclick="switchMethod('upload',this)">📄 Upload Doc / PDF</button>
+    <button class="method-tab" onclick="switchMethod('paste',this)">📋 Paste & Parse</button>
+    <button class="method-tab" onclick="switchMethod('manual',this)">✏️ Manual Entry</button>
+  </div>
+
+  <!-- ══ UPLOAD ══ -->
+  <div class="method-panel active" id="method-upload">
+    <div class="card">
+      <div class="card-title">📄 Upload Document</div>
+
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="file-input" accept=".docx,.doc,.txt,.pdf">
+        <div class="upload-zone-icon">📂</div>
+        <div class="upload-zone-text">Drag & drop your file here, or click to browse</div>
+        <div class="upload-zone-sub">Supports .docx · .txt · .pdf (text-based) · Extracts questions, options, answers & explanations</div>
+      </div>
+
+      <div id="file-chosen" style="display:none;margin-top:10px;font-size:13px;color:var(--teal);font-weight:600"></div>
+
+      <div class="upload-config">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Section</label>
+          <select class="form-select" id="up-section">
+            <option value="Q">Quantitative (Q)</option>
+            <option value="V">Verbal (V)</option>
+            <option value="D">Data Insights (DI)</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Default Difficulty</label>
+          <select class="form-select" id="up-difficulty">
+            <option value="auto">Auto-detect from file</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Assign to Sectional</label>
+          <select class="form-select" id="up-sectional">
+            <option value="">Untagged (assign later)</option>
+            ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}">Sectional ${String(n).padStart(2,'0')}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-teal" onclick="runExtraction()">⚡ Extract Questions</button>
+        <button class="btn btn-outline" onclick="clearUpload()">Clear</button>
+        <span style="font-size:12px;color:var(--muted)" id="up-status"></span>
+      </div>
+
+      <div class="extract-progress" id="extract-progress">
+        <div class="ep-text" id="ep-text">Parsing document...</div>
+        <div class="ep-bar-wrap"><div class="ep-bar" id="ep-bar"></div></div>
+        <div class="ep-sub" id="ep-sub">Reading file...</div>
+      </div>
+    </div>
+
+    <!-- PARSED RESULTS -->
+    <div class="card" id="parsed-card" style="display:none">
+      <div class="parsed-header">
+        <div class="parsed-count" id="parsed-count">0 questions found</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-xs btn-outline" onclick="selectAll(true)">✓ Select All</button>
+          <button class="btn btn-xs btn-outline" onclick="selectAll(false)">✗ Deselect</button>
+          <button class="btn btn-xs btn-outline" onclick="filterParsed('all')">All</button>
+          <button class="btn btn-xs btn-outline" onclick="filterParsed('Easy')">Easy</button>
+          <button class="btn btn-xs btn-outline" onclick="filterParsed('Medium')">Medium</button>
+          <button class="btn btn-xs btn-outline" onclick="filterParsed('Hard')">Hard</button>
+          <button class="btn btn-teal btn-sm" onclick="importSelected()">Import Selected →</button>
+        </div>
+      </div>
+      <div class="parsed-list" id="parsed-list"></div>
+      <div style="margin-top:12px;display:flex;justify-content:flex-end">
+        <button class="btn btn-teal" onclick="importSelected()">Import Selected Questions →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PASTE ══ -->
+  <div class="method-panel" id="method-paste">
+    <div class="card">
+      <div class="card-title">📋 Paste Question Block</div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--muted);line-height:1.7">
+        <strong style="color:var(--text)">Expected format:</strong><br>
+        Copy a question block from your book — the parser handles the GMAT Official Guide format automatically.<br>
+        Include the question, options (A–E), topic line, explanation, and "The correct answer is X." line.
+      </div>
+      <div class="form-grid-3" style="margin-bottom:12px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Section</label>
+          <select class="form-select" id="pa-section">
+            <option value="Q">Quantitative (Q)</option>
+            <option value="V">Verbal (V)</option>
+            <option value="D">Data Insights (DI)</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Difficulty</label>
+          <select class="form-select" id="pa-difficulty">
+            <option value="auto">Auto-detect</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Assign to Sectional</label>
+          <select class="form-select" id="pa-sectional">
+            <option value="">Untagged</option>
+            ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}">Sectional ${String(n).padStart(2,'0')}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="textarea-wrap">
+        <button class="clean-btn" onclick="cleanField('pa-text','pa-preview')">✨ Clean</button>
+        <textarea class="form-textarea" id="pa-text" rows="12"
+          data-preview="pa-preview"
+          oninput="updatePreview('pa-text','pa-preview')"
+          placeholder="Paste question block here. Example:
+
+The numbers of cars sold at a certain dealership on six of the last seven business days were 4, 7, 2, 8, 3, and 6. If the number of cars sold on the seventh business day was either 2, 4, or 5...
+
+	- II only
+	- III only
+	- I and II only
+	- II and III only
+	- I, II, and III
+
+# Arithmetic Statistics
+
+The explanation text goes here...
+
+# The correct answer is B."></textarea>
+      </div>
+      <div class="preview-wrap">
+        <div class="preview-label">Preview</div>
+        <div class="preview-box" id="pa-preview"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-teal" onclick="parsePasteAndShow()">Parse & Preview</button>
+        <button class="btn btn-outline" onclick="g('pa-text').value='';g('pa-preview').classList.remove('show');g('paste-parsed-card').style.display='none'">Clear</button>
+      </div>
+    </div>
+
+    <div class="card" id="paste-parsed-card" style="display:none">
+      <div class="parsed-header">
+        <div class="parsed-count" id="paste-parsed-count">0 questions</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-xs btn-outline" onclick="paSelectAll(true)">Select All</button>
+          <button class="btn btn-xs btn-outline" onclick="paSelectAll(false)">Deselect</button>
+          <button class="btn btn-teal btn-sm" onclick="importPasteParsed()">Import →</button>
+        </div>
+      </div>
+      <div class="parsed-list" id="paste-parsed-list"></div>
+    </div>
+  </div>
+
+  <!-- ══ MANUAL ══ -->
+  <div class="method-panel" id="method-manual">
+    <div class="card">
+      <div class="card-title">✏️ Manual Entry</div>
+      <input type="hidden" id="edit-id">
+
+      <div class="form-group">
+        <label class="form-label">Question Text <span style="color:var(--red)">*</span></label>
+        <div class="textarea-wrap">
+          <button class="clean-btn" onclick="cleanField('f-q','f-q-pv')">✨ Clean</button>
+          <textarea class="form-textarea" id="f-q" rows="5"
+            data-preview="f-q-pv"
+            oninput="updatePreview('f-q','f-q-pv')"
+            placeholder="Paste or type the full question here. Multi-line OK. LaTeX like $\frac{9}{90}$ renders in preview."></textarea>
+        </div>
+        <div class="preview-wrap">
+          <div class="preview-label">Preview</div>
+          <div class="preview-box" id="f-q-pv"></div>
+        </div>
+      </div>
+
+      <div class="opts-grid">
+        <div class="opt-row"><span class="opt-ltr">A.</span><input class="form-input" id="f-A" placeholder="Option A"></div>
+        <div class="opt-row"><span class="opt-ltr">B.</span><input class="form-input" id="f-B" placeholder="Option B"></div>
+        <div class="opt-row"><span class="opt-ltr">C.</span><input class="form-input" id="f-C" placeholder="Option C"></div>
+        <div class="opt-row"><span class="opt-ltr">D.</span><input class="form-input" id="f-D" placeholder="Option D"></div>
+        <div class="opt-row"><span class="opt-ltr">E.</span><input class="form-input" id="f-E" placeholder="Option E (optional)"></div>
+      </div>
+
+      <div class="form-grid-4" style="margin-bottom:14px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Correct Answer <span style="color:var(--red)">*</span></label>
+          <select class="form-select" id="f-ans">
+            <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Difficulty <span style="color:var(--red)">*</span></label>
+          <select class="form-select" id="f-diff">
+            <option value="Easy">Easy</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Section <span style="color:var(--red)">*</span></label>
+          <select class="form-select" id="f-sec">
+            <option value="Q">Quantitative</option>
+            <option value="V">Verbal</option>
+            <option value="D">Data Insights</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Sectional</label>
+          <select class="form-select" id="f-sectional">
+            <option value="">Untagged</option>
+            ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}">Sectional ${String(n).padStart(2,'0')}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Topic</label>
+        <input class="form-input" id="f-topic" placeholder="e.g. Arithmetic – Averages">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Explanation</label>
+        <div class="textarea-wrap">
+          <button class="clean-btn" onclick="cleanField('f-expl','f-expl-pv')">✨ Clean</button>
+          <textarea class="form-textarea" id="f-expl" rows="4"
+            data-preview="f-expl-pv"
+            oninput="updatePreview('f-expl','f-expl-pv')"
+            placeholder="Paste explanation from the book. LaTeX renders in preview below."></textarea>
+        </div>
+        <div class="preview-wrap">
+          <div class="preview-label">Preview</div>
+          <div class="preview-box" id="f-expl-pv"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-blue" onclick="saveManual()">Save Question</button>
+        <button class="btn btn-outline" id="cancel-edit-btn" style="display:none" onclick="cancelEdit()">Cancel Edit</button>
+        <button class="btn btn-outline" onclick="resetManual()">Reset Form</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast info" id="toast"></div>
+
+<script src="admin-shared.js"></script>
+<script>
+if(!checkAuth()) throw new Error();
+document.getElementById('shared-styles').textContent = SHARED_STYLES;
+document.getElementById('topbar-wrap').innerHTML = renderTopbar('questions');
+
+// ── METHOD TABS ──
+function switchMethod(id, btn){
+  document.querySelectorAll('.method-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.method-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  g('method-'+id).classList.add('active');
+}
+
+// ══════════════════════════════════════
+// UPLOAD & EXTRACT
+// ══════════════════════════════════════
+let uploadedText = '';
+let parsedQs = [];
+let pasteParsedQs = [];
+
+const uz = g('upload-zone');
+uz.addEventListener('dragover', e=>{ e.preventDefault(); uz.classList.add('over'); });
+uz.addEventListener('dragleave', ()=>uz.classList.remove('over'));
+uz.addEventListener('drop', e=>{
+  e.preventDefault(); uz.classList.remove('over');
+  const file = e.dataTransfer.files[0];
+  if(file){ loadFile(file); }
+});
+g('file-input').addEventListener('change', e=>{
+  if(e.target.files[0]) loadFile(e.target.files[0]);
+});
+
+function loadFile(file){
+  const fc = g('file-chosen');
+  fc.textContent = '📄 ' + file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)';
+  fc.style.display = 'block';
+  g('up-status').textContent = 'File ready — click Extract Questions';
+
+  const reader = new FileReader();
+  reader.onload = e => { uploadedText = e.target.result; };
+  // For docx/pdf we read as text (works for txt/docx extracted text)
+  reader.readAsText(file);
+}
+
+function clearUpload(){
+  uploadedText = '';
+  g('file-input').value = '';
+  g('file-chosen').style.display = 'none';
+  g('up-status').textContent = '';
+  g('parsed-card').style.display = 'none';
+  g('extract-progress').classList.remove('show');
+  parsedQs = [];
+}
+
+async function runExtraction(){
+  if(!uploadedText){
+    showToast('Please upload a file first.', 'error'); return;
+  }
+
+  const sec  = g('up-section').value;
+  const diff = g('up-difficulty').value;
+  const sectional = g('up-sectional').value;
+
+  // Show progress
+  const prog = g('extract-progress');
+  prog.classList.add('show');
+  setProgress(10, 'Reading document structure...');
+
+  await sleep(100);
+  setProgress(30, 'Identifying question blocks...');
+
+  await sleep(100);
+  const qs = parseDocText(uploadedText, sec, diff);
+
+  setProgress(70, 'Extracting answers and explanations...');
+  await sleep(100);
+
+  // Apply sectional
+  qs.forEach(q => { if(sectional) q.sectional = sectional; });
+
+  setProgress(100, `Done! Found ${qs.length} questions.`);
+  parsedQs = qs;
+
+  if(!qs.length){
+    showToast('No questions found. Make sure the file has "The correct answer is X." lines.', 'error');
+    return;
+  }
+
+  renderParsedList(qs, 'parsed-list', 'parsed-count');
+  g('parsed-card').style.display = 'block';
+  showToast(qs.length + ' questions extracted ✓', 'success');
+}
+
+function setProgress(pct, text){
+  g('ep-bar').style.width = pct + '%';
+  g('ep-text').textContent = text;
+  g('ep-sub').textContent = pct + '% complete';
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+// ══════════════════════════════════════
+// PASTE PARSE
+// ══════════════════════════════════════
+function parsePasteAndShow(){
+  const raw = g('pa-text').value.trim();
+  if(!raw){ showToast('Please paste some text first.','error'); return; }
+
+  const sec  = g('pa-section').value;
+  const diff = g('pa-difficulty').value;
+  const sectional = g('pa-sectional').value;
+
+  const qs = parseDocText(raw, sec, diff);
+  qs.forEach(q=>{ if(sectional) q.sectional = sectional; });
+
+  if(!qs.length){
+    showToast('No questions detected. Check that text includes "The correct answer is X."','error');
+    return;
+  }
+
+  pasteParsedQs = qs;
+  renderParsedList(qs, 'paste-parsed-list', 'paste-parsed-count');
+  g('paste-parsed-card').style.display = 'block';
+  showToast(qs.length + ' question(s) parsed ✓','success');
+}
+
+function paSelectAll(sel){
+  g('paste-parsed-list').querySelectorAll('.pq-check').forEach(c=>c.checked=sel);
+}
+
+function importPasteParsed(){
+  importFromList('paste-parsed-list', pasteParsedQs);
+  g('paste-parsed-card').style.display = 'none';
+  g('pa-text').value = '';
+  g('pa-preview').classList.remove('show');
+}
+
+// ══════════════════════════════════════
+// RENDER PARSED QUESTIONS
+// ══════════════════════════════════════
+function renderParsedList(qs, listId, countId){
+  const list = g(listId);
+  const countEl = g(countId);
+  if(countEl) countEl.textContent = qs.length + ' question(s) found';
+  list.innerHTML = '';
+
+  qs.forEach((q, i) => {
+    const item = document.createElement('div');
+    item.className = 'pq-item';
+    item.dataset.diff = q.difficulty;
+
+    const optHtml = Object.entries(q.options).map(([l,v])=>
+      `<span class="pq-opt${l===q.answer?' correct':''}">${l}. ${v.slice(0,40)}${v.length>40?'…':''}</span>`
+    ).join('');
+
+    const explHtml = q.explanation
+      ? `<div class="pq-expl">📝 ${q.explanation.slice(0,200)}${q.explanation.length>200?'…':''}</div>`
+      : '';
+
+    item.innerHTML = `
+      <input type="checkbox" class="pq-check" data-idx="${i}" checked>
+      <div class="pq-body">
+        <div class="pq-q">${q.question.slice(0,180)}${q.question.length>180?'…':''}</div>
+        <div class="pq-opts">${optHtml}</div>
+        ${explHtml}
+        <div class="pq-tags">
+          <span class="dpill ${q.difficulty}">${q.difficulty}</span>
+          <span class="spill spill-${q.section}">${q.section}</span>
+          ${q.topic ? `<span style="font-size:10px;color:var(--muted);padding:2px 6px;background:var(--bg);border-radius:4px;border:1px solid var(--border)">${q.topic}</span>` : ''}
+          ${q.sectional ? `<span style="font-size:10px;color:var(--teal-d);padding:2px 6px;background:var(--teal-l);border-radius:4px">S${String(q.sectional).padStart(2,'0')}</span>` : ''}
+          <select class="pq-diff-sel" onchange="qs[${i}].difficulty=this.value" data-list="${listId}">
+            <option ${q.difficulty==='Easy'?'selected':''}>Easy</option>
+            <option ${q.difficulty==='Medium'?'selected':''}>Medium</option>
+            <option ${q.difficulty==='Hard'?'selected':''}>Hard</option>
+          </select>
+        </div>
+      </div>`;
+    list.appendChild(item);
+  });
+}
+
+function selectAll(sel){
+  g('parsed-list').querySelectorAll('.pq-check').forEach(c=>c.checked=sel);
+}
+
+function filterParsed(diff){
+  g('parsed-list').querySelectorAll('.pq-item').forEach(item=>{
+    item.style.display = diff==='all' || item.dataset.diff===diff ? '' : 'none';
+  });
+}
+
+function importSelected(){
+  importFromList('parsed-list', parsedQs);
+  g('parsed-card').style.display = 'none';
+  parsedQs = [];
+}
+
+function importFromList(listId, qsArray){
+  const checks = g(listId).querySelectorAll('.pq-check');
+  let count = 0;
+  checks.forEach(c => {
+    if(c.checked){
+      DB.add({...qsArray[parseInt(c.dataset.idx)]});
+      count++;
+    }
+  });
+  showToast(count + ' question(s) imported to bank ✓', 'success');
+}
+
+// ══════════════════════════════════════
+// MANUAL ENTRY
+// ══════════════════════════════════════
+function saveManual(){
+  const question = g('f-q').value.trim();
+  const optA = g('f-A').value.trim();
+  const optB = g('f-B').value.trim();
+  if(!question){ showToast('Question text is required.','error'); return; }
+  if(!optA || !optB){ showToast('At least options A and B are required.','error'); return; }
+
+  const q = {
+    question,
+    answer:      g('f-ans').value,
+    difficulty:  g('f-diff').value,
+    section:     g('f-sec').value,
+    sectional:   g('f-sectional').value,
+    topic:       g('f-topic').value.trim(),
+    explanation: g('f-expl').value.trim(),
+    options:{ A:optA, B:optB,
+      C:g('f-C').value.trim()||undefined,
+      D:g('f-D').value.trim()||undefined,
+      E:g('f-E').value.trim()||undefined
+    }
+  };
+  ['C','D','E'].forEach(l=>{ if(!q.options[l]) delete q.options[l]; });
+
+  const editId = g('edit-id').value;
+  if(editId){
+    DB.update(editId, q);
+    showToast('Question updated ✓','success');
+    cancelEdit();
+  } else {
+    DB.add(q);
+    showToast('Question saved to bank ✓','success');
+    resetManual();
+  }
+}
+
+function resetManual(){
+  g('edit-id').value = '';
+  ['f-q','f-A','f-B','f-C','f-D','f-E','f-topic','f-expl'].forEach(id=>{
+    const el = g(id); if(el) el.value='';
+  });
+  g('f-ans').value='A'; g('f-diff').value='Medium';
+  g('f-sec').value='Q'; g('f-sectional').value='';
+  ['f-q-pv','f-expl-pv'].forEach(id=>{ const el=g(id); if(el) el.classList.remove('show'); });
+  g('cancel-edit-btn').style.display='none';
+}
+
+function cancelEdit(){
+  resetManual();
+  g('cancel-edit-btn').style.display='none';
+}
+
+// Pre-fill form for edit (called from bank.html via URL param)
+const urlParams = new URLSearchParams(window.location.search);
+const editId = urlParams.get('edit');
+if(editId){
+  const q = DB.getQs().find(x=>x.id===editId);
+  if(q){
+    // Switch to manual tab
+    document.querySelectorAll('.method-tab')[2].click();
+    g('edit-id').value = q.id;
+    g('f-q').value = q.question;
+    g('f-A').value = q.options.A||'';
+    g('f-B').value = q.options.B||'';
+    g('f-C').value = q.options.C||'';
+    g('f-D').value = q.options.D||'';
+    g('f-E').value = q.options.E||'';
+    g('f-ans').value = q.answer;
+    g('f-diff').value = q.difficulty;
+    g('f-sec').value = q.section;
+    g('f-sectional').value = q.sectional||'';
+    g('f-topic').value = q.topic||'';
+    g('f-expl').value = q.explanation||'';
+    g('cancel-edit-btn').style.display='inline-flex';
+    updatePreview('f-q','f-q-pv');
+    updatePreview('f-expl','f-expl-pv');
+    showToast('Editing question — make changes and save.','info');
+  }
+}
+</script>
+</body>
+</html>
