@@ -252,122 +252,205 @@ document.addEventListener('paste', e => {
 // Parses the exact format from GMAT Official Guide docx:
 // Question: \t\t- text  OR  numbered "1. text"
 // Options:  \t- text  OR  "A. text"
-// Topic:    # Arithmetic Statistics
-// Answer:   # The correct answer is X.
-// Explanation: text between topic and answer lines
+// ── FLEXIBLE MULTI-FORMAT PARSER ──
+// Detects answer in ANY of these formats:
+//   "The correct answer is B."
+//   "Answer: B"
+//   "Correct Answer: B"
+//   "OA: B"
+//   "OA - B"
+//   "Answer is B"
+//   "Ans: B"
+//   "Ans - B"
+//   "(B)" on its own line after options
+//   "Choice B is correct"
+//   "B is correct"
+//   "B is the answer"
+//   "B." or "B)" on its own line (after options block)
+
+
+// ── FLEXIBLE MULTI-FORMAT PARSER ──
+// Supports: GMAT OG, Answer:X, OA:X, Ans:X, Correct Answer:X,
+//           Choice X is correct, B is correct, standalone letter after options
+
+function detectAnswer(text){
+  const t = text.trim();
+  const patterns = [
+    /[Tt]he\s+correct\s+answer\s+is\s*[:\-]?\s*([A-E])/,
+    /[Cc]orrect\s+[Aa]nswer\s*[:\-]\s*([A-E])/,
+    /\b[Aa]nswer\s*[:\-]\s*([A-E])\b/,
+    /\bOA\s*[:\-]\s*([A-E])\b/i,
+    /\b[Aa]ns\s*[:\-]\s*([A-E])\b/,
+    /[Cc]hoice\s+([A-E])\s+is\s+correct/i,
+    /\b([A-E])\s+is\s+(?:the\s+)?(?:correct\s+)?answer/i,
+    /\b([A-E])\s+is\s+correct\b/i,
+  ];
+  for(const r of patterns){ const m = t.match(r); if(m) return m[1].toUpperCase(); }
+  return null;
+}
+
+function isJunkLine(line){
+  const t = line.trim();
+  if(!t) return true;
+  if(t.match(/^Difficulty:/i)) return true;
+  if(t.match(/^Format\s+\d/i)) return true;
+  if(t.match(/^(Tips|Rules|Optional|Part|Section|Chapter)\b/i)) return true;
+  if(t.match(/^Sasta\s+GMAT/i)) return true;
+  // Title line pattern: "Word — Word" no question mark, no leading digit
+  if(t.match(/^[A-Za-z].{1,30}[—–].+/) && !t.includes('?') && !t.match(/^\d/)) return true;
+  return false;
+}
+
+function isExplLine(line){
+  const t = line.trim().toLowerCase();
+  return t.startsWith('explanation') || t.startsWith('solution') || t.startsWith('rationale');
+}
 
 function parseDocText(rawText, defaultSection, defaultDifficulty){
   const questions = [];
   const lines = rawText.split('\n');
+  let lastDiff = defaultDifficulty || 'Medium';
 
-  // Detect difficulty from section headers
-  let currentDiff = defaultDifficulty || 'Medium';
-  const diffMap = {
-    'easy': 'Easy', 'medium': 'Medium', 'hard': 'Hard'
-  };
-
-  // Split into blocks by "The correct answer is X" lines
-  // First collect all answer positions
-  const answerLines = [];
+  // ── STEP 1: Find all answer line positions + track difficulty ──
+  const segments = [];
   lines.forEach((line, i) => {
-    const m = line.match(/[Tt]he correct answer is\s+([A-E])[\.\s]?/);
-    if(m) answerLines.push({ lineIdx: i, answer: m[1].toUpperCase() });
+    const dl = line.toLowerCase();
+    if(dl.includes('difficulty') && dl.includes('easy'))   lastDiff = 'Easy';
+    if(dl.includes('difficulty') && dl.includes('medium')) lastDiff = 'Medium';
+    if(dl.includes('difficulty') && dl.includes('hard'))   lastDiff = 'Hard';
+
+    const ans = detectAnswer(line);
+    if(ans){ segments.push({ ansIdx: i, ans, diff: lastDiff }); return; }
+
+    // Standalone single letter ONLY if previous lines have options
+    const t = line.trim();
+    if(t.match(/^[A-E]$/)){
+      const prev = lines.slice(Math.max(0,i-8), i);
+      const hasOpts = prev.some(l =>
+        l.trim().match(/^[A-E][.)]\s+\S/) || l.trim().match(/^-\s+\S/)
+      );
+      if(hasOpts) segments.push({ ansIdx: i, ans: t, diff: lastDiff });
+    }
   });
 
-  if(!answerLines.length) return [];
+  if(!segments.length) return [];
 
-  // For each answer, work backwards to find question + options + explanation
-  answerLines.forEach(({ lineIdx, answer }, qi) => {
-    // Determine block start (line after previous answer, or 0)
-    const blockStart = qi > 0 ? answerLines[qi-1].lineIdx + 1 : 0;
-    const blockLines = lines.slice(blockStart, lineIdx + 1);
+  // ── STEP 2: Compute block ends (answer line + trailing explanation) ──
+  const blockEnds = segments.map(({ ansIdx }, qi) => {
+    let end = ansIdx;
+    for(let j = ansIdx + 1; j < lines.length; j++){
+      const l = lines[j].trim();
+      if(!l) break; // stop at blank line
+      if(qi + 1 < segments.length && j >= segments[qi+1].ansIdx) break;
+      end = j; // non-blank line after answer = part of this block's explanation
+    }
+    return end;
+  });
 
-    // Detect difficulty from header lines in block
-    blockLines.forEach(l => {
-      const dl = l.toLowerCase();
-      Object.entries(diffMap).forEach(([k,v]) => {
-        if(dl.includes('difficulty:') && dl.includes(k)) currentDiff = v;
-      });
-    });
+  // ── STEP 3: Extract each question ──
+  segments.forEach(({ ansIdx, ans: answer, diff }, qi) => {
+    const blockStart = qi > 0 ? blockEnds[qi-1] + 1 : 0;
+    const block = lines.slice(blockStart, ansIdx + 1);
 
-    // Find topic line (# Arithmetic Statistics etc.)
-    let topic = '';
-    let topicLineIdx = -1;
-    for(let i = blockLines.length - 1; i >= 0; i--){
-      const l = blockLines[i].trim();
-      if(l.startsWith('#') && !l.toLowerCase().includes('correct answer')){
-        topic = l.replace(/^#+\s*/,'').trim();
-        topicLineIdx = i;
-        break;
+    // Trailing explanation lines (after answer line)
+    const trailingLines = lines.slice(ansIdx + 1, blockEnds[qi] + 1)
+      .map(l => l.trim()).filter(l => l && !detectAnswer(l));
+
+    // Find explanation boundary inside block
+    let explIdx = -1, topic = '';
+    for(let j = block.length - 2; j >= 0; j--){
+      const l = block[j].trim();
+      if(!l) continue;
+      if(isExplLine(block[j])){ explIdx = j; break; }
+      if(l.startsWith('#') && !detectAnswer(l)){
+        topic = l.replace(/^#+\s*/,'').trim(); explIdx = j; break;
       }
     }
 
-    // Explanation = lines between topic and answer line
+    // Build explanation
     let explanation = '';
-    if(topicLineIdx >= 0 && topicLineIdx < blockLines.length - 1){
-      explanation = blockLines
-        .slice(topicLineIdx + 1, blockLines.length - 1)
-        .map(l => l.replace(/^\t+/,'').replace(/^#+\s*/,'').trim())
-        .filter(l => l && !l.match(/^[Tt]he correct answer/))
-        .join(' ')
-        .trim();
+    if(explIdx >= 0){
+      const markerLine = block[explIdx].trim()
+        .replace(/^(Explanation|Solution|Rationale)\s*:\s*/i,'')
+        .replace(/^#+\s*/,'').trim();
+      const innerLines = block.slice(explIdx+1, block.length-1)
+        .map(l=>l.trim()).filter(Boolean);
+      explanation = [...(markerLine?[markerLine]:[]), ...innerLines, ...trailingLines]
+        .join(' ').trim();
+    } else if(trailingLines.length){
+      explanation = trailingLines.join(' ').trim();
     }
 
-    // Lines before topic = question + options
-    const contentLines = topicLineIdx >= 0
-      ? blockLines.slice(0, topicLineIdx)
-      : blockLines.slice(0, -1);
+    // Content = before explanation boundary
+    const contentEnd = explIdx >= 0 ? explIdx : block.length - 1;
+    const content = block.slice(0, contentEnd);
 
-    // Identify options: lines starting with \t- or A. B. C. etc
-    const optRegex = /^(?:\t-\s+|([A-E])[.)]\s+)/;
-    const options = {};
-    const optionLineIdxs = [];
-    contentLines.forEach((l, i) => {
-      const stripped = l.replace(/^\t+/,'');
-      const m = stripped.match(/^([A-E])[.)]\s+(.+)/);
-      if(m){ options[m[1]] = m[2].trim(); optionLineIdxs.push(i); return; }
-      // Single-tab lines that are options (no letter prefix)
-      if(l.startsWith('\t-') && !l.startsWith('\t\t')){
-        const text = l.replace(/^\t-\s*/,'').trim();
-        if(text) {
-          const letters = ['A','B','C','D','E'];
-          const idx = optionLineIdxs.length;
-          if(idx < 5){ options[letters[idx]] = text; optionLineIdxs.push(i); }
+    // Extract options
+    const options = {}, optIdxs = [];
+    content.forEach((l, j) => {
+      const s = l.trim();
+      // A. text  /  A) text  /  (A) text
+      const ltr = s.match(/^[\(\[]?([A-E])[\)\].]\s+(.+)/);
+      if(ltr && !detectAnswer(s)){ options[ltr[1]] = ltr[2].trim(); optIdxs.push(j); return; }
+      // - text  (bullet, from mammoth/docx)
+      if(s.match(/^-\s+\S/) && !detectAnswer(s)){
+        const text = s.replace(/^-\s+/,'').trim();
+        if(text && optIdxs.length < 5){
+          options[['A','B','C','D','E'][optIdxs.length]] = text;
+          optIdxs.push(j);
         }
       }
     });
 
-    // Question = everything before first option, using double-tab lines or numbered
-    const firstOptIdx = optionLineIdxs.length ? Math.min(...optionLineIdxs) : contentLines.length;
-    let questionText = contentLines
-      .slice(0, firstOptIdx)
-      .map(l => {
-        // Remove markdown bold artifacts
-        let t = l.replace(/\*\*/g,'').replace(/\t\t-\s*/,'').replace(/^\t+/,'').replace(/^[-–]\s*/,'').replace(/^\d+\.\s*/,'');
-        return t.trim();
-      })
-      .filter(l => l.length > 0)
-      .join('\n')
-      .trim();
-
-    // Skip if no valid question or options
-    if(!questionText || questionText.length < 10) return;
     if(Object.keys(options).length < 2) return;
+
+    // Extract question text
+    const firstOpt = optIdxs.length ? Math.min(...optIdxs) : content.length;
+    const qText = content.slice(0, firstOpt)
+      .map(l => l.replace(/\*\*/g,'').replace(/^\t+/,'')
+                  .replace(/^\d+\.\s*/,'').replace(/^[-–•]\s+/,'').trim())
+      .filter(l => l && !isJunkLine(l))
+      .join('\n').trim();
+
+    if(!qText || qText.length < 8) return;
+
+    // Topic fallback: short title-case line after options
+    if(!topic){
+      for(let j = content.length-1; j >= firstOpt; j--){
+        const l = content[j].trim();
+        if(l.match(/^[A-Z][a-zA-Z\s]+$/) && l.length > 4 && l.length < 55 && !l.match(/[?.!]/)){
+          topic = l; break;
+        }
+      }
+    }
 
     questions.push({
       id: 'Q_' + Date.now() + '_' + qi + '_' + Math.floor(Math.random()*9999),
-      section: defaultSection || 'Q',
-      difficulty: currentDiff,
-      topic: topic,
-      question: questionText,
-      options: options,
-      answer: answer,
-      explanation: explanation,
-      sectional: ''
+      section:     defaultSection || 'Q',
+      difficulty:  diff,
+      topic:       topic.trim(),
+      question:    qText,
+      options,
+      answer,
+      explanation,
+      sectional:   ''
     });
   });
 
   return questions;
+}
+
+// Detect which answer format a doc uses
+function detectDocFormat(text){
+  const formats = [
+    { p: /[Tt]he correct answer is\s+[A-E]/,  label: 'GMAT Official Guide format' },
+    { p: /[Cc]orrect [Aa]nswer\s*:\s*[A-E]/,  label: '"Correct Answer: X" format' },
+    { p: /\bOA\s*:\s*[A-E]/i,                 label: '"OA: X" format (GMATClub)' },
+    { p: /\b[Aa]ns(?:wer)?\s*:\s*[A-E]/,      label: '"Answer: X" format' },
+    { p: /[Cc]hoice\s+[A-E]\s+is correct/,    label: '"Choice X is correct" format' },
+  ];
+  for(const f of formats){ if(f.p.test(text)) return f.label; }
+  return 'Unknown — will attempt auto-detection';
 }
 
 function dlFile(blob, name){
