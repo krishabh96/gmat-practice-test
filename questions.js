@@ -17,23 +17,6 @@ const PRELOADED_QUESTIONS = [
     "sectional": "2"
   },
   {
-    "question": "In the past, every ten-percentage-point increase in cigarette prices in the country of Coponia has decreased per capita sales of cigarettes by four percent. Coponia is about to raise taxes on cigarettes by 9 cents per pack. The average price of cigarettes in Coponia is and has been for more than a year 90 cents per pack. So the tax hike stands an excellent chance of reducing per capita sales of cigarettes by four percent.\n\nWhich of the following is an assumption on which the argument depends?",
-    "answer": "A",
-    "difficulty": "Hard",
-    "section": "V",
-    "sectional": "1",
-    "topic": "Assumption",
-    "explanation": "The Argument StructurePremise 1: A 10-percentage-point increase in price $= 4\\%$ decrease in per capita sales.Premise 2: The current average price is 90 cents. A tax hike of 9 cents is being introduced.Calculation: 9 cents is exactly $10\\%$ of the current 90-cent price ($\\frac{9}{90} = 10\\%$).Conclusion: Therefore, this tax hike stands an excellent chance of reducing per capita sales by $4\\%$.The Logical GapThe argument assumes that a 9-cent tax hike will automatically translate into a 10-percentage-point price increase for the consumer.But what if the tobacco companies decide to absorb the 9-cent tax themselves (by lowering their wholesale prices) so that the retail price stays at 90 cents? If the price doesn't change for the consumer, sales won't drop. Therefore, the author must assume that the companies will pass the tax directly onto the consumers.Evaluating the OptionsA. Tobacco companies are unlikely to reduce their profit per pack of cigarettes to avoid an increase in the cost per pack to consumers in Coponia.Correct. This perfectly addresses our logical gap. If we negate this statement (\"Tobacco companies ARE likely to reduce their profit to avoid a price increase\"), then the price for consumers won't go up by 9 cents, and the conclusion falls completely apart.B. Previous increases in cigarette prices in Coponia have generally been due to increases in taxes on cigarettes.Incorrect. The cause of past price increases doesn't matter. Whether past increases were caused by taxes, inflation, or supply chain issues, the historical data shows that whenever the price went up, sales went down.C. Any decrease in per capita sales of cigarettes in Coponia will result mainly from an increase in the number of people who quit smoking entirely.Incorrect. The argument only cares that per capita sales decrease by 4%. It is completely irrelevant whether that decrease happens because people quit entirely or because existing smokers simply smoke fewer cigarettes per day.D. At present, the price of a pack of cigarettes in Coponia includes taxes that amount to less than ten percent of the total selling price.Incorrect. The existing breakdown of the 90-cent price (how much of it is currently tax vs. profit) has no bearing on how a new 9-cent increase will affect consumer behavior.E. The number of people in Coponia who smoke cigarettes has remained relatively constant for the past several years.Incorrect. The conclusion specifically targets per capita sales (sales per person). Because it is a per-capita metric, fluctuations in the total population size or the total number of smokers over the years are already accounted for.",
-    "options": {
-      "A": "Tobacco companies are unlikely to reduce their profit per pack of cigarettes to avoid an increase in the cost per pack to consumers in Coponia.",
-      "B": "Previous increases in cigarette prices in Coponia have generally been due to increases in taxes on cigarettes.",
-      "C": "Any decrease in per capita sales of cigarettes in Coponia will result mainly from an increase in the number of people who quit smoking entirely.",
-      "D": "At present, the price of a pack of cigarettes in Coponia includes taxes that amount to less than ten percent of the total selling price.",
-      "E": "The number of people in Coponia who smoke cigarettes has remained relatively constant for the past several years."
-    },
-    "id": "Q_1778873720913_5265"
-  },
-  {
     "id": "Q_1778932070137_0_7282",
     "section": "Q",
     "difficulty": "Medium",
