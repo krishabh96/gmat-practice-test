@@ -34,181 +34,11 @@ const PRELOADED_QUESTIONS = [
     "id": "Q_1778873720913_5265"
   },
   {
-    "id": "Q_1778931419449_0_948",
-    "section": "Q",
-    "difficulty": "Easy",
-    "topic": "",
-    "question": "This template shows the exact format the parser expects. Copy this structure for all your questions.\nCRITICAL RULE:\nEvery question MUST end with:  The correct answer is X.  (where X is A, B, C, D, or E)\nThis is how the parser finds where each question ends. Without it, extraction fails.\nDOCUMENT STRUCTURE:\nQuestions 1 to 10 - Difficulty: Easy\nA shirt originally priced at $80 is on sale for 25% off. What is the sale price of the shirt?",
-    "options": {
-      "A": "$15",
-      "B": "$20",
-      "C": "$60",
-      "D": "$65",
-      "E": "$75"
-    },
-    "answer": "C",
-    "explanation": "",
-    "sectional": ""
-  },
-  {
-    "id": "Q_1778931419450_1_2874",
-    "section": "Q",
-    "difficulty": "Easy",
-    "topic": "",
-    "question": "The numbers of cars sold at a dealership on six days were 4, 7, 2, 8, 3, and 6. If the seventh day had either 2, 4, or 5 cars sold, for which values does the average equal the median?\nI.   2\nII.  4\nIII. 5",
-    "options": {
-      "A": "I only",
-      "B": "III only",
-      "C": "I and II only",
-      "D": "II and III only",
-      "E": "I, II, and III"
-    },
-    "answer": "B",
-    "explanation": "",
-    "sectional": ""
-  },
-  {
-    "id": "Q_1778931419450_2_8212",
-    "section": "Q",
-    "difficulty": "Easy",
-    "topic": "",
-    "question": "A car travels at a constant speed of 60 miles per hour. How many miles does it travel in 2 hours and 30 minutes?",
-    "options": {
-      "A": "120",
-      "B": "130",
-      "C": "140",
-      "D": "150",
-      "E": "160"
-    },
-    "answer": "D",
-    "explanation": "",
-    "sectional": ""
-  },
-  {
-    "id": "Q_1778931419450_4_4147",
-    "section": "Q",
-    "difficulty": "Medium",
-    "topic": "",
-    "question": "NOTE FOR ADMIN: Complex equations in Word do not extract via mammoth.\nWrite equations in plain text using: ^2 for squared, sqrt() for root, / for fractions.\nExample: \"x^2 + 3x - 10 = 0\" or \"sqrt(144) = 12\" or \"(9/90) = 10%\"\nA 40-litre solution is 30% alcohol. How many litres of pure alcohol must be added to make the solution 50% alcohol?\nNote: Set up the equation: (12 + x) / (40 + x) = 0.50",
-    "options": {
-      "A": "12",
-      "B": "14",
-      "C": "16",
-      "D": "18",
-      "E": "20"
-    },
-    "answer": "C",
-    "explanation": "",
-    "sectional": ""
-  },
-  {
-    "id": "Q_1778931419450_5_338",
-    "section": "Q",
-    "difficulty": "Medium",
-    "topic": "",
-    "question": "Machine A produces 300 units per hour and Machine B produces 200 units per hour. Working together, how many hours will it take to produce 2,500 units?",
-    "options": {
-      "A": "4 hours",
-      "B": "5 hours",
-      "C": "6 hours",
-      "D": "7 hours",
-      "E": "8 hours"
-    },
-    "answer": "B",
-    "explanation": "",
-    "sectional": ""
-  },
-  {
-    "id": "Q_1778931419450_6_4225",
-    "section": "Q",
-    "difficulty": "Medium",
-    "topic": "",
-    "question": "A committee of 3 people is to be chosen from a group of 7 people. How many different committees are possible?",
-    "options": {
-      "A": "21",
-      "B": "28",
-      "C": "35",
-      "D": "42",
-      "E": "56"
-    },
-    "answer": "C",
-    "explanation": "",
-    "sectional": ""
-  },
-  {
-    "id": "Q_1778931419450_7_7306",
-    "section": "Q",
-    "difficulty": "Hard",
-    "topic": "",
-    "question": "Questions 26 to 35 - Difficulty: Hard\nWhen a positive integer n is divided by 7, the remainder is 3. What is the remainder when 3n + 5 is divided by 7?",
-    "options": {
-      "A": "0",
-      "B": "1",
-      "C": "2",
-      "D": "3",
-      "E": "4"
-    },
-    "answer": "A",
-    "explanation": "",
-    "sectional": ""
-  },
-  {
-    "id": "Q_1778931419450_8_818",
-    "section": "Q",
-    "difficulty": "Hard",
-    "topic": "",
-    "question": "Pump A fills a tank in 6 hours. Pump B fills the same tank in 4 hours. Pump C drains the full tank in 12 hours. If all three operate simultaneously starting with an empty tank, how long does it take to fill the tank?",
-    "options": {
-      "A": "3 hours",
-      "B": "3 hours 20 minutes",
-      "C": "3 hours 30 minutes",
-      "D": "4 hours",
-      "E": "4 hours 30 minutes"
-    },
-    "answer": "A",
-    "explanation": "",
-    "sectional": ""
-  },
-  {
-    "id": "Q_1778931419450_9_9106",
-    "section": "Q",
-    "difficulty": "Hard",
-    "topic": "",
-    "question": "Line L passes through points (2, 5) and (-1, -4). Line M is perpendicular to Line L and passes through point (3, 1). At what point do Lines L and M intersect?",
-    "options": {
-      "A": "(0, -1)",
-      "B": "(1, 2)",
-      "C": "(2, 5)",
-      "D": "(3, 8)",
-      "E": "(4, 11)"
-    },
-    "answer": "B",
-    "explanation": "",
-    "sectional": ""
-  },
-  {
-    "id": "Q_1778931419450_17_2169",
-    "section": "Q",
-    "difficulty": "Hard",
-    "topic": "",
-    "question": "Questions 1 to 10 - Difficulty: Easy\nQuestions 11 to 25 - Difficulty: Medium\nQuestions 26 to 35 - Difficulty: Hard\nx squared    →   x^2\nfraction     →   (9/90)  or  9/90\nsquare root  →   sqrt(144)\npercent      →   10%  or  10/100\naverage      →   (a + b + c) / n\nYou CAN include a table visually in the Word doc — it looks nice.\nBUT the extraction engine reads plain text, so also write the key table data in the question text or explanation, as shown in Question 4 above.\nQUICK TEMPLATE FOR A SINGLE QUESTION:\nQuestion text goes here. What is the value of x?",
-    "options": {
-      "A": "Option A",
-      "B": "Option B",
-      "C": "Option C",
-      "D": "Option D",
-      "E": "Option E"
-    },
-    "answer": "C",
-    "explanation": "Explanation text goes here.",
-    "sectional": ""
-  },
-  {
     "id": "Q_1778932070137_0_7282",
     "section": "Q",
     "difficulty": "Medium",
     "topic": "",
-    "question": "Q1. If n is a positive integer and n² is divisible by 72, then the largest positive integer that must divide n is",
+    "question": "If n is a positive integer and n² is divisible by 72, then the largest positive integer that must divide n is",
     "options": {
       "A": "6",
       "B": "12",
@@ -225,7 +55,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Easy",
     "topic": "",
-    "question": "Q2. Jackie has two solutions that are 2 percent sulfuric acid and 12 percent sulfuric acid by volume, respectively. If these solutions are mixed in appropriate quantities to produce 60 liters of a solution that is 5 percent sulfuric acid, approximately how many liters of the 2 percent solution will be required?",
+    "question": "Jackie has two solutions that are 2 percent sulfuric acid and 12 percent sulfuric acid by volume, respectively. If these solutions are mixed in appropriate quantities to produce 60 liters of a solution that is 5 percent sulfuric acid, approximately how many liters of the 2 percent solution will be required?",
     "options": {
       "A": "18",
       "B": "20",
@@ -242,7 +72,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Hard",
     "topic": "",
-    "question": "Q3. The closing price of Stock X changed on each trading day last month. The percent change in the closing price of Stock X from the first trading day last month to each of the other trading days last month was less than 50 percent. If the closing price on the second trading day last month was $10.00, which of the following CANNOT be the closing price on the last trading day last month?",
+    "question": "The closing price of Stock X changed on each trading day last month. The percent change in the closing price of Stock X from the first trading day last month to each of the other trading days last month was less than 50 percent. If the closing price on the second trading day last month was $10.00, which of the following CANNOT be the closing price on the last trading day last month?",
     "options": {
       "A": "$3.00",
       "B": "$9.00",
@@ -259,7 +89,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Hard",
     "topic": "",
-    "question": "Q4. 4 < (7 − x)/3, which of the following must be true?\nI. 5 < x\nII. |x + 3| > 2\nIII. −(x + 5) is positive",
+    "question": "4 < (7 − x)/3, which of the following must be true?\nI. 5 < x\nII. |x + 3| > 2\nIII. −(x + 5) is positive",
     "options": {
       "A": "II only",
       "B": "III only",
@@ -276,7 +106,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Hard",
     "topic": "",
-    "question": "Q5. The ratio, by volume, of soap to alcohol to water in a certain solution is 2:50:100. The solution will be altered so that the ratio of soap to alcohol is doubled while the ratio of soap to water is halved. If the altered solution will contain 100 cubic centimeters of alcohol, how many cubic centimeters of water will it contain?",
+    "question": "The ratio, by volume, of soap to alcohol to water in a certain solution is 2:50:100. The solution will be altered so that the ratio of soap to alcohol is doubled while the ratio of soap to water is halved. If the altered solution will contain 100 cubic centimeters of alcohol, how many cubic centimeters of water will it contain?",
     "options": {
       "A": "50",
       "B": "200",
@@ -293,7 +123,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Medium",
     "topic": "",
-    "question": "Q6. If a motorist had driven 1 hour longer on a certain day and at an average rate of 5 miles per hour faster, he would have covered 70 more miles than he actually did. How many more miles would he have covered than he actually did if he had driven 2 hours longer and at an average rate of 10 miles per hour faster on that day?",
+    "question": "If a motorist had driven 1 hour longer on a certain day and at an average rate of 5 miles per hour faster, he would have covered 70 more miles than he actually did. How many more miles would he have covered than he actually did if he had driven 2 hours longer and at an average rate of 10 miles per hour faster on that day?",
     "options": {
       "A": "100",
       "B": "120",
@@ -310,7 +140,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Medium",
     "topic": "",
-    "question": "Q7. What values of x have a corresponding value of y that satisfies both xy > 0 and xy = x + y?",
+    "question": "What values of x have a corresponding value of y that satisfies both xy > 0 and xy = x + y?",
     "options": {
       "A": "x ≤ 1",
       "B": "−1 < x ≤ 0",
@@ -327,7 +157,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Medium",
     "topic": "",
-    "question": "Q8. Which of the following equations has 1 + √2 as one of its roots?",
+    "question": "Which of the following equations has 1 + √2 as one of its roots?",
     "options": {
       "A": "x² + 2x – 1 = 0",
       "B": "x² – 2x + 1 = 0",
@@ -344,7 +174,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Medium",
     "topic": "",
-    "question": "Q9. If a committee of 3 people is to be selected from among 5 married couples so that the committee does not include two people who are married to each other, how many such committees are possible?",
+    "question": "If a committee of 3 people is to be selected from among 5 married couples so that the committee does not include two people who are married to each other, how many such committees are possible?",
     "options": {
       "A": "20",
       "B": "40",
@@ -361,7 +191,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Easy",
     "topic": "",
-    "question": "Q10. There are 10 books on a shelf, of which 4 are paperbacks and 6 are hardbacks. How many possible selections of 5 books from the shelf contain at least one paperback and at least one hardback?",
+    "question": "There are 10 books on a shelf, of which 4 are paperbacks and 6 are hardbacks. How many possible selections of 5 books from the shelf contain at least one paperback and at least one hardback?",
     "options": {
       "A": "75",
       "B": "120",
@@ -378,7 +208,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Medium",
     "topic": "",
-    "question": "Q11. A certain club has 10 members, including Harry. One of the 10 members is to be chosen at random to be the president, one of the remaining 9 members is to be chosen at random to be the secretary, and one of the remaining 8 members is to be chosen at random to be the treasurer. What is the probability that Harry will be either the member chosen to be the secretary or the member chosen to be the treasurer?",
+    "question": "A certain club has 10 members, including Harry. One of the 10 members is to be chosen at random to be the president, one of the remaining 9 members is to be chosen at random to be the secretary, and one of the remaining 8 members is to be chosen at random to be the treasurer. What is the probability that Harry will be either the member chosen to be the secretary or the member chosen to be the treasurer?",
     "options": {
       "A": "1/720",
       "B": "1/80",
@@ -395,7 +225,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Medium",
     "topic": "",
-    "question": "Q12. If 3 < x < 100, for how many values of x is x/3 the square of a prime number?",
+    "question": "If 3 < x < 100, for how many values of x is x/3 the square of a prime number?",
     "options": {
       "A": "Two",
       "B": "Three",
@@ -412,7 +242,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Hard",
     "topic": "",
-    "question": "Q13. Of the 300 subjects who participated in an experiment using virtual-reality therapy to reduce their fear of heights, 40 percent experienced sweaty palms, 30 percent experienced vomiting, and 75 percent experienced dizziness. If all of the subjects experienced at least one of these effects and 35 percent of the subjects experienced exactly two of these effects, how many of the subjects experienced only one of these effects?",
+    "question": "Of the 300 subjects who participated in an experiment using virtual-reality therapy to reduce their fear of heights, 40 percent experienced sweaty palms, 30 percent experienced vomiting, and 75 percent experienced dizziness. If all of the subjects experienced at least one of these effects and 35 percent of the subjects experienced exactly two of these effects, how many of the subjects experienced only one of these effects?",
     "options": {
       "A": "105",
       "B": "125",
@@ -429,7 +259,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Hard",
     "topic": "",
-    "question": "Q14. The product of all the prime numbers less than 20 is closest to which of the following powers of 10?",
+    "question": "The product of all the prime numbers less than 20 is closest to which of the following powers of 10?",
     "options": {
       "A": "10⁹",
       "B": "10⁸",
@@ -446,7 +276,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Medium",
     "topic": "",
-    "question": "Q15. A can complete a project in 20 days and B can complete the same project in 30 days. If A and B start working on the project together and A quits 10 days before the project is completed, in how many days will the project be completed?",
+    "question": "A can complete a project in 20 days and B can complete the same project in 30 days. If A and B start working on the project together and A quits 10 days before the project is completed, in how many days will the project be completed?",
     "options": {
       "A": "18 days",
       "B": "27 days",
@@ -463,7 +293,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Hard",
     "topic": "",
-    "question": "Q16. A car traveling at a certain constant speed takes 2 seconds longer to travel 1 kilometer than it would take to travel 1 kilometer at 75 kilometers per hour. At what speed, in kilometers per hour, is the car traveling?",
+    "question": "A car traveling at a certain constant speed takes 2 seconds longer to travel 1 kilometer than it would take to travel 1 kilometer at 75 kilometers per hour. At what speed, in kilometers per hour, is the car traveling?",
     "options": {
       "A": "71.5",
       "B": "72",
@@ -480,7 +310,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Easy",
     "topic": "",
-    "question": "Q17. If y is an integer, then the least possible value of |23 − 5y| is",
+    "question": "If y is an integer, then the least possible value of |23 − 5y| is",
     "options": {
       "A": "1",
       "B": "2",
@@ -497,7 +327,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Easy",
     "topic": "",
-    "question": "Q18. If a, b, and c are constants, a > b > c, and x³ − x = (x − a)(x − b)(x − c) for all numbers x, what is the value of b?",
+    "question": "If a, b, and c are constants, a > b > c, and x³ − x = (x − a)(x − b)(x − c) for all numbers x, what is the value of b?",
     "options": {
       "A": "−3",
       "B": "−1",
@@ -514,7 +344,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Easy",
     "topic": "",
-    "question": "Q19. Car A is 20 miles behind car B, which is traveling in the same direction along the same route as Car A. Car A is traveling at a constant speed of 58 miles per hour and Car B is traveling at a constant speed of 50 miles per hour. How many hours will it take for Car A to overtake and drive 8 miles ahead of Car B?",
+    "question": "Car A is 20 miles behind car B, which is traveling in the same direction along the same route as Car A. Car A is traveling at a constant speed of 58 miles per hour and Car B is traveling at a constant speed of 50 miles per hour. How many hours will it take for Car A to overtake and drive 8 miles ahead of Car B?",
     "options": {
       "A": "1.5",
       "B": "2.0",
@@ -531,7 +361,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Easy",
     "topic": "",
-    "question": "Q20. Among a group of 2,500 people, 35 percent invest in municipal bonds, 18 percent invest in oil stocks, and 7 percent invest in both municipal bonds and oil stocks. If 1 person is to be randomly selected from the 2,500 people, what is the probability that the person selected will be one who invests in municipal bonds but NOT in oil stocks?",
+    "question": "Among a group of 2,500 people, 35 percent invest in municipal bonds, 18 percent invest in oil stocks, and 7 percent invest in both municipal bonds and oil stocks. If 1 person is to be randomly selected from the 2,500 people, what is the probability that the person selected will be one who invests in municipal bonds but NOT in oil stocks?",
     "options": {
       "A": "9/50",
       "B": "7/25",
@@ -548,7 +378,7 @@ const PRELOADED_QUESTIONS = [
     "section": "Q",
     "difficulty": "Hard",
     "topic": "",
-    "question": "Q21. Of the science books in a certain supply room, 50 are on botany, 65 are on zoology, 90 are on physics, 50 are on geology, and 110 are on chemistry. If science books are removed randomly from the supply room, how many must be removed to ensure that 80 of the books removed are on the same science?",
+    "question": "Of the science books in a certain supply room, 50 are on botany, 65 are on zoology, 90 are on physics, 50 are on geology, and 110 are on chemistry. If science books are removed randomly from the supply room, how many must be removed to ensure that 80 of the books removed are on the same science?",
     "options": {
       "A": "81",
       "B": "159",
