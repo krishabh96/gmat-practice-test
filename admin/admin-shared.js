@@ -29,30 +29,107 @@ function adminLogout() {
 }
 
 // ── STORAGE ──
+// ── Supabase client (shared across all admin pages) ──
+const _adminSb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// ── DB: Supabase-backed question store ──
+// All methods are async — await them in calling code
 const DB = {
-  getQs()    { try{ return JSON.parse(localStorage.getItem('admin_questions')||'[]'); }catch(e){ return []; } },
-  saveQs(qs) { localStorage.setItem('admin_questions', JSON.stringify(qs)); },
-  add(q)     {
-    const qs = this.getQs();
-    q.id = q.id || 'Q_' + Date.now() + '_' + Math.floor(Math.random()*9999);
-    qs.push(q); this.saveQs(qs); return q;
+
+  // ── READ ──
+  async getQs(filters = {}) {
+    let q = _adminSb.from('questions').select('*');
+    if(filters.section)   q = q.eq('section', filters.section);
+    if(filters.sectional) q = q.eq('sectional', filters.sectional);
+    if(filters.difficulty) q = q.eq('difficulty', filters.difficulty);
+    const { data, error } = await q.order('created_at', { ascending: false });
+    if(error){ console.error('DB.getQs error:', error); return []; }
+    return (data || []).map(r => ({
+      ...r,
+      options: typeof r.options === 'string' ? JSON.parse(r.options) : r.options
+    }));
   },
-  update(id, upd) {
-    const qs = this.getQs();
-    const i = qs.findIndex(x => x.id === id);
-    if(i >= 0){ qs[i] = {...qs[i], ...upd}; this.saveQs(qs); return true; }
-    return false;
-  },
-  delete(id) { this.saveQs(this.getQs().filter(q => q.id !== id)); },
-  counts() {
-    const qs = this.getQs();
-    const tagged = qs.filter(q => q.sectional).length;
+
+  // ── COUNTS ──
+  async counts() {
+    const { data, error } = await _adminSb.from('questions').select('section, sectional');
+    if(error) return { total:0, tagged:0, untagged:0, Q:0, V:0, D:0 };
+    const qs = data || [];
     return {
-      total:qs.length, tagged, untagged:qs.length - tagged,
-      Q:qs.filter(q=>q.section==='Q').length,
-      V:qs.filter(q=>q.section==='V').length,
-      D:qs.filter(q=>q.section==='D').length
+      total:    qs.length,
+      tagged:   qs.filter(q => q.sectional).length,
+      untagged: qs.filter(q => !q.sectional).length,
+      Q:        qs.filter(q => q.section === 'Q').length,
+      V:        qs.filter(q => q.section === 'V').length,
+      D:        qs.filter(q => q.section === 'D').length,
     };
+  },
+
+  // ── ADD ──
+  async add(q) {
+    q.id = q.id || 'Q_' + Date.now() + '_' + Math.floor(Math.random()*9999);
+    q.options = typeof q.options === 'string' ? q.options : JSON.stringify(q.options);
+    const { data, error } = await _adminSb.from('questions').insert([q]).select().single();
+    if(error){ console.error('DB.add error:', error); throw error; }
+    return data;
+  },
+
+  // ── ADD MANY ──
+  async addMany(qs) {
+    const rows = qs.map(q => ({
+      ...q,
+      id: q.id || 'Q_' + Date.now() + '_' + Math.floor(Math.random()*9999),
+      options: typeof q.options === 'string' ? q.options : JSON.stringify(q.options)
+    }));
+    const { data, error } = await _adminSb.from('questions').insert(rows).select();
+    if(error){ console.error('DB.addMany error:', error); throw error; }
+    return data || [];
+  },
+
+  // ── UPDATE ──
+  async update(id, upd) {
+    if(upd.options && typeof upd.options !== 'string'){
+      upd.options = JSON.stringify(upd.options);
+    }
+    const { error } = await _adminSb.from('questions').update(upd).eq('id', id);
+    if(error){ console.error('DB.update error:', error); return false; }
+    return true;
+  },
+
+  // ── DELETE ──
+  async delete(id) {
+    const { error } = await _adminSb.from('questions').delete().eq('id', id);
+    if(error){ console.error('DB.delete error:', error); return false; }
+    return true;
+  },
+
+  // ── DELETE MANY ──
+  async deleteMany(ids) {
+    const { error } = await _adminSb.from('questions').delete().in('id', ids);
+    if(error){ console.error('DB.deleteMany error:', error); return false; }
+    return true;
+  },
+
+  // ── CLEAR ALL ──
+  async clearAll() {
+    const { error } = await _adminSb.from('questions').delete().neq('id', '');
+    if(error){ console.error('DB.clearAll error:', error); return false; }
+    return true;
+  },
+
+  // ── MIGRATE: push localStorage questions to Supabase ──
+  async migrateFromLocalStorage() {
+    try {
+      const raw = localStorage.getItem('admin_questions');
+      if(!raw) return 0;
+      const qs = JSON.parse(raw);
+      if(!qs.length) return 0;
+      await this.addMany(qs);
+      return qs.length;
+    } catch(e) {
+      console.error('Migration error:', e);
+      throw e;
+    }
   }
 };
 

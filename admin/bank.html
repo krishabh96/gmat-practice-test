@@ -4,155 +4,150 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Question Bank — Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style id="shared-styles"></style>
 <style>
-.filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
 .search-input{padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:'Inter',sans-serif;background:var(--white);outline:none;width:220px;transition:border-color .2s}
 .search-input:focus{border-color:var(--teal)}
 .filter-sel{padding:8px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;background:var(--white);outline:none;cursor:pointer;font-family:'Inter',sans-serif;color:var(--text)}
 .filter-sel:focus{border-color:var(--teal)}
 .bank-stats{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-bottom:10px;flex-wrap:wrap}
 .bank-stat-num{font-weight:700;color:var(--navy)}
-
-/* TABLE */
 .q-table{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .q-head{display:grid;grid-template-columns:40px 44px 52px 1fr 80px 70px 54px 100px 80px;background:var(--navy);color:#fff;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:10px 14px;gap:8px;align-items:center}
 .q-row{display:grid;grid-template-columns:40px 44px 52px 1fr 80px 70px 54px 100px 80px;padding:11px 14px;gap:8px;border-bottom:1px solid var(--border);align-items:center;transition:background .1s;font-size:12px}
-.q-row:last-child{border-bottom:none}
-.q-row:hover{background:#f8f9fb}
+.q-row:last-child{border-bottom:none}.q-row:hover{background:#f8f9fb}
 .tc{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
 .tc.dim{color:var(--muted);font-size:11px}
 .action-btns{display:flex;gap:4px}
 .btn-icon{background:transparent;border:1px solid var(--border);border-radius:4px;padding:3px 7px;cursor:pointer;font-size:11px;color:var(--muted);transition:all .1s;font-family:'Inter',sans-serif;text-decoration:none;display:inline-flex;align-items:center}
-.btn-icon:hover{border-color:var(--teal);color:var(--teal)}
-.btn-icon.del:hover{border-color:var(--red);color:var(--red)}
+.btn-icon:hover{border-color:var(--teal);color:var(--teal)}.btn-icon.del:hover{border-color:var(--red);color:var(--red)}
 .reassign-sel{font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:4px;background:var(--white);font-family:'Inter',sans-serif;outline:none;cursor:pointer;max-width:96px}
 .reassign-sel:focus{border-color:var(--teal)}
 .empty-state{text-align:center;padding:60px 24px;color:var(--muted)}
-.empty-icon{font-size:40px;margin-bottom:12px}
 .q-checkbox{accent-color:var(--teal);cursor:pointer;width:14px;height:14px}
 .bulk-bar{background:var(--navy);color:#fff;padding:10px 16px;border-radius:8px;display:none;align-items:center;gap:12px;margin-bottom:12px;font-size:13px}
-.bulk-bar.show{display:flex}
-.bulk-count{font-weight:700}
+.bulk-bar.show{display:flex}.bulk-count{font-weight:700}
+.page-loading{text-align:center;padding:40px;color:var(--muted);font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 <div id="topbar-wrap"></div>
 <div class="page">
   <div class="page-title">Question Bank</div>
-  <div class="page-sub">Browse, filter, reassign, edit or delete questions.</div>
+  <div class="page-sub">All questions from Supabase — filter, reassign, edit or delete.</div>
 
   <div class="bulk-bar" id="bulk-bar">
     <span class="bulk-count" id="bulk-count">0 selected</span>
-    <select class="filter-sel" id="bulk-reassign-sec" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff">
+    <select class="filter-sel" id="bulk-sec" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff">
       <option value="">Reassign section...</option>
-      <option value="Q">→ Quantitative</option>
-      <option value="V">→ Verbal</option>
-      <option value="D">→ Data Insights</option>
+      <option value="Q">→ Quantitative</option><option value="V">→ Verbal</option><option value="D">→ Data Insights</option>
     </select>
-    <select class="filter-sel" id="bulk-reassign-pool" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff">
+    <select class="filter-sel" id="bulk-pool" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff">
       <option value="__none__">Reassign pool...</option>
       <option value="">Untagged</option>
       ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}">Sectional ${String(n).padStart(2,'0')}</option>`).join('')}
     </select>
     <button class="btn btn-teal btn-sm" onclick="applyBulk()">Apply</button>
-    <button class="btn btn-red btn-sm" onclick="bulkDelete()">Delete Selected</button>
-    <button class="btn btn-outline btn-sm" onclick="clearSelection()" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.3)">Cancel</button>
+    <button class="btn btn-red btn-sm" onclick="bulkDelete()">Delete</button>
+    <button class="btn btn-outline btn-sm" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.3)" onclick="clearSel()">Cancel</button>
   </div>
 
   <div class="filter-bar">
-    <input class="search-input" id="search" placeholder="🔍 Search questions..." oninput="renderBank()">
-    <select class="filter-sel" id="f-sec" onchange="renderBank()">
-      <option value="all">All Sections</option>
-      <option value="Q">Quantitative</option>
-      <option value="V">Verbal</option>
-      <option value="D">Data Insights</option>
+    <input class="search-input" id="search" placeholder="🔍 Search questions..." oninput="applyFilters()">
+    <select class="filter-sel" id="f-sec" onchange="applyFilters()">
+      <option value="">All Sections</option><option value="Q">Quantitative</option><option value="V">Verbal</option><option value="D">Data Insights</option>
     </select>
-    <select class="filter-sel" id="f-diff" onchange="renderBank()">
-      <option value="all">All Difficulties</option>
-      <option value="Easy">Easy</option>
-      <option value="Medium">Medium</option>
-      <option value="Hard">Hard</option>
+    <select class="filter-sel" id="f-diff" onchange="applyFilters()">
+      <option value="">All Difficulties</option><option value="Easy">Easy</option><option value="Medium">Medium</option><option value="Hard">Hard</option>
     </select>
-    <select class="filter-sel" id="f-pool" onchange="renderBank()">
-      <option value="all">All Pools</option>
-      <option value="">Untagged</option>
+    <select class="filter-sel" id="f-pool" onchange="applyFilters()">
+      <option value="__all__">All Pools</option>
+      <option value="__untagged__">Untagged</option>
       ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}">Sectional ${String(n).padStart(2,'0')}</option>`).join('')}
     </select>
     <div style="margin-left:auto;display:flex;gap:8px">
-      <button class="btn btn-outline btn-sm" onclick="importJSON()">Import JSON</button>
+      <button class="btn btn-outline btn-sm" onclick="loadBank()">🔄 Refresh</button>
       <button class="btn btn-red btn-sm" onclick="clearAll()">Clear All</button>
     </div>
   </div>
 
   <div class="bank-stats" id="bank-stats"></div>
-
   <div class="q-table">
     <div class="q-head">
-      <div><input type="checkbox" id="select-all-cb" class="q-checkbox" onchange="toggleSelectAll(this.checked)"></div>
+      <div><input type="checkbox" id="sel-all" class="q-checkbox" onchange="toggleAll(this.checked)"></div>
       <div>Sec</div><div>Pool</div><div>Question</div>
-      <div>Difficulty</div><div>Topic</div><div>Ans</div>
-      <div>Sectional</div><div>Actions</div>
+      <div>Difficulty</div><div>Topic</div><div>Ans</div><div>Sectional</div><div>Actions</div>
     </div>
-    <div id="bank-body"></div>
+    <div id="bank-body"><div class="page-loading"><div class="spinner"></div> Loading from Supabase...</div></div>
   </div>
 </div>
-
-<input type="file" id="json-import" accept=".json" style="display:none" onchange="handleJSONImport(this)">
 <div class="toast info" id="toast"></div>
-
 <script src="admin-shared.js"></script>
 <script>
 if(!checkAuth()) throw new Error();
 document.getElementById('shared-styles').textContent = SHARED_STYLES;
 document.getElementById('topbar-wrap').innerHTML = renderTopbar('bank');
 
-let selectedIds = new Set();
+let allQs = [], filteredQs = [], selectedIds = new Set();
 
-function renderBank(){
-  const secF    = g('f-sec').value;
-  const diffF   = g('f-diff').value;
-  const poolF   = g('f-pool').value;
-  const search  = g('search').value.toLowerCase().trim();
+async function loadBank(){
+  g('bank-body').innerHTML = '<div class="page-loading"><div class="spinner"></div> Loading from Supabase...</div>';
+  try {
+    allQs = await DB.getQs();
+    applyFilters();
+  } catch(e) {
+    g('bank-body').innerHTML = `<div class="empty-state">Error loading: ${e.message}</div>`;
+    showToast('Error: ' + e.message, 'error');
+  }
+}
 
-  let qs = DB.getQs();
-  if(secF  !== 'all') qs = qs.filter(q => q.section === secF);
-  if(diffF !== 'all') qs = qs.filter(q => q.difficulty === diffF);
-  if(poolF !== 'all') qs = qs.filter(q => (q.sectional||'') === poolF);
-  if(search) qs = qs.filter(q =>
-    q.question.toLowerCase().includes(search) ||
-    (q.topic||'').toLowerCase().includes(search)
-  );
+function applyFilters(){
+  const sec  = g('f-sec').value;
+  const diff = g('f-diff').value;
+  const pool = g('f-pool').value;
+  const search = g('search').value.toLowerCase().trim();
 
-  // Stats
-  const statsEl = g('bank-stats');
-  statsEl.innerHTML = `
-    <span>Showing <span class="bank-stat-num">${qs.length}</span> questions</span>
-    <span>Easy: <span class="bank-stat-num">${qs.filter(q=>q.difficulty==='Easy').length}</span></span>
-    <span>Medium: <span class="bank-stat-num">${qs.filter(q=>q.difficulty==='Medium').length}</span></span>
-    <span>Hard: <span class="bank-stat-num">${qs.filter(q=>q.difficulty==='Hard').length}</span></span>
-    <span>Untagged: <span class="bank-stat-num">${qs.filter(q=>!q.sectional).length}</span></span>`;
+  filteredQs = allQs.filter(q => {
+    if(sec  && q.section !== sec) return false;
+    if(diff && q.difficulty !== diff) return false;
+    if(pool === '__untagged__' && q.sectional) return false;
+    if(pool !== '__all__' && pool !== '__untagged__' && String(q.sectional) !== pool) return false;
+    if(search && !q.question.toLowerCase().includes(search) && !(q.topic||'').toLowerCase().includes(search)) return false;
+    return true;
+  });
 
+  g('bank-stats').innerHTML = `
+    <span>Showing <span class="bank-stat-num">${filteredQs.length}</span> of ${allQs.length}</span>
+    <span>Easy: <span class="bank-stat-num">${filteredQs.filter(q=>q.difficulty==='Easy').length}</span></span>
+    <span>Medium: <span class="bank-stat-num">${filteredQs.filter(q=>q.difficulty==='Medium').length}</span></span>
+    <span>Hard: <span class="bank-stat-num">${filteredQs.filter(q=>q.difficulty==='Hard').length}</span></span>
+    <span>Untagged: <span class="bank-stat-num">${filteredQs.filter(q=>!q.sectional).length}</span></span>`;
+
+  renderRows();
+}
+
+function renderRows(){
   const body = g('bank-body');
-  if(!qs.length){
-    body.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div>No questions found.</div></div>`;
+  if(!filteredQs.length){
+    body.innerHTML = '<div class="empty-state">No questions found.</div>';
     return;
   }
-
   body.innerHTML = '';
-  qs.forEach(q => {
+  filteredQs.forEach(q => {
     const pool = q.sectional ? 'S'+String(q.sectional).padStart(2,'0') : '—';
-    const short = q.question.length > 60 ? q.question.slice(0,60)+'…' : q.question;
-    const isSelected = selectedIds.has(q.id);
-
+    const short = (q.question||'').replace(/\n/g,' ').slice(0,55) + ((q.question||'').length>55?'…':'');
+    const isSel = selectedIds.has(q.id);
     const row = document.createElement('div');
-    row.className = 'q-row';
-    row.dataset.id = q.id;
+    row.className = 'q-row'; row.dataset.id = q.id;
     row.innerHTML = `
-      <div><input type="checkbox" class="q-checkbox row-cb" data-id="${q.id}" ${isSelected?'checked':''} onchange="toggleRow('${q.id}',this.checked)"></div>
+      <div><input type="checkbox" class="q-checkbox row-cb" data-id="${q.id}" ${isSel?'checked':''} onchange="toggleRow('${q.id}',this.checked)"></div>
       <div class="tc"><span class="spill spill-${q.section}">${q.section}</span></div>
       <div class="tc dim">${pool}</div>
-      <div class="tc" title="${q.question.replace(/"/g,'').replace(/\n/g,' ')}">${short.replace(/\n/g,' ')}</div>
+      <div class="tc" title="${(q.question||'').replace(/"/g,'').replace(/\n/g,' ')}">${short}</div>
       <div class="tc"><span class="dpill ${q.difficulty}">${q.difficulty}</span></div>
       <div class="tc dim">${(q.topic||'—').slice(0,18)}</div>
       <div class="tc" style="font-weight:700;color:var(--teal)">${q.answer}</div>
@@ -162,124 +157,81 @@ function renderBank(){
           ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}" ${q.sectional==n?'selected':''}>S${String(n).padStart(2,'0')}</option>`).join('')}
         </select>
       </div>
-      <div class="tc">
-        <div class="action-btns">
-          <a class="btn-icon" href="questions.html?edit=${q.id}" title="Edit">✏️</a>
-          <button class="btn-icon del" onclick="deleteQ('${q.id}')" title="Delete">🗑️</button>
-        </div>
-      </div>`;
+      <div class="tc"><div class="action-btns">
+        <a class="btn-icon" href="questions.html?edit=${q.id}" title="Edit">✏️</a>
+        <button class="btn-icon del" onclick="deleteQ('${q.id}')" title="Delete">🗑️</button>
+      </div></div>`;
     body.appendChild(row);
   });
 }
 
-function reassign(id, sectional){
-  DB.update(id, { sectional });
-  renderBank();
+async function reassign(id, sectional){
+  await DB.update(id, { sectional: sectional || null });
+  const q = allQs.find(x=>x.id===id);
+  if(q) q.sectional = sectional || null;
   showToast('Reassigned ✓','success');
+  applyFilters();
 }
 
-function deleteQ(id){
+async function deleteQ(id){
   if(!confirm('Delete this question?')) return;
-  DB.delete(id);
+  await DB.delete(id);
+  allQs = allQs.filter(q=>q.id!==id);
   selectedIds.delete(id);
-  renderBank();
+  applyFilters();
   showToast('Deleted','info');
 }
 
-// ── BULK ACTIONS ──
-function toggleRow(id, checked){
-  if(checked) selectedIds.add(id);
-  else selectedIds.delete(id);
+// ── BULK ──
+function toggleRow(id,checked){
+  if(checked) selectedIds.add(id); else selectedIds.delete(id);
   updateBulkBar();
 }
-
-function toggleSelectAll(checked){
-  document.querySelectorAll('.row-cb').forEach(cb => {
-    cb.checked = checked;
-    const id = cb.dataset.id;
-    if(checked) selectedIds.add(id);
-    else selectedIds.delete(id);
-  });
+function toggleAll(checked){
+  filteredQs.forEach(q=>{ if(checked) selectedIds.add(q.id); else selectedIds.delete(q.id); });
+  document.querySelectorAll('.row-cb').forEach(cb=>cb.checked=checked);
   updateBulkBar();
 }
-
 function updateBulkBar(){
-  const bar = g('bulk-bar');
-  const count = g('bulk-count');
-  if(selectedIds.size > 0){
-    bar.classList.add('show');
-    count.textContent = selectedIds.size + ' selected';
-  } else {
-    bar.classList.remove('show');
-  }
+  const bar=g('bulk-bar');
+  selectedIds.size>0 ? bar.classList.add('show') : bar.classList.remove('show');
+  g('bulk-count').textContent = selectedIds.size+' selected';
 }
+function clearSel(){ selectedIds.clear(); document.querySelectorAll('.row-cb').forEach(c=>c.checked=false); g('sel-all').checked=false; updateBulkBar(); }
 
-function clearSelection(){
-  selectedIds.clear();
-  document.querySelectorAll('.row-cb').forEach(cb=>cb.checked=false);
-  g('select-all-cb').checked = false;
-  updateBulkBar();
-}
-
-function applyBulk(){
-  const newSec  = g('bulk-reassign-sec').value;
-  const newPool = g('bulk-reassign-pool').value;
-  if(!newSec && newPool === '__none__'){ showToast('Select a section or pool to reassign to.','error'); return; }
-  let count = 0;
-  selectedIds.forEach(id => {
+async function applyBulk(){
+  const newSec  = g('bulk-sec').value;
+  const newPool = g('bulk-pool').value;
+  if(!newSec && newPool==='__none__'){ showToast('Select section or pool.','error'); return; }
+  const ids = [...selectedIds];
+  for(const id of ids){
     const upd = {};
     if(newSec) upd.section = newSec;
-    if(newPool !== '__none__') upd.sectional = newPool;
-    DB.update(id, upd);
-    count++;
-  });
-  clearSelection();
-  renderBank();
-  showToast(count + ' questions updated ✓','success');
+    if(newPool!=='__none__') upd.sectional = newPool || null;
+    await DB.update(id, upd);
+    const q = allQs.find(x=>x.id===id);
+    if(q){ if(newSec) q.section=newSec; if(newPool!=='__none__') q.sectional=newPool||null; }
+  }
+  clearSel(); applyFilters();
+  showToast(ids.length+' questions updated ✓','success');
 }
 
-function bulkDelete(){
-  if(!confirm(`Delete ${selectedIds.size} selected questions?`)) return;
-  selectedIds.forEach(id => DB.delete(id));
-  clearSelection();
-  renderBank();
-  showToast('Deleted selected questions','info');
+async function bulkDelete(){
+  if(!confirm(`Delete ${selectedIds.size} questions?`)) return;
+  await DB.deleteMany([...selectedIds]);
+  allQs = allQs.filter(q=>!selectedIds.has(q.id));
+  clearSel(); applyFilters();
+  showToast('Deleted','info');
 }
 
-// ── IMPORT ──
-function importJSON(){ g('json-import').click(); }
-
-function handleJSONImport(input){
-  const file = input.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try{
-      const data = JSON.parse(e.target.result);
-      const arr = Array.isArray(data) ? data : (data.questions || []);
-      if(!arr.length){ showToast('No questions found in JSON','error'); return; }
-      const existing = new Set(DB.getQs().map(q=>q.id));
-      let added = 0;
-      arr.forEach(q => {
-        if(q.question && q.options && q.answer && !existing.has(q.id)){
-          DB.add(q); added++;
-        }
-      });
-      renderBank();
-      showToast(added + ' questions imported ✓','success');
-    } catch(err){ showToast('Invalid JSON file','error'); }
-  };
-  reader.readAsText(file);
-  input.value = '';
+async function clearAll(){
+  if(!confirm('Delete ALL questions from Supabase? This cannot be undone.')) return;
+  await DB.clearAll();
+  allQs=[]; filteredQs=[]; renderRows();
+  showToast('All questions deleted','info');
 }
 
-function clearAll(){
-  if(!confirm('Delete ALL questions? This cannot be undone.')) return;
-  DB.saveQs([]);
-  renderBank();
-  showToast('All questions cleared','info');
-}
-
-renderBank();
+loadBank();
 </script>
 </body>
 </html>

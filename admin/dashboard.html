@@ -3,126 +3,722 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard — Admin</title>
-<style id="shared-styles"></style>
+<title>Dashboard — Sasta GMAT Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
-.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-.stat-box{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
-.stat-val{font-family:'Playfair Display',serif;font-size:30px;color:var(--navy);display:block;line-height:1;margin-bottom:4px}
-.stat-val.teal{color:var(--teal)}.stat-val.green{color:var(--green)}.stat-val.amber{color:var(--amber)}
+:root{
+  --navy:#0F172A;--teal:#14B8A6;--teal-d:#0D9488;--teal-l:rgba(20,184,166,0.1);
+  --bg:#F8FAFC;--white:#FFFFFF;--text:#111827;--muted:#6B7280;
+  --border:#E5E7EB;--green:#22C55E;--green-bg:rgba(34,197,94,0.08);
+  --red:#EF4444;--red-bg:rgba(239,68,68,0.08);
+  --amber:#F59E0B;--amber-bg:rgba(245,158,11,0.08);
+  --shadow:0 1px 3px rgba(0,0,0,0.07),0 4px 12px rgba(0,0,0,0.05);
+  --shadow-lg:0 8px 32px rgba(15,23,42,0.12);
+  --radius:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+
+#auth-loading{position:fixed;inset:0;background:var(--white);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:14px}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#main-content{display:none}
+
+/* PREMIUM BANNER */
+.premium-banner{background:linear-gradient(135deg,#1e1b4b 0%,#0F172A 50%,#134e4a 100%);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.premium-banner.hidden{display:none}
+.pb-left{display:flex;align-items:center;gap:12px}
+.pb-icon{font-size:20px}
+.pb-text{font-size:13px;color:rgba(255,255,255,0.85);line-height:1.4}
+.pb-text strong{color:var(--teal)}
+.pb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.btn-upgrade-banner{background:var(--teal);color:var(--navy);border:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:background .2s}
+.btn-upgrade-banner:hover{background:var(--teal-d)}
+.pb-dismiss{background:transparent;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:18px;line-height:1;padding:4px;transition:color .2s}
+.pb-dismiss:hover{color:rgba(255,255,255,0.8)}
+
+/* TOPBAR */
+.topbar{background:var(--navy);height:60px;display:flex;align-items:center;padding:0 32px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,0.06)}
+.topbar-inner{max-width:1200px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.topbar-logo{font-family:'Playfair Display',serif;font-size:18px;color:#fff;text-decoration:none}
+.topbar-right{display:flex;align-items:center;gap:14px}
+.user-chip{display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--teal);color:var(--navy);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.user-name{font-size:13px;color:rgba(255,255,255,0.8)}
+.tier-badge{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:100px}
+.tier-free{background:rgba(34,197,94,0.15);color:#4ade80}
+.tier-pro{background:rgba(20,184,166,0.2);color:var(--teal)}
+.btn-signout{background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-signout:hover{border-color:rgba(255,255,255,0.4);color:#fff}
+
+/* LAYOUT */
+.page{max-width:1200px;margin:0 auto;padding:28px 24px 80px}
+
+/* WELCOME */
+.welcome-banner{background:var(--navy);border-radius:var(--radius);padding:26px 30px;margin-bottom:24px;position:relative;overflow:hidden}
+.welcome-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(20,184,166,0.12) 0%,transparent 60%);pointer-events:none}
+.welcome-name{font-size:19px;font-weight:700;color:#fff;margin-bottom:5px}
+.welcome-name span{color:var(--teal)}
+.welcome-msg{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;max-width:580px}
+.welcome-streak{position:absolute;right:30px;top:50%;transform:translateY(-50%);text-align:center}
+.streak-fire{font-size:28px;line-height:1}
+.streak-num{font-family:'Playfair Display',serif;font-size:26px;color:var(--teal);display:block;line-height:1;margin-top:4px}
+.streak-lbl{font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.5px}
+
+/* QUICK STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+.stat-val{font-family:'Playfair Display',serif;font-size:28px;color:var(--navy);display:block;line-height:1;margin-bottom:4px}
+.stat-val.teal{color:var(--teal)}.stat-val.green{color:var(--green)}
 .stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.sec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
-.sec-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:box-shadow .2s,border-color .2s;text-decoration:none;display:block}
-.sec-card:hover{box-shadow:var(--shadow);border-color:var(--teal)}
-.sec-card-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.sec-letter{font-family:'Playfair Display',serif;font-size:28px;color:var(--teal);line-height:1}
-.sec-name{font-size:14px;font-weight:700;color:var(--navy)}
-.sec-meta{font-size:11px;color:var(--muted);margin-top:2px}
-.pool-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:12px}
-.pool-item{background:var(--bg);border-radius:6px;padding:6px 4px;text-align:center;border:1px solid var(--border)}
-.pool-num{font-size:13px;font-weight:700;display:block}
-.pool-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
-.prog-wrap{height:4px;background:var(--border);border-radius:2px;margin-top:4px;overflow:hidden}
-.prog-fill{height:100%;border-radius:2px;background:var(--teal)}
-.quick-links{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.quick-link{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:box-shadow .2s,border-color .2s}
-.quick-link:hover{box-shadow:var(--shadow);border-color:var(--teal)}
-.ql-icon{font-size:22px}
-.ql-label{font-size:13px;font-weight:600;color:var(--navy)}
-.ql-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* NOTE CARD */
+.note-card{background:var(--white);border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:var(--radius);padding:18px 22px;margin-bottom:24px}
+.note-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.note-icon{font-size:18px}
+.note-title{font-size:14px;font-weight:700;color:var(--navy)}
+.note-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:12px}
+.note-item{background:var(--bg);border-radius:8px;padding:12px 14px}
+.note-item-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.note-item-val{font-size:13px;font-weight:600;color:var(--navy)}
+.note-item-sub{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+.note-pills{display:flex;gap:8px;flex-wrap:wrap}
+.note-pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:var(--teal-l);color:var(--teal-d);border:1px solid rgba(20,184,166,0.2)}
+
+/* TABS */
+.tabs-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:24px}
+.tabs-header{display:flex;border-bottom:1px solid var(--border)}
+.tab-btn{flex:1;padding:14px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:transparent;font-family:'Inter',sans-serif;transition:all .2s;position:relative;display:flex;align-items:center;justify-content:center;gap:6px;flex-direction:column}
+.tab-btn:hover{color:var(--text);background:var(--bg)}
+.tab-btn.active{color:var(--navy);background:var(--white)}
+.tab-btn.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2.5px;background:var(--teal)}
+.tab-sec-label{font-family:'Playfair Display',serif;font-size:20px;color:var(--teal);line-height:1}
+.tab-sec-name{font-size:12px;font-weight:600;color:inherit}
+.tab-sec-meta{font-size:10px;color:var(--muted);font-weight:400}
+.tabs-body{padding:20px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+.tests-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+
+/* TEST CARD */
+.test-item{border-radius:10px;border:1.5px solid var(--border);overflow:hidden;transition:box-shadow .2s,border-color .2s;position:relative;background:var(--white)}
+.test-item.unlocked{cursor:pointer}
+.test-item.unlocked:hover{box-shadow:var(--shadow);border-color:var(--teal)}
+.test-item.locked{cursor:pointer}
+.test-item.locked:hover{box-shadow:var(--shadow)}
+.ti-header{padding:14px 12px 10px}
+.ti-num{font-family:'Playfair Display',serif;font-size:26px;color:var(--navy);line-height:1;margin-bottom:2px}
+.ti-name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.ti-body{padding:8px 12px 14px}
+.ti-meta{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6}
+.ti-label{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;margin-bottom:8px}
+.ti-label.free{background:var(--green-bg);color:var(--green)}
+.ti-label.pro{background:var(--teal-l);color:var(--teal-d)}
+.btn-start{width:100%;padding:8px;background:var(--navy);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s}
+.btn-start:hover{background:#1e293b}
+.ti-prev{font-size:10px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)}
+.ti-prev span{color:var(--teal-d);font-weight:600}
+
+/* Lock overlay */
+.lock-overlay{position:absolute;inset:0;background:rgba(248,250,252,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-radius:8px}
+.lock-icon{font-size:20px}
+.lock-label{font-size:10px;font-weight:700;color:var(--muted);text-align:center}
+.btn-lock-upgrade{font-size:10px;font-weight:700;padding:5px 12px;background:var(--teal);color:var(--navy);border:none;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:2px;transition:background .2s}
+.btn-lock-upgrade:hover{background:var(--teal-d)}
+
+/* SESSIONS */
+.section-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.sec-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:var(--teal-l);color:var(--teal-d)}
+
+.sessions-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:24px}
+.sess-head{display:grid;grid-template-columns:110px 1fr 76px 76px 76px 96px;background:var(--navy);color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:10px 20px;gap:10px}
+.sess-row{display:grid;grid-template-columns:110px 1fr 76px 76px 76px 96px;padding:13px 20px;gap:10px;border-bottom:1px solid var(--border);align-items:center;transition:background .1s;cursor:default}
+.sess-row:last-child{border-bottom:none}
+.sc{font-size:13px;color:var(--text)}
+.sc.dim{color:var(--muted);font-size:12px}
+.sec-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:4px}
+.sec-Q{background:#e8f0f8;color:#003865}
+.sec-V{background:#fce8e8;color:#c62828}
+.sec-D{background:#e8f5e8;color:#2e7d32}
+.acc-pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:100px}
+.acc-high{background:var(--green-bg);color:var(--green)}
+.acc-mid{background:var(--amber-bg);color:var(--amber)}
+.acc-low{background:var(--red-bg);color:var(--red)}
+.btn-report{font-size:11px;font-weight:700;padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s}
+.btn-report:hover{background:#1e293b}
+.empty-sess{padding:48px 24px;text-align:center;color:var(--muted)}
+.empty-sess .ei{font-size:36px;margin-bottom:12px}
+.empty-sess p{font-size:14px;line-height:1.6}
+
+/* ANALYTICS */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.analytics-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+.ac-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+.bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.bar-label{font-size:12px;font-weight:600;color:var(--text);min-width:52px}
+.bar-track{flex:1;height:10px;background:var(--border);border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px;transition:width .8s ease}
+.bar-fill.easy{background:var(--green)}
+.bar-fill.medium{background:var(--amber)}
+.bar-fill.hard{background:var(--red)}
+.bar-val{font-size:12px;font-weight:700;color:var(--text);min-width:36px;text-align:right}
+.cnt-row{display:flex;gap:20px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.cnt-item{text-align:center}
+.cnt-num{font-family:'Playfair Display',serif;font-size:22px;display:block}
+.cnt-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+
+.acc-table{width:100%;border-collapse:collapse}
+.acc-table th{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);padding:0 0 10px;text-align:left}
+.acc-table td{font-size:13px;padding:8px 0;border-top:1px solid var(--border)}
+.acc-table td:not(:first-child){text-align:center}
+
+.trend-wrap{margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+.trend-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.trend-bars{display:flex;align-items:flex-end;gap:8px;height:56px}
+.trend-bar{flex:1;border-radius:3px 3px 0 0;min-height:4px;transition:height .6s ease;cursor:default}
+.trend-labels{display:flex;gap:8px;margin-top:4px}
+.trend-label{flex:1;font-size:10px;color:var(--muted);text-align:center}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;z-index:200;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:24px}
+.modal-ov.open{display:flex}
+.modal{background:var(--white);border-radius:16px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:mIn .25s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.modal-hdr{background:var(--navy);padding:22px 26px;position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:15px;font-weight:700;color:#fff}
+.modal-close{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:rgba(255,255,255,.2)}
+.modal-body{padding:22px 26px}
+.rep-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.rep-stat{background:var(--bg);border-radius:8px;padding:12px;text-align:center}
+.rep-stat-val{font-family:'Playfair Display',serif;font-size:24px;color:var(--navy);display:block}
+.rep-stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.rep-sec-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:16px 0 10px}
+.rep-q-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.rep-q-row:last-child{border-bottom:none}
+.rqn{font-weight:700;color:var(--muted);min-width:22px}
+.rqt{flex:1;color:var(--text);line-height:1.5}
+.rqd{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;flex-shrink:0}
+.rqd.Easy{background:#e8f5e8;color:#2e7d32}.rqd.Medium{background:#fff8e1;color:#f57f17}.rqd.Hard{background:#fce8e8;color:#c62828}
+.rqr{font-size:13px;font-weight:700;min-width:18px;flex-shrink:0}
+.rqr.C{color:var(--green)}.rqr.W{color:var(--red)}.rqr.S{color:var(--muted)}
+
+/* PAYMENT MODAL */
+.pay-modal{background:var(--white);border-radius:20px;width:100%;max-width:440px;box-shadow:var(--shadow-lg);animation:mIn .25s ease;overflow:hidden}
+.pay-hdr{background:linear-gradient(135deg,var(--navy) 0%,#134e4a 100%);padding:32px 32px 24px;text-align:center}
+.pay-logo{font-family:'Playfair Display',serif;font-size:18px;color:#fff;margin-bottom:8px}
+.pay-price{font-family:'Playfair Display',serif;font-size:48px;color:var(--teal);line-height:1}
+.pay-price span{font-family:'Inter',sans-serif;font-size:16px;color:rgba(255,255,255,.5)}
+.pay-desc{font-size:13px;color:rgba(255,255,255,.6);margin-top:6px}
+.pay-body{padding:24px 28px}
+.pay-features{list-style:none;margin-bottom:24px}
+.pay-features li{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);padding:7px 0;border-bottom:1px solid var(--border)}
+.pay-features li:last-child{border-bottom:none}
+.pay-check{width:18px;height:18px;background:var(--green-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--green);flex-shrink:0}
+.btn-pay{width:100%;padding:14px;background:var(--teal);color:var(--navy);border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s;margin-bottom:10px}
+.btn-pay:hover{background:var(--teal-d)}
+.pay-note{font-size:11px;color:var(--muted);text-align:center;line-height:1.5}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:13px;padding:11px 22px;border-radius:8px;z-index:400;display:none;box-shadow:var(--shadow-lg);font-family:'Inter',sans-serif;border:1px solid rgba(255,255,255,.1)}
+
+@media(max-width:900px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .tests-grid{grid-template-columns:repeat(2,1fr)}
+  .analytics-grid{grid-template-columns:1fr}
+  .note-grid{grid-template-columns:1fr}
+  .sess-head,.sess-row{grid-template-columns:80px 1fr 60px 60px 60px 76px;padding:10px 12px;font-size:11px}
+  .topbar,.premium-banner{padding-left:16px;padding-right:16px}
+  .page{padding:16px 16px 60px}
+  .welcome-streak{display:none}
+}
+@media(max-width:600px){
+  .tests-grid{grid-template-columns:repeat(2,1fr)}
+  .tabs-header{flex-wrap:wrap}
+  .tab-btn{padding:10px 8px}
+}
 </style>
 </head>
 <body>
-<div id="topbar-wrap"></div>
-<div class="page">
-  <div class="page-title">Dashboard</div>
-  <div class="page-sub">Question bank overview and sectional pool status</div>
 
-  <div class="stat-row">
-    <div class="stat-box"><span class="stat-val teal" id="d-total">0</span><div class="stat-lbl">Total Questions</div></div>
-    <div class="stat-box"><span class="stat-val green" id="d-tagged">0</span><div class="stat-lbl">Tagged to Sectionals</div></div>
-    <div class="stat-box"><span class="stat-val amber" id="d-untagged">0</span><div class="stat-lbl">Untagged (Pool)</div></div>
-    <div class="stat-box"><span class="stat-val" id="d-pools">0/30</span><div class="stat-lbl">Pools with Questions</div></div>
+<div id="auth-loading">
+  <div class="spinner"></div>
+  <span style="font-family:'Inter',sans-serif;font-size:13px;color:#6B7280">Loading dashboard...</span>
+</div>
+
+<div id="main-content">
+
+  <!-- PREMIUM BANNER (free users only) -->
+  <div class="premium-banner" id="premium-banner">
+    <div class="pb-left">
+      <div class="pb-icon">⚡</div>
+      <div class="pb-text">
+        You're on the <strong>Free Plan</strong> — only 2 tests per section unlocked.
+        Upgrade to Premium for all 10 tests, full mocks, and priority updates.
+      </div>
+    </div>
+    <div class="pb-right">
+      <button class="btn-upgrade-banner" onclick="openPayModal()">Upgrade to Premium — ₹299/mo</button>
+      <button class="pb-dismiss" onclick="dismissBanner()" title="Dismiss">×</button>
+    </div>
   </div>
 
-  <div class="sec-grid">
-    <a class="sec-card" href="sectionals.html?sec=Q">
-      <div class="sec-card-top">
-        <div class="sec-letter">Q</div>
-        <div><div class="sec-name">Quantitative</div><div class="sec-meta">21 questions · Problem Solving</div></div>
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="index.html">Sasta GMAT Prep</a>
+      <div class="topbar-right">
+        <div class="user-chip">
+          <div class="user-avatar" id="top-avatar">R</div>
+          <div>
+            <div class="user-name" id="top-name">Loading...</div>
+            <span class="tier-badge tier-free" id="top-tier">Free</span>
+          </div>
+        </div>
+        <button class="btn-signout" onclick="handleSignOut()">Sign Out</button>
       </div>
-      <div><span style="font-size:12px;font-weight:700;color:var(--navy)" id="sec-Q-count">0</span> <span style="font-size:11px;color:var(--muted)">questions</span></div>
-      <div class="pool-row" id="pool-row-Q"></div>
-    </a>
-    <a class="sec-card" href="sectionals.html?sec=V">
-      <div class="sec-card-top">
-        <div class="sec-letter">V</div>
-        <div><div class="sec-name">Verbal</div><div class="sec-meta">23 questions · CR & RC</div></div>
-      </div>
-      <div><span style="font-size:12px;font-weight:700;color:var(--navy)" id="sec-V-count">0</span> <span style="font-size:11px;color:var(--muted)">questions</span></div>
-      <div class="pool-row" id="pool-row-V"></div>
-    </a>
-    <a class="sec-card" href="sectionals.html?sec=D">
-      <div class="sec-card-top">
-        <div class="sec-letter">DI</div>
-        <div><div class="sec-name">Data Insights</div><div class="sec-meta">20 questions · DS & MSR</div></div>
-      </div>
-      <div><span style="font-size:12px;font-weight:700;color:var(--navy)" id="sec-D-count">0</span> <span style="font-size:11px;color:var(--muted)">questions</span></div>
-      <div class="pool-row" id="pool-row-D"></div>
-    </a>
+    </div>
   </div>
 
-  <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">Quick Actions</div>
-  <div class="quick-links">
-    <a class="quick-link" href="questions.html"><div class="ql-icon">➕</div><div><div class="ql-label">Add Questions</div><div class="ql-sub">Upload doc or paste</div></div></a>
-    <a class="quick-link" href="bank.html"><div class="ql-icon">🗃️</div><div><div class="ql-label">Question Bank</div><div class="ql-sub">Browse, edit, delete</div></div></a>
-    <a class="quick-link" href="sectionals.html"><div class="ql-icon">🧩</div><div><div class="ql-label">Manage Pools</div><div class="ql-sub">Assign to sectionals</div></div></a>
-    <a class="quick-link" href="export.html"><div class="ql-icon">📦</div><div><div class="ql-label">Export & Deploy</div><div class="ql-sub">Download questions.js</div></div></a>
+  <div class="page">
+
+    <!-- WELCOME -->
+    <div class="welcome-banner">
+      <div class="welcome-name">Welcome back, <span id="wb-name">there</span>! 👋</div>
+      <div class="welcome-msg">Track every test, spot your weak spots, and build the streak. Pick a sectional below — consistency beats cramming every time.</div>
+      <div class="welcome-streak">
+        <div class="streak-fire">🔥</div>
+        <span class="streak-num" id="streak-num">0</span>
+        <div class="streak-lbl">Day Streak</div>
+      </div>
+    </div>
+
+    <!-- QUICK STATS -->
+    <div class="stats-row">
+      <div class="stat-card"><span class="stat-val teal" id="qs-total">0</span><span class="stat-lbl">Tests Taken</span></div>
+      <div class="stat-card"><span class="stat-val green" id="qs-accuracy">—</span><span class="stat-lbl">Overall Accuracy</span></div>
+      <div class="stat-card"><span class="stat-val" id="qs-best">—</span><span class="stat-lbl">Best Score</span></div>
+      <div class="stat-card"><span class="stat-val" id="qs-avgtime">—</span><span class="stat-lbl">Avg Time / Question</span></div>
+    </div>
+
+    <!-- NOTE -->
+    <div class="note-card">
+      <div class="note-header">
+        <div class="note-icon">📋</div>
+        <div class="note-title">About These Sectional Tests</div>
+      </div>
+      <div class="note-grid">
+        <div class="note-item">
+          <div class="note-item-label">Quantitative</div>
+          <div class="note-item-val">21 Questions · 45 min</div>
+          <div class="note-item-sub">Problem Solving — Arithmetic, Algebra, Geometry, Statistics</div>
+        </div>
+        <div class="note-item">
+          <div class="note-item-label">Verbal</div>
+          <div class="note-item-val">23 Questions · 45 min</div>
+          <div class="note-item-sub">Critical Reasoning & Reading Comprehension</div>
+        </div>
+        <div class="note-item">
+          <div class="note-item-label">Data Insights</div>
+          <div class="note-item-val">20 Questions · 45 min</div>
+          <div class="note-item-sub">Data Sufficiency, MSR, Two-Part Analysis, Graphics</div>
+        </div>
+      </div>
+      <div class="note-pills">
+        <span class="note-pill">🔥 Streak Method</span>
+        <span class="note-pill">📈 Adaptive Difficulty</span>
+        <span class="note-pill">⏱ Timed Conditions</span>
+        <span class="note-pill">📊 Full Post-Test Review</span>
+        <span class="note-pill">🎯 GMAT-Style Questions</span>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-wrap">
+      <div class="tabs-header">
+        <button class="tab-btn active" id="tbtn-Q" onclick="switchTab('Q',this)">
+          <div class="tab-sec-label">Q</div>
+          <div class="tab-sec-name">Quantitative</div>
+          <div class="tab-sec-meta">21 Qs · 45 min · PS</div>
+        </button>
+        <button class="tab-btn" id="tbtn-V" onclick="switchTab('V',this)">
+          <div class="tab-sec-label">V</div>
+          <div class="tab-sec-name">Verbal</div>
+          <div class="tab-sec-meta">23 Qs · 45 min · CR & RC</div>
+        </button>
+        <button class="tab-btn" id="tbtn-D" onclick="switchTab('D',this)">
+          <div class="tab-sec-label">DI</div>
+          <div class="tab-sec-name">Data Insights</div>
+          <div class="tab-sec-meta">20 Qs · 45 min · DS & MSR</div>
+        </button>
+      </div>
+      <div class="tabs-body">
+        <div class="tab-panel active" id="tab-Q"><div class="tests-grid" id="grid-Q"></div></div>
+        <div class="tab-panel" id="tab-V"><div class="tests-grid" id="grid-V"></div></div>
+        <div class="tab-panel" id="tab-D"><div class="tests-grid" id="grid-D"></div></div>
+      </div>
+    </div>
+
+    <!-- RECENT SESSIONS -->
+    <div class="section-title">Recent Test Sessions <span class="sec-tag">Last 10</span></div>
+    <div class="sessions-wrap">
+      <div class="sess-head">
+        <div>Date</div><div>Test</div><div>Score</div>
+        <div>Correct</div><div>Time</div><div>Report</div>
+      </div>
+      <div id="sessions-body"></div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="section-title">Analytics <span class="sec-tag">All Time</span></div>
+    <div class="analytics-grid">
+      <div class="analytics-card">
+        <div class="ac-title">Accuracy by Difficulty</div>
+        <div class="bar-row"><span class="bar-label">Easy</span><div class="bar-track"><div class="bar-fill easy" id="bar-easy" style="width:0%"></div></div><span class="bar-val" id="val-easy">—</span></div>
+        <div class="bar-row"><span class="bar-label">Medium</span><div class="bar-track"><div class="bar-fill medium" id="bar-medium" style="width:0%"></div></div><span class="bar-val" id="val-medium">—</span></div>
+        <div class="bar-row"><span class="bar-label">Hard</span><div class="bar-track"><div class="bar-fill hard" id="bar-hard" style="width:0%"></div></div><span class="bar-val" id="val-hard">—</span></div>
+        <div class="cnt-row">
+          <div class="cnt-item"><span class="cnt-num" style="color:var(--green)" id="cnt-easy">0</span><span class="cnt-lbl">Easy Qs</span></div>
+          <div class="cnt-item"><span class="cnt-num" style="color:var(--amber)" id="cnt-medium">0</span><span class="cnt-lbl">Medium Qs</span></div>
+          <div class="cnt-item"><span class="cnt-num" style="color:var(--red)" id="cnt-hard">0</span><span class="cnt-lbl">Hard Qs</span></div>
+        </div>
+      </div>
+      <div class="analytics-card">
+        <div class="ac-title">Accuracy by Section</div>
+        <table class="acc-table">
+          <thead><tr><th>Section</th><th>Attempted</th><th>Correct</th><th>Accuracy</th></tr></thead>
+          <tbody id="section-acc-table">
+            <tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px 0">No data yet — take a test!</td></tr>
+          </tbody>
+        </table>
+        <div class="trend-wrap">
+          <div class="trend-title">Score Trend (Last 5 Tests)</div>
+          <div class="trend-bars" id="trend-bars"></div>
+          <div class="trend-labels" id="trend-labels"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-<div class="toast info" id="toast"></div>
-<script src="admin-shared.js"></script>
+
+<!-- REPORT MODAL -->
+<div class="modal-ov" id="report-modal" onclick="if(event.target===this)closeReport()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="report-title">Test Report</div>
+      <button class="modal-close" onclick="closeReport()">✕</button>
+    </div>
+    <div class="modal-body" id="report-body"></div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-ov" id="pay-modal" onclick="if(event.target===this)closePayModal()">
+  <div class="pay-modal">
+    <div class="pay-hdr">
+      <div class="pay-logo">Sasta GMAT Prep</div>
+      <div class="pay-price">₹299 <span>/ month</span></div>
+      <div class="pay-desc">Full access to every test and feature</div>
+    </div>
+    <div class="pay-body">
+      <ul class="pay-features">
+        <li><span class="pay-check">✓</span>10 Quant sectional tests (21 Qs each)</li>
+        <li><span class="pay-check">✓</span>10 Verbal sectional tests (23 Qs each)</li>
+        <li><span class="pay-check">✓</span>10 Data Insights sectionals (20 Qs each)</li>
+        <li><span class="pay-check">✓</span>Full mock tests (coming soon)</li>
+        <li><span class="pay-check">✓</span>Detailed analytics & streak tracking</li>
+        <li><span class="pay-check">✓</span>Cancel anytime — no lock-in</li>
+      </ul>
+      <button class="btn-pay" onclick="handlePayment()">Pay ₹299 — Unlock Everything</button>
+      <div class="pay-note">Payment gateway integration coming soon.<br>You'll be notified when it's live. 🚀</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-if(!checkAuth()) throw new Error('Not authenticated');
-document.getElementById('shared-styles').textContent = SHARED_STYLES;
-document.getElementById('topbar-wrap').innerHTML = renderTopbar('dashboard');
+const SUPA_URL='https://uavoffiwmocvvymtrsat.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhdm9mZml3bW9jdnZ5bXRyc2F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MjkxMjAsImV4cCI6MjA5NDQwNTEyMH0.YSob4QEO0lIZl9GNdjEKS4RHFSB7yhc7eLekV6PuWAY';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 
-function render(){
-  const qs = DB.getQs();
-  const c = DB.counts();
-  const set = (id,v) => { const el=g(id); if(el) el.textContent=v; };
-  set('d-total', c.total);
-  set('d-tagged', c.tagged);
-  set('d-untagged', c.untagged);
+let currentUser=null;
+let userTier='free';
 
-  // Count pools with at least 1 question
-  let filledPools = 0;
-  ['Q','V','D'].forEach(sec => {
-    for(let n=1;n<=10;n++){
-      if(qs.filter(q=>q.section===sec&&q.sectional==n).length > 0) filledPools++;
-    }
-  });
-  set('d-pools', filledPools + '/30');
+const SECTION_CONFIG={
+  Q:{name:'Quantitative',folder:'test/quant',qs:21,badge:'sec-Q'},
+  V:{name:'Verbal',folder:'test/verbal',qs:23,badge:'sec-V'},
+  D:{name:'Data Insights',folder:'test/di',qs:20,badge:'sec-D'}
+};
 
-  ['Q','V','D'].forEach(sec => {
-    const secQs = qs.filter(q=>q.section===sec);
-    set('sec-'+sec+'-count', secQs.length);
-    const row = g('pool-row-'+sec);
-    if(!row) return;
-    row.innerHTML = '';
-    for(let n=1;n<=10;n++){
-      const pool = secQs.filter(q=>q.sectional==n).length;
-      const target = SECTION_TARGETS[sec];
-      const pct = Math.min(100, Math.round(pool/target*100));
-      const col = pct>=100?'#22C55E':pct>=50?'#F59E0B':'#EF4444';
-      const item = document.createElement('div');
-      item.className = 'pool-item';
-      item.innerHTML = `<span class="pool-num" style="color:${col}">${pool}</span><span class="pool-lbl">S${String(n).padStart(2,'0')}</span><div class="prog-wrap"><div class="prog-fill" style="width:${pct}%;background:${col}"></div></div>`;
-      row.appendChild(item);
+// ── AUTH ──
+async function initAuth(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='index.html';return;}
+  currentUser=session.user;
+  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+  const initials=name.slice(0,2).toUpperCase();
+  const firstName=name.split(' ')[0];
+
+  try{
+    const{data}=await sb.from('profiles').select('subscription_tier').eq('id',currentUser.id).single();
+    if(data?.subscription_tier==='pro') userTier='pro';
+  }catch(e){}
+
+  g('top-avatar').textContent=initials;
+  g('top-name').textContent=name;
+  g('top-tier').textContent=userTier==='pro'?'Pro':'Free';
+  g('top-tier').className='tier-badge '+(userTier==='pro'?'tier-pro':'tier-free');
+  g('wb-name').textContent=firstName;
+
+  // Hide premium banner for pro users
+  if(userTier==='pro') g('premium-banner').classList.add('hidden');
+  // Also hide if dismissed this session
+  if(sessionStorage.getItem('banner_dismissed')) g('premium-banner').classList.add('hidden');
+
+  const sessions=loadSessions();
+  renderStreak(sessions);
+  renderQuickStats(sessions);
+  renderTestGrids(sessions);
+  renderSessions(sessions);
+  renderAnalytics(sessions);
+
+  g('auth-loading').style.display='none';
+  g('main-content').style.display='block';
+}
+
+async function handleSignOut(){
+  await sb.auth.signOut();
+  window.location.href='index.html';
+}
+
+// ── SESSIONS ──
+function sessKey(){return'gmat_sessions_'+(currentUser?.id||'guest');}
+function loadSessions(){try{return JSON.parse(localStorage.getItem(sessKey())||'[]');}catch(e){return[];}}
+
+// ── STREAK ──
+function renderStreak(sessions){
+  if(!sessions.length){g('streak-num').textContent='0';return;}
+  const days=new Set(sessions.map(s=>new Date(s.date).toDateString()));
+  let streak=0,d=new Date();
+  while(days.has(d.toDateString())){streak++;d.setDate(d.getDate()-1);}
+  g('streak-num').textContent=streak;
+}
+
+// ── QUICK STATS ──
+function renderQuickStats(sessions){
+  if(!sessions.length) return;
+  const total=sessions.length;
+  const allCorrect=sessions.reduce((s,x)=>s+(x.correct||0),0);
+  const allTotal=sessions.reduce((s,x)=>s+(x.total||0),0);
+  const acc=allTotal?Math.round(allCorrect/allTotal*100):0;
+  const best=Math.max(...sessions.map(s=>s.pct||0));
+  const avgTime=Math.round(sessions.reduce((s,x)=>s+(x.avgTime||0),0)/total);
+  g('qs-total').textContent=total;
+  g('qs-accuracy').textContent=acc+'%';
+  g('qs-best').textContent=best+'%';
+  g('qs-avgtime').textContent=avgTime+'s';
+}
+
+// ── TEST GRIDS ──
+function renderTestGrids(sessions){
+  ['Q','V','D'].forEach(sec=>{
+    const cfg=SECTION_CONFIG[sec];
+    const grid=g('grid-'+sec);
+    grid.innerHTML='';
+    for(let i=1;i<=10;i++){
+      const isFree=i<=2;
+      const canAccess=isFree||userTier==='pro';
+      const prev=sessions.find(s=>s.section===sec&&s.testNum===i);
+
+      const card=document.createElement('div');
+      card.className='test-item '+(canAccess?'unlocked':'locked');
+
+      card.innerHTML=`
+        <div class="ti-header">
+          <div class="ti-num">${String(i).padStart(2,'0')}</div>
+          <div class="ti-name">Sectional ${i}</div>
+        </div>
+        <div class="ti-body">
+          <span class="ti-label ${isFree?'free':'pro'}">${isFree?'Free':'Premium'}</span>
+          <div class="ti-meta">${cfg.qs} Qs · 45 min</div>
+          ${canAccess
+            ?`<button class="btn-start" onclick="startTest('${sec}',${i})">Start →</button>`
+            :`<button class="btn-start" style="background:#94a3b8" onclick="openPayModal()">🔒 Unlock</button>`
+          }
+          ${prev?`<div class="ti-prev">Last: <span>${prev.pct}%</span> · ${prev.correct}/${prev.total}</div>`:''}
+        </div>
+        ${canAccess?'':`
+          <div class="lock-overlay" onclick="openPayModal()">
+            <div class="lock-icon">🔒</div>
+            <div class="lock-label">Premium</div>
+            <button class="btn-lock-upgrade">Upgrade</button>
+          </div>`
+        }`;
+      grid.appendChild(card);
     }
   });
 }
-render();
+
+function startTest(sec,num){
+  localStorage.setItem('current_test',JSON.stringify({section:sec,num}));
+  window.location.href=SECTION_CONFIG[sec].folder+'/s'+num+'.html';
+}
+
+// ── TAB SWITCHING ──
+function switchTab(sec,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  g('tab-'+sec).classList.add('active');
+}
+
+// ── SESSIONS LIST ──
+function renderSessions(sessions){
+  const body=g('sessions-body');
+  const recent=sessions.slice(0,10);
+  if(!recent.length){
+    body.innerHTML='<div class="empty-sess"><div class="ei">📝</div><p>No test sessions yet.<br>Take your first sectional test to see results here.</p></div>';
+    return;
+  }
+  body.innerHTML='';
+  recent.forEach(s=>{
+    const date=new Date(s.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+    const acc=s.pct||0;
+    const accCls=acc>=70?'acc-high':acc>=50?'acc-mid':'acc-low';
+    const secName=SECTION_CONFIG[s.section]?.name||s.section;
+    const row=document.createElement('div');
+    row.className='sess-row';
+    row.innerHTML=`
+      <div class="sc dim">${date}</div>
+      <div class="sc"><span class="sec-badge sec-${s.section}">${s.section}</span> Sectional ${s.testNum||1}</div>
+      <div class="sc"><span class="acc-pill ${accCls}">${acc}%</span></div>
+      <div class="sc">${s.correct||0}/${s.total||'—'}</div>
+      <div class="sc dim">${s.elapsed||'—'}</div>
+      <div class="sc"><button class="btn-report" onclick="openReport(${s.id})">View</button></div>`;
+    body.appendChild(row);
+  });
+}
+
+// ── REPORT MODAL ──
+function openReport(id){
+  const sessions=loadSessions();
+  const s=sessions.find(x=>x.id===id);
+  if(!s){showToast('Session not found');return;}
+  const date=new Date(s.date).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+  g('report-title').textContent=(SECTION_CONFIG[s.section]?.name||s.section)+' Sectional '+s.testNum+' · '+date;
+  const entries=s.entries||[];
+  const correct=entries.filter(e=>e.result==='correct').length;
+  const wrong=entries.filter(e=>e.result==='wrong').length;
+  const skipped=entries.filter(e=>e.result==='skip').length;
+  const pct=entries.length?Math.round(correct/entries.length*100):0;
+
+  const body=g('report-body');
+  body.innerHTML=`
+    <div class="rep-stat-row">
+      <div class="rep-stat"><span class="rep-stat-val" style="color:var(--teal)">${pct}%</span><span class="rep-stat-lbl">Accuracy</span></div>
+      <div class="rep-stat"><span class="rep-stat-val" style="color:var(--green)">${correct}</span><span class="rep-stat-lbl">Correct</span></div>
+      <div class="rep-stat"><span class="rep-stat-val" style="color:var(--red)">${wrong}</span><span class="rep-stat-lbl">Wrong</span></div>
+      <div class="rep-stat"><span class="rep-stat-val" style="color:var(--muted)">${skipped}</span><span class="rep-stat-lbl">Skipped</span></div>
+    </div>
+    <div class="rep-sec-title">Question Breakdown</div>
+    <div id="rep-q-list"></div>`;
+
+  const qList=body.querySelector('#rep-q-list');
+  if(!entries.length){
+    qList.innerHTML='<p style="color:var(--muted);font-size:13px;padding:12px 0">No question data available.</p>';
+  } else {
+    entries.forEach((e,i)=>{
+      const row=document.createElement('div');
+      row.className='rep-q-row';
+      const ri=e.result==='correct'?'✓':e.result==='wrong'?'✗':'—';
+      const rc=e.result==='correct'?'C':e.result==='wrong'?'W':'S';
+      const qt=(e.q?.question||'Question '+(i+1));
+      const short=qt.length>80?qt.slice(0,80)+'…':qt;
+      const diff=e.q?.difficulty||'Medium';
+      row.innerHTML=`<div class="rqn">${i+1}</div><div class="rqt">${short}</div><span class="rqd ${diff}">${diff}</span><span class="rqr ${rc}">${ri}</span>`;
+      qList.appendChild(row);
+    });
+  }
+  g('report-modal').classList.add('open');
+}
+function closeReport(){g('report-modal').classList.remove('open');}
+
+// ── PAYMENT ──
+function openPayModal(){g('pay-modal').classList.add('open');}
+function closePayModal(){g('pay-modal').classList.remove('open');}
+function handlePayment(){
+  // Payment gateway integration coming soon
+  showToast('Payment gateway coming soon! We\'ll notify you when it\'s live. 🚀');
+  closePayModal();
+}
+function dismissBanner(){
+  g('premium-banner').classList.add('hidden');
+  sessionStorage.setItem('banner_dismissed','1');
+}
+
+// ── ANALYTICS ──
+function renderAnalytics(sessions){
+  const all=sessions.flatMap(s=>s.entries||[]);
+  if(!all.length) return;
+
+  ['Easy','Medium','Hard'].forEach(diff=>{
+    const dqs=all.filter(e=>e.q?.difficulty===diff);
+    const correct=dqs.filter(e=>e.result==='correct').length;
+    const pct=dqs.length?Math.round(correct/dqs.length*100):0;
+    const k=diff.toLowerCase();
+    g('bar-'+k).style.width=pct+'%';
+    g('val-'+k).textContent=dqs.length?pct+'%':'—';
+    g('cnt-'+k).textContent=dqs.length;
+  });
+
+  // Section accuracy
+  const secData={};
+  sessions.forEach(s=>{
+    const sec=s.section||'Q';
+    if(!secData[sec]) secData[sec]={total:0,correct:0};
+    secData[sec].total+=(s.total||0);
+    secData[sec].correct+=(s.correct||0);
+  });
+  const tbody=g('section-acc-table');
+  const rows=Object.entries(secData).map(([sec,d])=>{
+    const pct=d.total?Math.round(d.correct/d.total*100):0;
+    const cls=pct>=70?'color:var(--green)':pct>=50?'color:var(--amber)':'color:var(--red)';
+    return`<tr><td><span class="sec-badge sec-${sec}">${sec}</span> ${SECTION_CONFIG[sec]?.name||sec}</td><td>${d.total}</td><td>${d.correct}</td><td style="font-weight:700;${cls}">${pct}%</td></tr>`;
+  });
+  tbody.innerHTML=rows.length?rows.join(''):'<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:16px 0">No data yet</td></tr>';
+
+  // Trend
+  const last5=sessions.slice(0,5).reverse();
+  const tb=g('trend-bars'),tl=g('trend-labels');
+  tb.innerHTML='';tl.innerHTML='';
+  last5.forEach(s=>{
+    const pct=s.pct||0;
+    const h=Math.max(4,Math.round(pct*0.56));
+    const col=pct>=70?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+    const bar=document.createElement('div');
+    bar.className='trend-bar';
+    bar.style.cssText=`height:${h}px;background:${col}`;
+    bar.title=pct+'%';
+    tb.appendChild(bar);
+    const lbl=document.createElement('div');
+    lbl.className='trend-label';lbl.textContent=pct+'%';
+    tl.appendChild(lbl);
+  });
+}
+
+// ── UTILS ──
+const g=id=>document.getElementById(id);
+let _tt;
+function showToast(msg){
+  const t=g('toast');t.textContent=msg;t.style.display='block';
+  clearTimeout(_tt);_tt=setTimeout(()=>t.style.display='none',3500);
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeReport();closePayModal();}
+});
+
+initAuth();
 </script>
 </body>
 </html>
