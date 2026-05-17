@@ -8,103 +8,132 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-height:100vh;font-size:15px;overflow:hidden}
 .screen{display:none;height:100vh;flex-direction:column}.screen.active{display:flex}
-.gmat-topbar{background:#005487;color:#fff;height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0}
-.gmat-topbar-left{font-size:13px;font-weight:700;font-family:Arial,sans-serif}
-.gmat-topbar-right{display:flex;align-items:center;gap:12px}
+
+/* ── GMAT BARS ── */
+.gmat-topbar{background:#005487;color:#fff;height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;font-family:Arial,sans-serif}
+.gmat-topbar-left{font-size:13px;font-weight:700;letter-spacing:.3px}
+.gmat-topbar-right{display:flex;align-items:center;gap:12px;font-size:12px}
 .gmat-timer{font-family:'Courier New',monospace;font-size:15px;font-weight:700;background:rgba(0,0,0,.2);padding:2px 10px;border-radius:3px;min-width:68px;text-align:center}
 .gmat-timer.urgent{color:#ffb3b3;animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
-.gmat-bottombar{background:#005487;color:#fff;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0}
-.gmat-btn{background:#e8e8e8;color:#000;border:2px outset #999;padding:5px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;min-width:80px;text-align:center;border-radius:2px}
-.gmat-btn:hover{background:#d0d0d0}.gmat-btn:active{border-style:inset}.gmat-btn:disabled{opacity:.5;cursor:not-allowed}
-.gmat-btn-blue{background:#005487;color:#fff;border:2px solid #003d66}.gmat-btn-blue:hover{background:#006ba3}
-.help-btn{background:transparent;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:50%;width:22px;height:22px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif}
+.gmat-bottombar{background:#005487;color:#fff;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;font-family:Arial,sans-serif}
 .progress-wrap{height:3px;background:rgba(0,0,0,.2);flex-shrink:0}
 .progress-fill{height:100%;background:#7ec8e3;transition:width .3s ease}
 
-/* INSTRUCTION */
+/* ── BUTTONS ── */
+.gmat-btn{background:#e8e8e8;color:#000;border:2px outset #999;padding:5px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;border-radius:2px;min-width:80px;text-align:center}
+.gmat-btn:hover{background:#d0d0d0}.gmat-btn:active{border-style:inset}.gmat-btn:disabled{opacity:.5;cursor:not-allowed}
+.gmat-btn-blue{background:#005487;color:#fff;border:2px solid #003d66}.gmat-btn-blue:hover{background:#006ba3}
+.gmat-btn-sm{padding:4px 12px;font-size:12px;min-width:60px}
+.help-btn{background:transparent;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:50%;width:22px;height:22px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif}
+
+/* ── BOTTOM BAR ITEMS ── */
+.bb-actions{display:flex;align-items:center;gap:8px}
+.bb-save{display:flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,.8);cursor:pointer;padding:4px 8px;border:1px solid rgba(255,255,255,.3);border-radius:2px;background:transparent;font-family:Arial,sans-serif}
+.bb-save:hover{background:rgba(255,255,255,.1)}
+.bb-save svg{width:14px;height:14px}
+.bb-pause,.bb-fullscreen,.bb-study{font-size:12px;color:rgba(255,255,255,.8);cursor:pointer;padding:4px 10px;border:1px solid rgba(255,255,255,.2);border-radius:2px;background:transparent;font-family:Arial,sans-serif}
+.bb-pause:hover,.bb-fullscreen:hover,.bb-study:hover{background:rgba(255,255,255,.1)}
+.bb-mark{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.7);font-family:Arial,sans-serif}
+.bb-mark input{accent-color:#7ec8e3;cursor:pointer}
+.bb-next{background:#005487;color:#fff;border:2px solid rgba(255,255,255,.6);padding:7px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;border-radius:2px;display:flex;align-items:center;gap:8px}
+.bb-next:hover{background:#006ba3}.bb-next:disabled{opacity:.5;cursor:not-allowed}
+.bb-next svg{width:18px;height:18px}
+
+/* ── INSTRUCTION ── */
 #screen-instruction .inst-wrap{flex:1;overflow-y:auto;padding:40px 60px;max-width:960px;margin:0 auto;width:100%}
 .inst-title{font-size:17px;font-weight:700;text-align:center;margin-bottom:24px;font-family:Arial,sans-serif}
 .inst-body{font-family:Arial,sans-serif;font-size:14px;line-height:1.9;color:#111}
-.inst-body p{margin-bottom:14px}.inst-body ul{margin:8px 0 14px 32px}.inst-body li{margin-bottom:6px}
+.inst-body p{margin-bottom:14px}.inst-body strong{font-weight:700}.inst-body ul{margin:8px 0 14px 32px}.inst-body li{margin-bottom:6px}
 
-/* LOADING */
+/* ── LOADING ── */
 #screen-loading{align-items:center;justify-content:center;flex-direction:column;gap:16px;font-family:Arial,sans-serif}
 .load-spinner{width:36px;height:36px;border:4px solid #e8e8e8;border-top-color:#005487;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.load-msg{font-size:14px;color:#555}
-.load-sub{font-size:12px;color:#888}
 
-/* TEST */
-#screen-test .test-body{flex:1;display:flex;overflow:hidden}
-.test-left{flex:1.3;border-right:1px solid #ccc;padding:24px 28px;overflow-y:auto;background:#fff}
-.test-right{flex:1;padding:20px 24px;overflow-y:auto;background:#f9f9f9;display:flex;flex-direction:column;justify-content:space-between}
-.q-header{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid #ddd}
-.q-num{font-family:Arial,sans-serif;font-size:12px;font-weight:700;color:#005487;background:#e8f0f8;padding:3px 10px;border-radius:2px}
-.q-of{font-family:Arial,sans-serif;font-size:12px;color:#666}
-.q-topic{font-family:Arial,sans-serif;font-size:11px;color:#888;margin-left:4px}
-.bookmark-btn{margin-left:auto;background:transparent;border:1px solid #999;border-radius:3px;padding:3px 10px;cursor:pointer;font-family:Arial,sans-serif;font-size:12px;display:flex;align-items:center;gap:5px;color:#333;transition:all .15s}
-.bookmark-btn:hover{border-color:#005487;color:#005487}
-.bookmark-btn.bookmarked{background:#fff3cd;border-color:#f59e0b;color:#92400e}
-.question-text{font-size:15px;line-height:1.85;color:#111;white-space:pre-wrap;margin-bottom:8px}
-.options-title{font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888;margin-bottom:10px}
-.options-list{display:flex;flex-direction:column;gap:8px}
-.option-row{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;border:1.5px solid #ccc;border-radius:2px;cursor:pointer;background:#fff;transition:all .1s}
-.option-row:hover{border-color:#005487;background:#f0f6fb}
-.option-row.selected{border-color:#005487;background:#e8f0f8}
-.option-row.confirmed{border-color:#005487;background:#e8f0f8;pointer-events:none}
-.option-circle{width:18px;height:18px;border-radius:50%;border:2px solid #888;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .1s}
-.option-row.selected .option-circle,.option-row.confirmed .option-circle{border-color:#005487;background:#005487}
-.option-row.selected .option-circle::after,.option-row.confirmed .option-circle::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;display:block}
-.option-letter{font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:#005487;min-width:18px;padding-top:1px}
-.option-text{font-size:14px;line-height:1.55;color:#111;flex:1}
-.status-area{margin-top:14px;padding-top:14px;border-top:1px solid #ddd;font-family:Arial,sans-serif;font-size:12px}
-.bookmark-list-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:6px}
-.bookmark-chips{display:flex;flex-wrap:wrap;gap:4px}
-.bookmark-chip{background:#fff3cd;border:1px solid #f59e0b;color:#92400e;padding:2px 7px;border-radius:3px;font-size:11px;font-weight:600}
+/* ── CR LAYOUT (single panel) ── */
+.cr-body{flex:1;overflow-y:auto;padding:32px 48px;max-width:1100px;margin:0 auto;width:100%}
+.cr-passage{font-size:15px;line-height:1.9;color:#111;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid #ddd}
+.cr-passage b,.cr-passage strong{font-weight:700}
+.cr-question{font-size:15px;line-height:1.7;color:#111;margin-bottom:20px}
+.cr-options{display:flex;flex-direction:column;gap:10px}
+.cr-option{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;border:1.5px solid #ccc;border-radius:2px;cursor:pointer;background:#fff;transition:all .1s}
+.cr-option:hover{border-color:#005487;background:#f0f6fb}
+.cr-option.selected{border-color:#005487;background:#e8f0f8}
+.cr-option.confirmed{border-color:#005487;background:#e8f0f8;pointer-events:none}
+.opt-circle{width:18px;height:18px;border-radius:50%;border:2px solid #888;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.cr-option.selected .opt-circle,.cr-option.confirmed .opt-circle{border-color:#005487;background:#005487}
+.cr-option.selected .opt-circle::after,.cr-option.confirmed .opt-circle::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;display:block}
+.opt-text{font-size:14px;line-height:1.6;color:#111;flex:1}
 
-/* PAUSE */
+/* ── RC LAYOUT (split screen) ── */
+.rc-body{flex:1;display:flex;overflow:hidden}
+.rc-left{width:50%;border-right:1px solid #ccc;overflow-y:auto;padding:32px 36px;background:#fff}
+.rc-right{width:50%;overflow-y:auto;padding:28px 32px;background:#fff}
+.rc-passage{font-size:14px;line-height:1.85;color:#111}
+.rc-passage p{margin-bottom:16px;text-indent:2em}
+.rc-question-text{font-size:15px;line-height:1.7;color:#111;margin-bottom:20px}
+/* RC highlight style */
+.rc-highlight{color:#005487;text-decoration:underline;cursor:pointer;font-weight:600}
+.rc-highlight.highlighted{background:#fff3cd;color:#92400e;text-decoration:none;padding:0 2px;border-radius:2px}
+.rc-options{display:flex;flex-direction:column;gap:9px}
+.rc-option{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border:1px solid #ddd;border-radius:2px;cursor:pointer;background:#fff;transition:all .1s}
+.rc-option:hover{border-color:#005487;background:#f0f6fb}
+.rc-option.selected{border-color:#005487;background:#e8f0f8}
+.rc-option.confirmed{border-color:#005487;background:#e8f0f8;pointer-events:none}
+.rc-option.selected .opt-circle,.rc-option.confirmed .opt-circle{border-color:#005487;background:#005487}
+.rc-option.selected .opt-circle::after,.rc-option.confirmed .opt-circle::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;display:block}
+.rc-q-header{font-size:12px;font-family:Arial,sans-serif;color:#888;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #eee}
+.rc-q-badge{font-weight:700;color:#005487}
+
+/* ── MARK AS GUESS checkbox ── */
+.mark-guess-bar{background:#f5f5f5;border-top:1px solid #ddd;padding:6px 16px;display:flex;align-items:center;gap:8px;font-family:Arial,sans-serif;font-size:12px;color:#555;flex-shrink:0}
+.mark-guess-bar input{accent-color:#005487}
+
+/* ── DIALOGS ── */
+.dialog-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:none;align-items:center;justify-content:center}
+.dialog-overlay.show{display:flex}
+.dialog-box{background:#fff;border:2px solid #005487;border-radius:3px;width:480px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.dialog-hdr{background:#005487;color:#fff;padding:14px 18px;font-family:Arial,sans-serif;font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px}
+.dialog-hdr-icon{width:24px;height:24px;border-radius:50%;background:#fff;color:#005487;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dialog-body{padding:22px 22px 18px;font-family:Arial,sans-serif;font-size:14px;color:#111;line-height:1.7}
+.dialog-footer{padding:14px 22px;display:flex;gap:10px;justify-content:center;border-top:1px solid #ddd}
+.dialog-btn{padding:7px 32px;font-family:Arial,sans-serif;font-size:14px;font-weight:700;cursor:pointer;border:2px solid #888;background:#fff;color:#000;border-radius:2px;min-width:100px;text-align:center}
+.dialog-btn:hover{background:#f0f0f0}
+.dialog-btn.primary{background:#fff;border:2px solid #005487;color:#005487}
+.dialog-btn.primary:hover{background:#e8f0f8}
+
+/* ── PAUSE ── */
 .pause-overlay{position:fixed;inset:0;background:rgba(0,56,87,.96);z-index:200;display:none;align-items:center;justify-content:center}
 .pause-overlay.show{display:flex}
 .pause-box{background:#fff;border-radius:4px;padding:40px 48px;text-align:center;max-width:420px}
 .pause-title{font-family:Arial,sans-serif;font-size:18px;font-weight:700;color:#005487;margin-bottom:12px}
-.pause-sub{font-family:Arial,sans-serif;font-size:13px;color:#555;margin-bottom:24px;line-height:1.6}
+.pause-sub{font-family:Arial,sans-serif;font-size:13px;color:#555;margin-bottom:20px;line-height:1.6}
 .pause-timer{font-family:'Courier New',monospace;font-size:32px;font-weight:700;color:#005487;margin-bottom:4px}
-.pause-lbl{font-family:Arial,sans-serif;font-size:11px;color:#888;margin-bottom:24px}
+.pause-lbl{font-family:Arial,sans-serif;font-size:11px;color:#888;margin-bottom:20px}
 
-/* DIALOGS */
-.dialog-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:none;align-items:center;justify-content:center}
-.dialog-overlay.show{display:flex}
-.dialog-box{background:#fff;border:2px solid #005487;border-radius:3px;width:420px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
-.dialog-header{background:#005487;color:#fff;padding:12px 18px;font-family:Arial,sans-serif;font-size:14px;font-weight:700}
-.dialog-body{padding:20px 18px;font-family:Arial,sans-serif;font-size:13px;color:#111;line-height:1.6}
-.dialog-footer{padding:12px 18px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #ddd}
-.dialog-btn{padding:6px 20px;font-family:Arial,sans-serif;font-size:13px;font-weight:700;cursor:pointer;border-radius:2px;border:2px outset #999;background:#e8e8e8;color:#000}
-.dialog-btn:hover{background:#d0d0d0}
-.dialog-btn.primary{background:#005487;color:#fff;border:2px solid #003d66}.dialog-btn.primary:hover{background:#006ba3}
-
-/* EDIT */
-#screen-edit .edit-body{flex:1;overflow-y:auto;padding:24px 36px}
+/* ── EDIT SCREEN ── */
+#screen-edit .edit-wrap{flex:1;overflow-y:auto;padding:24px 40px}
 .edit-title{font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:#005487;margin-bottom:6px}
 .edit-sub{font-family:Arial,sans-serif;font-size:13px;color:#555;margin-bottom:6px;line-height:1.6}
 .edit-counter{font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:#c62828;margin-bottom:16px}
 .edit-table{width:100%;border-collapse:collapse;font-family:Arial,sans-serif;font-size:13px}
 .edit-table th{background:#005487;color:#fff;padding:8px 12px;text-align:left;font-size:11px;letter-spacing:.5px;text-transform:uppercase}
-.edit-table td{padding:10px 12px;border-bottom:1px solid #eee;vertical-align:middle}
-.edit-table tr:hover td{background:#f0f6fb;cursor:pointer}
-.edit-table tr.selected-for-edit td{background:#fff3cd}
-.edit-row-num{font-weight:700;color:#005487;font-family:Arial,sans-serif}
+.edit-table td{padding:10px 12px;border-bottom:1px solid #eee;vertical-align:middle;cursor:pointer}
+.edit-table tr:hover td{background:#f0f6fb}
+.edit-table tr.sel-edit td{background:#fff3cd}
+.edit-row-num{font-weight:700;color:#005487}
 .edit-status{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:700}
 .edit-status.answered{background:#e8f5e8;color:#2e7d32}
 .edit-status.skipped{background:#f5f5f5;color:#888}
-.edit-status.bookmarked{background:#fff3cd;color:#92400e}
+.edit-status.marked{background:#fff3cd;color:#92400e}
 .edit-status.editing{background:#e8f0f8;color:#005487}
 .edit-q-panel{margin-top:16px;background:#fff;border:1px solid #ddd;border-radius:3px;padding:18px;display:none}
 .edit-q-panel.show{display:block}
 .edit-q-text{font-size:14px;line-height:1.8;margin-bottom:14px;white-space:pre-wrap}
 .edit-opts{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
 
-/* REPORT */
+/* ── REPORT ── */
 #screen-report .report-header{background:#005487;color:#fff;padding:22px 36px;flex-shrink:0}
 .report-header-title{font-family:Arial,sans-serif;font-size:20px;font-weight:700;margin-bottom:4px}
 .report-header-sub{font-family:Arial,sans-serif;font-size:13px;color:rgba(255,255,255,.7)}
@@ -114,12 +143,12 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 .score-val{font-family:Arial,sans-serif;font-size:26px;font-weight:700;display:block;line-height:1;margin-bottom:4px}
 .score-val.blue{color:#005487}.score-val.green{color:#2e7d32}.score-val.red{color:#c62828}.score-val.amber{color:#f59e0b}.score-val.grey{color:#888}
 .score-lbl{font-family:Arial,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#888}
-.rep-section-title{font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #eee}
+.rep-sec-title{font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #eee}
 .adaptive-trail{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px}
 .trail-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;font-size:10px;font-weight:700;color:#fff;cursor:pointer}
 .trail-dot.cE{background:#66bb6a}.trail-dot.cM{background:#005487}.trail-dot.cH{background:#7e57c2}
 .trail-dot.wE{background:#ef9a9a}.trail-dot.wM{background:#90caf9}.trail-dot.wH{background:#ce93d8}
-.trail-dot.sk{background:#bbb}.trail-dot.bm{outline:3px solid #f59e0b;outline-offset:2px}
+.trail-dot.sk{background:#bbb}.trail-dot.mk{outline:3px solid #f59e0b;outline-offset:2px}
 .diff-bars{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:24px}
 .diff-card{background:#fff;border:1px solid #ddd;border-radius:3px;padding:14px}
 .diff-card-title{font-family:Arial,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:8px}
@@ -138,9 +167,10 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 .rpill.C{background:#e8f5e8;color:#2e7d32}.rpill.W{background:#fce8e8;color:#c62828}.rpill.S{background:#f0f0f0;color:#888}
 .dpill{font-size:10px;font-weight:600;padding:2px 7px;border-radius:2px;display:inline-block}
 .dpill.Easy{background:#e8f5e8;color:#2e7d32}.dpill.Medium{background:#fff8e1;color:#f57f17}.dpill.Hard{background:#fce8e8;color:#c62828}
+.type-pill{font-size:10px;font-weight:600;padding:2px 7px;border-radius:2px;display:inline-block;background:#e8f0f8;color:#003865}
 .exp-panel{display:none;padding:14px;background:#f9f9f9;border-top:1px solid #eee;font-size:13px;line-height:1.7}
 .exp-panel.show{display:block}
-.exp-q{font-weight:700;margin-bottom:10px;white-space:pre-wrap;line-height:1.6}
+.exp-q{font-weight:700;margin-bottom:10px;line-height:1.6;white-space:pre-wrap}
 .exp-opt{padding:2px 0;font-size:13px}
 .exp-opt.ca{color:#2e7d32;font-weight:700}.exp-opt.wa{color:#c62828;text-decoration:line-through}
 .exp-text{margin-top:10px;padding-top:10px;border-top:1px solid #eee;color:#444}
@@ -154,94 +184,134 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 
 <div id="auth-loading"><div class="spinner"></div><span>Checking session...</span></div>
 
-<!-- INSTRUCTION -->
+<!-- ══ INSTRUCTION ══ -->
 <div id="screen-instruction" class="screen">
   <div class="gmat-topbar">
     <div class="gmat-topbar-left">Welcome</div>
     <div class="gmat-topbar-right"><button class="help-btn" onclick="showHelp()">?</button></div>
   </div>
   <div class="inst-wrap">
-    <div class="inst-title" id="inst-title"></div>
-    <div class="inst-body" id="inst-body"></div>
+    <div class="inst-title" id="inst-title">Verbal Reasoning Instructions</div>
+    <div class="inst-body">
+      <p>You are about to start the <strong>Verbal Reasoning</strong> section — <strong>Sectional Test 08</strong>.</p>
+      <p>You will have <strong>45.0 minutes</strong> to complete <strong>23 questions</strong>.</p>
+      <p>There are two types of questions in the Verbal section: <strong>Critical Reasoning</strong> and <strong>Reading Comprehension</strong>.</p>
+      <p>For each question, select the best of the answer choices given.</p>
+      <p>Each of the <strong>Critical Reasoning</strong> questions is based on a short argument, a set of statements, or a plan of action.</p>
+      <p>Each of the <strong>Reading Comprehension</strong> questions is based on the content of a passage. The passage appears on the left side of the screen. The question and answer choices appear on the right.</p>
+      <p>At the end, if time remains, you may edit up to <strong>3 answers</strong>.</p>
+      <p>Click <strong>Next</strong> to begin.</p>
+    </div>
   </div>
   <div class="gmat-bottombar">
-    <div><button class="gmat-btn" onclick="goBack()">← Exit</button></div>
+    <div></div>
     <div><button class="gmat-btn gmat-btn-blue" onclick="startTest()">Next →</button></div>
   </div>
 </div>
 
-<!-- LOADING -->
+<!-- ══ LOADING ══ -->
 <div id="screen-loading" class="screen">
-  <div class="gmat-topbar">
-    <div class="gmat-topbar-left">GMAT Verbal — Sectional 08</div>
-  </div>
+  <div class="gmat-topbar"><div class="gmat-topbar-left">GMAT · Verbal Reasoning | New Adaptive Algorithm</div></div>
   <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;font-family:Arial,sans-serif">
     <div class="load-spinner"></div>
-    <div class="load-msg" id="loading-msg">Loading your question pool...</div>
-    <div class="load-sub">Fetching from database — this takes just a moment</div>
+    <div id="loading-msg" style="font-size:14px;color:#555">Loading your question pool...</div>
   </div>
 </div>
 
-<!-- TEST -->
-<div id="screen-test" class="screen">
+<!-- ══ TEST (CR) ══ -->
+<div id="screen-test-cr" class="screen">
   <div class="gmat-topbar">
-    <div class="gmat-topbar-left">GMAT Verbal — Sectional 08</div>
+    <div class="gmat-topbar-left">Verbal Reasoning | New Adaptive Algorithm</div>
     <div class="gmat-topbar-right">
       <span style="font-size:11px;color:rgba(255,255,255,.7)">Time Remaining</span>
-      <div class="gmat-timer" id="test-timer">45:00</div>
+      <div class="gmat-timer" id="cr-timer">45:00</div>
       <button class="help-btn" onclick="showHelp()">?</button>
     </div>
   </div>
-  <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-  <div class="test-body">
-    <div class="test-left">
-      <div class="q-header">
-        <span class="q-num" id="q-num-badge">Q1</span>
-        <span class="q-of" id="q-of-label">of 23</span>
-        <span class="q-topic" id="q-topic"></span>
-        <button class="bookmark-btn" id="bookmark-btn" onclick="toggleBookmark()">
-          <span id="bookmark-icon">☆</span>
-          <span id="bookmark-label">Bookmark</span>
-        </button>
-      </div>
-      <div class="question-text" id="q-text"></div>
-    </div>
-    <div class="test-right">
-      <div>
-        <div class="options-title">Select one answer</div>
-        <div class="options-list" id="opts-list"></div>
-      </div>
-      <div class="status-area">
-        <div class="bookmark-list-title">Bookmarked Questions</div>
-        <div class="bookmark-chips" id="bookmark-chips"></div>
-      </div>
-    </div>
+  <div class="progress-wrap"><div class="progress-fill" id="cr-progress" style="width:0%"></div></div>
+  <div class="cr-body" id="cr-body">
+    <div class="cr-passage" id="cr-passage"></div>
+    <div class="cr-question" id="cr-question"></div>
+    <div class="cr-options" id="cr-options"></div>
+  </div>
+  <div class="mark-guess-bar">
+    <input type="checkbox" id="cr-mark-guess">
+    <label for="cr-mark-guess" style="cursor:pointer">Mark as a guess</label>
   </div>
   <div class="gmat-bottombar">
-    <div style="display:flex;gap:8px">
-      <button class="gmat-btn" onclick="togglePause()">⏸ Pause</button>
-      <button class="gmat-btn" onclick="skipQuestion()">Skip</button>
+    <div class="bb-actions">
+      <button class="bb-save" onclick="toggleSaveForLater()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save for Later
+      </button>
+      <button class="bb-pause" onclick="togglePause()">⏸ Pause Exam</button>
+      <button class="bb-fullscreen" onclick="toggleFullscreen()">⛶ Full Screen</button>
+      <button class="bb-study" onclick="alert('Study Mode available in Premium')">📖 Study Mode</button>
     </div>
-    <div style="font-family:Arial,sans-serif;font-size:12px;color:rgba(255,255,255,.7)" id="q-pos-label">Question 1 of 23</div>
-    <div><button class="gmat-btn gmat-btn-blue" id="btn-next" onclick="confirmNext()" disabled>Next →</button></div>
+    <div style="font-family:Arial,sans-serif;font-size:12px;color:rgba(255,255,255,.7)" id="cr-pos-label">Question 1 of 23</div>
+    <button class="bb-next" id="cr-next-btn" onclick="confirmNext()" disabled>
+      Next <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/></svg>
+    </button>
   </div>
 </div>
 
-<!-- EDIT -->
-<div id="screen-edit" class="screen">
+<!-- ══ TEST (RC) ══ -->
+<div id="screen-test-rc" class="screen">
   <div class="gmat-topbar">
-    <div class="gmat-topbar-left">GMAT Verbal — Sectional 08 — Review Answers</div>
+    <div class="gmat-topbar-left">Verbal Reasoning | New Adaptive Algorithm</div>
     <div class="gmat-topbar-right">
       <span style="font-size:11px;color:rgba(255,255,255,.7)">Time Remaining</span>
-      <div class="gmat-timer" id="edit-timer">45:00</div>
+      <div class="gmat-timer" id="rc-timer">45:00</div>
+      <button class="help-btn" onclick="showHelp()">?</button>
     </div>
   </div>
-  <div class="edit-body">
-    <div class="edit-title">Review &amp; Edit Your Answers</div>
-    <div class="edit-sub">You may edit up to <strong>3 answers</strong> before submitting — just like the official GMAT Focus Edition. Click any row to change an answer.</div>
+  <div class="progress-wrap"><div class="progress-fill" id="rc-progress" style="width:0%"></div></div>
+  <div class="rc-body">
+    <div class="rc-left" id="rc-passage-panel">
+      <div class="rc-passage" id="rc-passage-text"></div>
+    </div>
+    <div class="rc-right">
+      <div class="rc-q-header" id="rc-q-header">Question <span class="rc-q-badge" id="rc-q-num">1</span> of 23</div>
+      <div class="rc-question-text" id="rc-question"></div>
+      <div class="rc-options" id="rc-options"></div>
+    </div>
+  </div>
+  <div class="mark-guess-bar">
+    <input type="checkbox" id="rc-mark-guess">
+    <label for="rc-mark-guess" style="cursor:pointer">Mark as a guess</label>
+  </div>
+  <div class="gmat-bottombar">
+    <div class="bb-actions">
+      <button class="bb-save" onclick="toggleSaveForLater()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save for Later
+      </button>
+      <button class="bb-pause" onclick="togglePause()">⏸ Pause Exam</button>
+      <button class="bb-fullscreen" onclick="toggleFullscreen()">⛶ Full Screen</button>
+      <button class="bb-study" onclick="alert('Study Mode available in Premium')">📖 Study Mode</button>
+    </div>
+    <div style="font-family:Arial,sans-serif;font-size:12px;color:rgba(255,255,255,.7)" id="rc-pos-label">Question 1 of 23</div>
+    <button class="bb-next" id="rc-next-btn" onclick="confirmNext()" disabled>
+      Next <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ══ EDIT ANSWERS ══ -->
+<div id="screen-edit" class="screen">
+  <div class="gmat-topbar">
+    <div class="gmat-topbar-left">Verbal Reasoning — Review Answers</div>
+    <div class="gmat-topbar-right">
+      <span style="font-size:11px;color:rgba(255,255,255,.7)">Time Remaining</span>
+      <div class="gmat-timer" id="edit-timer">00:00</div>
+    </div>
+  </div>
+  <div class="edit-wrap">
+    <div class="edit-title">Review & Edit Your Answers</div>
+    <div class="edit-sub">You may edit up to <strong>3 answers</strong> before submitting — just like the official GMAT Focus Edition. Click any row to expand.</div>
     <div class="edit-counter" id="edit-counter">Edits remaining: 3</div>
     <table class="edit-table">
-      <thead><tr><th>#</th><th>Question</th><th>Your Answer</th><th>Status</th><th>Difficulty</th></tr></thead>
+      <thead><tr><th>#</th><th>Question</th><th>Type</th><th>Your Answer</th><th>Status</th><th>Difficulty</th></tr></thead>
       <tbody id="edit-tbody"></tbody>
     </table>
     <div class="edit-q-panel" id="edit-q-panel">
@@ -255,14 +325,14 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
   </div>
   <div class="gmat-bottombar">
     <div style="font-family:Arial,sans-serif;font-size:12px;color:rgba(255,255,255,.7)">Review carefully before submitting</div>
-    <div><button class="gmat-btn gmat-btn-blue" onclick="submitFinal()">Submit Test →</button></div>
+    <button class="bb-next" onclick="submitFinal()">Submit Test <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/></svg></button>
   </div>
 </div>
 
-<!-- REPORT -->
+<!-- ══ REPORT ══ -->
 <div id="screen-report" class="screen">
   <div class="gmat-topbar">
-    <div class="gmat-topbar-left">GMAT Verbal — Sectional 08 — Results</div>
+    <div class="gmat-topbar-left">Verbal Reasoning — Results</div>
     <div class="gmat-topbar-right"><button class="help-btn" onclick="goBack()">✕</button></div>
   </div>
   <div class="report-header">
@@ -271,13 +341,13 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
   </div>
   <div class="report-scroll">
     <div class="report-scorecard" id="report-scorecard"></div>
-    <div class="rep-section-title">Adaptive Path — Click any dot to review</div>
+    <div class="rep-sec-title">Adaptive Path</div>
     <div class="adaptive-trail" id="adaptive-trail"></div>
-    <div class="rep-section-title">Accuracy by Difficulty</div>
+    <div class="rep-sec-title">Accuracy by Difficulty</div>
     <div class="diff-bars" id="diff-bars"></div>
-    <div class="rep-section-title">Question-by-Question Review</div>
+    <div class="rep-sec-title">Question-by-Question Review</div>
     <table class="review-table">
-      <thead><tr><th>#</th><th>Question</th><th>Result</th><th>Difficulty</th><th>Your Ans</th><th>Correct</th><th>Time</th></tr></thead>
+      <thead><tr><th>#</th><th>Question</th><th>Type</th><th>Result</th><th>Difficulty</th><th>Your Ans</th><th>Correct</th><th>Time</th></tr></thead>
       <tbody id="review-tbody"></tbody>
     </table>
     <div style="display:flex;gap:12px;padding-bottom:40px">
@@ -287,57 +357,64 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
   </div>
 </div>
 
-<!-- PAUSE -->
+<!-- ══ PAUSE ══ -->
 <div class="pause-overlay" id="pause-overlay">
   <div class="pause-box">
-    <div class="pause-title">Test Paused</div>
-    <div class="pause-sub">Timer stopped. Your progress is saved.<br>Click Resume to continue.</div>
+    <div class="pause-title">Exam Paused</div>
+    <div class="pause-sub">Timer stopped. Click Resume to continue.</div>
     <div class="pause-timer" id="pause-timer-display">45:00</div>
     <div class="pause-lbl">Time Remaining</div>
-    <button class="gmat-btn gmat-btn-blue" style="width:100%;padding:10px;margin-top:4px" onclick="togglePause()">Resume Test →</button>
+    <button class="gmat-btn gmat-btn-blue" style="width:100%;padding:10px;margin-top:4px" onclick="togglePause()">Resume Exam →</button>
   </div>
 </div>
 
-<!-- CONFIRM -->
+<!-- ══ CONFIRM DIALOG ══ -->
 <div class="dialog-overlay" id="confirm-dialog">
   <div class="dialog-box">
-    <div class="dialog-header">Confirm Your Answer</div>
-    <div class="dialog-body">You selected <strong id="confirm-sel">Option A</strong>.<br><br>Once you click <strong>Yes</strong>, you will move to the next question. You can review at the end if time allows.</div>
+    <div class="dialog-hdr">
+      <div class="dialog-hdr-icon">i</div>
+      Response Confirmation
+    </div>
+    <div class="dialog-body">
+      Have you completed your response?<br><br>
+      Click <strong>Yes</strong> to move to the next question.<br>
+      Click <strong>No</strong> to continue responding to this question.
+    </div>
     <div class="dialog-footer">
-      <button class="dialog-btn" onclick="closeConfirm()">No, Go Back</button>
-      <button class="dialog-btn primary" onclick="confirmYes()">Yes, Next →</button>
+      <button class="dialog-btn primary" onclick="confirmYes()">Yes</button>
+      <button class="dialog-btn" onclick="closeConfirm()">No</button>
     </div>
   </div>
 </div>
 
-<!-- SKIP -->
+<!-- ══ SKIP CONFIRM ══ -->
 <div class="dialog-overlay" id="skip-dialog">
   <div class="dialog-box">
-    <div class="dialog-header">Skip This Question?</div>
-    <div class="dialog-body">Are you sure? This question will be marked as <strong>skipped</strong>. You can review it at the end if time allows.</div>
+    <div class="dialog-hdr"><div class="dialog-hdr-icon">i</div>Skip Question?</div>
+    <div class="dialog-body">
+      You have not selected an answer.<br><br>
+      Click <strong>Yes</strong> to move on without answering.<br>
+      Click <strong>No</strong> to go back and respond.
+    </div>
     <div class="dialog-footer">
-      <button class="dialog-btn" onclick="closeSkip()">No, Stay Here</button>
-      <button class="dialog-btn primary" onclick="confirmSkip()">Yes, Skip →</button>
+      <button class="dialog-btn primary" onclick="confirmSkip()">Yes</button>
+      <button class="dialog-btn" onclick="closeSkip()">No</button>
     </div>
   </div>
 </div>
 
-<!-- HELP -->
+<!-- ══ HELP ══ -->
 <div class="dialog-overlay" id="help-dialog">
   <div class="dialog-box">
-    <div class="dialog-header">Help — GMAT Verbal — Sectional 08</div>
-    <div class="dialog-body" style="font-family:Arial,sans-serif;font-size:13px;line-height:1.7">
-      <strong>Navigation:</strong><br>
-      • Select an answer then click <strong>Next</strong> — a confirmation dialog appears<br>
-      • Click <strong>Skip</strong> to move on without answering<br>
-      • Click <strong>☆ Bookmark</strong> to flag for end-of-test review<br>
-      • Click <strong>⏸ Pause</strong> to stop the timer temporarily<br><br>
-      <strong>At the end:</strong><br>
-      • If time remains, edit up to <strong>3 answers</strong><br>
-      • Bookmarked questions are highlighted ⭐<br><br>
-      <strong>Adaptive scoring:</strong><br>
-      • 2 correct in a row → harder questions<br>
-      • 2 wrong in a row → easier questions
+    <div class="dialog-hdr"><div class="dialog-hdr-icon">?</div>Help — Verbal Reasoning</div>
+    <div class="dialog-body" style="font-family:Arial,sans-serif;font-size:13px;line-height:1.8">
+      <strong>Critical Reasoning:</strong> Read the argument, then select the best answer.<br>
+      <strong>Reading Comprehension:</strong> Passage on left, question on right.<br>
+      <strong>Highlight questions:</strong> Click the highlighted word/phrase to mark it.<br><br>
+      <strong>Save for Later:</strong> Flag a question to review at end.<br>
+      <strong>Pause:</strong> Stops the timer temporarily.<br><br>
+      <strong>Adaptive:</strong> 2 correct → harder questions · 2 wrong → easier questions<br>
+      At the end, edit up to <strong>3 answers</strong> if time remains.
     </div>
     <div class="dialog-footer"><button class="dialog-btn primary" onclick="closeHelp()">Close</button></div>
   </div>
@@ -346,13 +423,513 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../supabase-config.js"></script>
 <script>
-// ── Per-page config (set by each sectional file) ──
-const SECTION      = 'V';
+// ── Per-page config ──
+const SECTION       = 'V';
 const SECTIONAL_NUM = 8;
-const TOTAL_QS     = 23;
-const SECTION_NAME = 'Verbal Reasoning';
+const TOTAL_QS      = 23;
+const SECTION_NAME  = 'Verbal Reasoning';
+
+const _sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+let currentUser = null;
+
+// ── Question types ──
+const Q_TYPE = { CR:'CR', RC:'RC' };
+
+// ── State ──
+let TEST = {
+  pool:[], entries:[], idx:0,
+  secsLeft:45*60, interval:null, qStart:null, sel:null,
+  savedForLater:new Set(), markedGuess:new Set(),
+  isPaused:false, editEditsLeft:3, editingIdx:-1, editSelLetter:null
+};
+
+// ── Adaptive Engine ──
+const Adaptive = {
+  diff:'Medium', last2:[], used:new Set(),
+  pools:{Easy:[],Medium:[],Hard:[]},
+  init(qs){
+    const by={Easy:[],Medium:[],Hard:[]};
+    qs.forEach(q=>by[q.difficulty]&&by[q.difficulty].push(q));
+    this.pools.Easy=shuffle([...by.Easy]);
+    this.pools.Medium=shuffle([...by.Medium]);
+    this.pools.Hard=shuffle([...by.Hard]);
+    this.diff='Medium';this.last2=[];this.used=new Set();
+  },
+  update(r){
+    if(r==='skip')return;
+    this.last2.push(r);if(this.last2.length>2)this.last2.shift();
+    const l=this.last2;
+    if(l.length===2&&l.every(x=>x==='correct')){
+      if(this.diff==='Easy')this.diff='Medium';
+      else if(this.diff==='Medium')this.diff='Hard';
+    }else if(l.length===2&&l.every(x=>x==='wrong')){
+      if(this.diff==='Hard')this.diff='Medium';
+      else if(this.diff==='Medium')this.diff='Easy';
+    }
+  },
+  next(){
+    let q=this._pick(this.diff);if(q)return q;
+    const fb=this.diff==='Hard'?['Medium','Easy']:this.diff==='Easy'?['Medium','Hard']:['Hard','Easy'];
+    for(const d of fb){q=this._pick(d);if(q)return q;}
+    return null;
+  },
+  _pick(d){
+    const a=this.pools[d].filter(q=>!this.used.has(q.id));
+    if(!a.length)return null;
+    this.used.add(a[0].id);return a[0];
+  }
+};
+
+// ── Auth ──
+async function initAuth(){
+  const{data:{session}}=await _sb.auth.getSession();
+  if(!session){window.location.href='../../index.html';return;}
+  currentUser=session.user;
+  g('auth-loading').style.display='none';
+  showScreen('instruction');
+}
+
+// ── Load pool ──
+async function loadPool(){
+  const{data,error}=await _sb.from('questions').select('*')
+    .eq('section',SECTION).eq('sectional',SECTIONAL_NUM);
+  if(error){console.error(error);return[];}
+  return(data||[]).map(q=>({
+    ...q,
+    options:typeof q.options==='string'?JSON.parse(q.options):q.options
+  }));
+}
+
+// ── Detect question type ──
+function detectType(q){
+  const t=(q.topic||'').toLowerCase();
+  const qtext=(q.question||'').toLowerCase();
+  if(t.includes('rc')||t.includes('reading')||t.includes('passage')||
+     q.passage||(qtext.includes('passage') && qtext.length>300)){
+    return Q_TYPE.RC;
+  }
+  return Q_TYPE.CR;
+}
+
+// ── Start test ──
+async function startTest(){
+  showScreen('loading');
+  g('loading-msg').textContent='Fetching question pool from Supabase...';
+  const pool=await loadPool();
+  if(!pool.length){
+    showScreen('instruction');
+    alert('No questions found for Verbal Sectional '+SECTIONAL_NUM+'. Please add questions via Admin panel.');
+    return;
+  }
+  TEST.pool=pool;
+  Adaptive.init(pool);
+  TEST.entries=[];TEST.idx=0;TEST.secsLeft=45*60;TEST.sel=null;
+  TEST.savedForLater=new Set();TEST.markedGuess=new Set();
+  TEST.isPaused=false;TEST.editEditsLeft=3;
+  clearInterval(TEST.interval);
+  const first=Adaptive.next();
+  if(!first){showScreen('instruction');alert('Pool error.');return;}
+  TEST.entries.push({q:first,selected:null,result:null,time:0,edited:false,type:detectType(first)});
+  renderQuestion();
+  startTimer();
+}
+
+// ── Render question ──
+function renderQuestion(){
+  const e=TEST.entries[TEST.idx],q=e.q;
+  const type=e.type;
+  TEST.sel=e.selected||null;
+  TEST.qStart=Date.now();
+
+  const posLabel='Question '+(TEST.idx+1)+' of '+TOTAL_QS;
+  const pct=TEST.idx/TOTAL_QS*100;
+
+  if(type===Q_TYPE.CR){
+    showScreen('test-cr');
+    g('cr-timer').textContent=formatTime(TEST.secsLeft);
+    g('cr-progress').style.width=pct+'%';
+    g('cr-pos-label').textContent=posLabel;
+
+    // Passage (argument) — supports **bold** markdown
+    g('cr-passage').innerHTML=formatText(q.question);
+
+    // Question stem (stored in topic or a sub-field)
+    const stem=q.question_stem||q.stem||getQuestionStem(q);
+    g('cr-question').innerHTML=formatText(stem);
+
+    // Options
+    renderOptions('cr-options','cr-option');
+    g('cr-mark-guess').checked=TEST.markedGuess.has(TEST.idx);
+    g('cr-next-btn').disabled=!TEST.sel;
+
+  } else {
+    showScreen('test-rc');
+    g('rc-timer').textContent=formatTime(TEST.secsLeft);
+    g('rc-progress').style.width=pct+'%';
+    g('rc-pos-label').textContent=posLabel;
+    g('rc-q-num').textContent=TEST.idx+1;
+    g('rc-q-header').innerHTML='Question <span class="rc-q-badge">'+(TEST.idx+1)+'</span> of '+TOTAL_QS;
+
+    // Passage on left
+    const passageText=q.passage||q.question;
+    g('rc-passage-text').innerHTML=formatPassage(passageText);
+
+    // Question on right (with highlight support)
+    g('rc-question').innerHTML=formatHighlightQuestion(q);
+
+    // Options
+    renderOptions('rc-options','rc-option');
+    g('rc-mark-guess').checked=TEST.markedGuess.has(TEST.idx);
+    g('rc-next-btn').disabled=!TEST.sel;
+  }
+}
+
+// ── Format helpers ──
+function formatText(text){
+  if(!text) return '';
+  // **bold** → <strong>bold</strong>
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\n/g,'<br>');
+}
+
+function formatPassage(text){
+  if(!text) return '';
+  const paragraphs=text.split(/\n\n+/);
+  return paragraphs.map(p=>'<p>'+formatText(p.trim())+'</p>').join('');
+}
+
+function formatHighlightQuestion(q){
+  let text=q.question_stem||getQuestionStem(q)||'';
+  // Handle "ideally" (click to highlight) style questions
+  // Pattern: word/phrase followed by (click to highlight)
+  text=text.replace(/"([^"]+)"\s*\(click to highlight\)/gi,(m,word)=>{
+    return `<span class="rc-highlight" onclick="toggleHighlight(this)" data-word="${word}">"${word}" (click to highlight)</span>`;
+  });
+  // Also handle plain **bold** in question text
+  return formatText(text).replace(/\*\*(.+?)\*\*/g,'<strong style="color:#005487">$1</strong>');
+}
+
+function toggleHighlight(el){
+  el.classList.toggle('highlighted');
+}
+
+function getQuestionStem(q){
+  // If question has a passage, the stem is a separate field
+  // Otherwise the whole question IS the stem (CR)
+  return q.stem || q.question_stem || q.question || '';
+}
+
+function renderOptions(containerId, optClass){
+  const e=TEST.entries[TEST.idx],q=e.q;
+  const container=g(containerId);
+  container.innerHTML='';
+  ['A','B','C','D','E'].forEach(l=>{
+    if(!q.options||!q.options[l])return;
+    const row=document.createElement('div');
+    row.className=optClass+(TEST.sel===l?' confirmed':'');
+    row.dataset.l=l;
+    const circle=document.createElement('div');circle.className='opt-circle';
+    const text=document.createElement('span');text.className='opt-text';
+    // Support **bold** in options (for boldface CR)
+    text.innerHTML=formatText(q.options[l]);
+    row.appendChild(circle);row.appendChild(text);
+    if(TEST.sel!==l){
+      row.addEventListener('click',()=>pickOption(l,containerId,optClass));
+    }
+    container.appendChild(row);
+  });
+}
+
+function pickOption(l,containerId,optClass){
+  TEST.sel=l;
+  document.querySelectorAll('.'+optClass).forEach(r=>{
+    r.classList.toggle('selected',r.dataset.l===l);
+    r.classList.remove('confirmed');
+  });
+  const e=TEST.entries[TEST.idx];
+  const type=e.type;
+  if(type===Q_TYPE.CR) g('cr-next-btn').disabled=false;
+  else g('rc-next-btn').disabled=false;
+}
+
+// ── Navigation ──
+function confirmNext(){
+  if(!TEST.sel){
+    g('skip-dialog').classList.add('show');
+    return;
+  }
+  g('confirm-dialog').classList.add('show');
+}
+function closeConfirm(){g('confirm-dialog').classList.remove('show');}
+function confirmYes(){closeConfirm();advance(false);}
+function closeSkip(){g('skip-dialog').classList.remove('show');}
+function confirmSkip(){closeSkip();advance(true);}
+
+function advance(skip=false){
+  const e=TEST.entries[TEST.idx];
+  e.time=Math.round((Date.now()-TEST.qStart)/1000);
+  // Save marked/saved state
+  if(g('cr-mark-guess').checked||g('rc-mark-guess').checked) TEST.markedGuess.add(TEST.idx);
+  else TEST.markedGuess.delete(TEST.idx);
+
+  if(skip){e.selected=null;e.result='skip';Adaptive.update('skip');}
+  else{e.selected=TEST.sel;e.result=TEST.sel===e.q.answer?'correct':'wrong';Adaptive.update(e.result);}
+
+  TEST.idx++;
+  if(TEST.idx>=TOTAL_QS){endTest();return;}
+  const next=Adaptive.next();
+  if(!next){endTest();return;}
+  TEST.entries.push({q:next,selected:null,result:null,time:0,edited:false,type:detectType(next)});
+  TEST.sel=null;
+  renderQuestion();
+}
+
+// ── Timer ──
+function startTimer(){
+  updateTimerDisplay();
+  TEST.interval=setInterval(()=>{
+    if(TEST.isPaused)return;
+    TEST.secsLeft--;
+    updateTimerDisplay();
+    if(TEST.secsLeft<=300){
+      ['cr-timer','rc-timer','edit-timer'].forEach(id=>g(id)&&g(id).classList.add('urgent'));
+    }
+    if(TEST.secsLeft<=0){clearInterval(TEST.interval);endTest();}
+  },1000);
+}
+
+function updateTimerDisplay(){
+  const str=formatTime(TEST.secsLeft);
+  ['cr-timer','rc-timer','edit-timer','pause-timer-display'].forEach(id=>{const el=g(id);if(el)el.textContent=str;});
+}
+
+function formatTime(secs){
+  const m=Math.floor(secs/60),s=secs%60;
+  return m+':'+String(s).padStart(2,'0');
+}
+
+function togglePause(){
+  TEST.isPaused=!TEST.isPaused;
+  if(TEST.isPaused) g('pause-overlay').classList.add('show');
+  else g('pause-overlay').classList.remove('show');
+}
+
+// ── Misc controls ──
+function toggleSaveForLater(){
+  if(TEST.savedForLater.has(TEST.idx)) TEST.savedForLater.delete(TEST.idx);
+  else TEST.savedForLater.add(TEST.idx);
+}
+
+function toggleFullscreen(){
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+
+// ── End test ──
+function endTest(){
+  clearInterval(TEST.interval);
+  if(TEST.secsLeft>30) showEditScreen();
+  else submitFinal();
+}
+
+// ── Edit answers ──
+function showEditScreen(){
+  showScreen('edit');
+  updateEditCounter();
+  renderEditTable();
+  g('edit-q-panel').classList.remove('show');
+}
+
+function updateEditCounter(){
+  g('edit-counter').textContent='Edits remaining: '+TEST.editEditsLeft;
+}
+
+function renderEditTable(){
+  const tbody=g('edit-tbody');tbody.innerHTML='';
+  TEST.entries.forEach((e,i)=>{
+    const mk=TEST.markedGuess.has(i);
+    const sv=TEST.savedForLater.has(i);
+    const statusText=e.edited?'Edited':mk?'Marked Guess':sv?'Saved for Later':e.result==='skip'?'Skipped':'Answered';
+    const statusClass=e.edited?'editing':mk?'marked':e.result==='skip'?'skipped':'answered';
+    const short=(e.q.question||'').replace(/\n/g,' ').replace(/\*\*/g,'').slice(0,55)+'…';
+    const tr=document.createElement('tr');
+    if(TEST.editingIdx===i)tr.classList.add('sel-edit');
+    tr.innerHTML=`
+      <td class="edit-row-num">${i+1}</td>
+      <td style="font-size:12px">${short}</td>
+      <td><span class="type-pill">${e.type}</span></td>
+      <td><strong>${e.selected||'—'}</strong></td>
+      <td><span class="edit-status ${statusClass}">${statusText}</span></td>
+      <td><span class="dpill ${e.q.difficulty}">${e.q.difficulty}</span></td>`;
+    tr.addEventListener('click',()=>openEditQ(i));
+    tbody.appendChild(tr);
+  });
+}
+
+function openEditQ(idx){
+  if(TEST.editEditsLeft<=0&&TEST.editingIdx!==idx){alert('No edits remaining.');return;}
+  TEST.editingIdx=idx;
+  TEST.editSelLetter=TEST.entries[idx].selected;
+  const e=TEST.entries[idx];
+  g('edit-q-text').innerHTML=formatText((e.q.question||'').slice(0,300)+(e.q.question.length>300?'…':''));
+  const opts=g('edit-opts');opts.innerHTML='';
+  ['A','B','C','D','E'].forEach(l=>{
+    if(!e.q.options||!e.q.options[l])return;
+    const row=document.createElement('div');
+    row.className='cr-option'+(TEST.editSelLetter===l?' confirmed':'');
+    row.dataset.l=l;
+    row.innerHTML=`<div class="opt-circle"></div><span class="opt-text">${formatText(e.q.options[l])}</span>`;
+    row.addEventListener('click',()=>{
+      TEST.editSelLetter=l;
+      opts.querySelectorAll('.cr-option').forEach(r=>{
+        r.classList.toggle('selected',r.dataset.l===l);r.classList.remove('confirmed');
+      });
+    });
+    opts.appendChild(row);
+  });
+  g('edit-q-panel').classList.add('show');
+  g('edit-q-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
+  renderEditTable();
+}
+
+function saveEdit(){
+  if(TEST.editingIdx<0)return;
+  const e=TEST.entries[TEST.editingIdx];
+  if(TEST.editSelLetter===e.selected){cancelEdit();return;}
+  e.selected=TEST.editSelLetter;
+  e.result=TEST.editSelLetter===e.q.answer?'correct':'wrong';
+  if(!e.edited){TEST.editEditsLeft--;e.edited=true;}
+  TEST.editingIdx=-1;TEST.editSelLetter=null;
+  updateEditCounter();renderEditTable();
+  g('edit-q-panel').classList.remove('show');
+}
+
+function cancelEdit(){
+  TEST.editingIdx=-1;TEST.editSelLetter=null;
+  renderEditTable();g('edit-q-panel').classList.remove('show');
+}
+
+// ── Submit & Report ──
+function submitFinal(){
+  clearInterval(TEST.interval);
+  saveSession();
+  renderReport();
+  showScreen('report');
+}
+
+function saveSession(){
+  const es=TEST.entries;
+  const correct=es.filter(e=>e.result==='correct').length;
+  const total=es.length;
+  const elapsed=45*60-TEST.secsLeft;
+  const em=Math.floor(elapsed/60),esec=elapsed%60;
+  const sessKey='gmat_sessions_'+(currentUser?.id||'guest');
+  const sessions=JSON.parse(localStorage.getItem(sessKey)||'[]');
+  sessions.unshift({
+    id:Date.now(),date:new Date().toISOString(),
+    section:SECTION,testNum:SECTIONAL_NUM,
+    entries:es.map(e=>({
+      result:e.result,selected:e.selected,time:e.time,edited:e.edited,type:e.type,
+      q:{question:e.q.question,answer:e.q.answer,difficulty:e.q.difficulty,
+         topic:e.q.topic,options:e.q.options,explanation:e.q.explanation}
+    })),
+    correct,total,
+    pct:total?Math.round(correct/total*100):0,
+    avgTime:total?Math.round(es.reduce((s,e)=>s+e.time,0)/total):0,
+    elapsed:em+'m '+esec+'s'
+  });
+  localStorage.setItem(sessKey,JSON.stringify(sessions.slice(0,50)));
+}
+
+function renderReport(){
+  const es=TEST.entries;
+  const correct=es.filter(e=>e.result==='correct').length;
+  const wrong=es.filter(e=>e.result==='wrong').length;
+  const skip=es.filter(e=>e.result==='skip').length;
+  const total=es.length;
+  const pct=total?Math.round(correct/total*100):0;
+  const avgT=total?Math.round(es.reduce((s,e)=>s+e.time,0)/total):0;
+  const elapsed=45*60-TEST.secsLeft;
+  const em=Math.floor(elapsed/60),esec=elapsed%60;
+  g('report-sub').textContent=SECTION_NAME+' Sectional '+SECTIONAL_NUM+' · '+total+' questions · '+em+'m '+esec+'s';
+  g('report-scorecard').innerHTML=`
+    <div class="score-cell"><span class="score-val blue">${pct}%</span><span class="score-lbl">Accuracy</span></div>
+    <div class="score-cell"><span class="score-val green">${correct}</span><span class="score-lbl">Correct</span></div>
+    <div class="score-cell"><span class="score-val red">${wrong}</span><span class="score-lbl">Wrong</span></div>
+    <div class="score-cell"><span class="score-val grey">${skip}</span><span class="score-lbl">Skipped</span></div>
+    <div class="score-cell"><span class="score-val amber">${avgT}s</span><span class="score-lbl">Avg/Q</span></div>`;
+
+  const trail=g('adaptive-trail');trail.innerHTML='';
+  es.forEach((e,i)=>{
+    const d0=e.q.difficulty[0];
+    const cls=e.result==='skip'?'sk':e.result==='correct'?'c'+d0:'w'+d0;
+    const mk=TEST.markedGuess.has(i)?'mk':'';
+    const dot=document.createElement('div');
+    dot.className=`trail-dot ${cls} ${mk}`;
+    dot.textContent=e.type;dot.title='Q'+(i+1)+': '+e.type+' · '+e.q.difficulty+' · '+e.result;
+    dot.addEventListener('click',()=>{const row=g('rrow-'+i);if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.click();}});
+    trail.appendChild(dot);
+  });
+
+  const diffWrap=g('diff-bars');diffWrap.innerHTML='';
+  ['Easy','Medium','Hard'].forEach(diff=>{
+    const dqs=es.filter(e=>e.q.difficulty===diff);
+    const dc=dqs.filter(e=>e.result==='correct').length;
+    const dpct=dqs.length?Math.round(dc/dqs.length*100):0;
+    const col=dpct>=70?'#2e7d32':dpct>=50?'#f57f17':'#c62828';
+    diffWrap.innerHTML+=`<div class="diff-card"><div class="diff-card-title">${diff}</div><div class="diff-pct" style="color:${col}">${dqs.length?dpct+'%':'—'}</div><div class="diff-bar-wrap"><div class="diff-bar" style="width:${dpct}%;background:${col}"></div></div><div class="diff-attempted">${dc}/${dqs.length} correct</div></div>`;
+  });
+
+  const tbody=g('review-tbody');tbody.innerHTML='';
+  es.forEach((e,i)=>{
+    const cls=e.result==='correct'?'row-c':e.result==='wrong'?'row-w':'row-s';
+    const pill=e.result==='correct'?'<span class="rpill C">✓ Correct</span>':e.result==='wrong'?'<span class="rpill W">✗ Wrong</span>':'<span class="rpill S">— Skipped</span>';
+    const editB=e.edited?' <span style="font-size:10px;color:#005487;font-weight:700">[Edited]</span>':'';
+    const short=(e.q.question||'').replace(/\n/g,' ').replace(/\*\*/g,'').slice(0,50)+'…';
+    const tr=document.createElement('tr');tr.className=cls;tr.id='rrow-'+i;
+    tr.innerHTML=`<td style="font-weight:700;color:#005487">${i+1}</td><td style="font-size:12px">${short}${editB}</td><td><span class="type-pill">${e.type}</span></td><td>${pill}</td><td><span class="dpill ${e.q.difficulty}">${e.q.difficulty}</span></td><td style="font-weight:700;color:#005487">${e.selected||'—'}</td><td style="font-weight:700;color:#2e7d32">${e.q.answer}</td><td style="color:#888;font-family:Arial">${e.time}s</td>`;
+    const expTr=document.createElement('tr');expTr.style.display='none';
+    const expTd=document.createElement('td');expTd.colSpan=8;expTd.style.padding='0';
+    const expDiv=document.createElement('div');expDiv.className='exp-panel';
+    const expQ=document.createElement('div');expQ.className='exp-q';expQ.innerHTML=formatText(e.q.question||'');
+    const expOpts=document.createElement('div');
+    ['A','B','C','D','E'].forEach(l=>{
+      if(!e.q.options||!e.q.options[l])return;
+      const d=document.createElement('div');
+      d.className='exp-opt'+(l===e.q.answer?' ca':l===e.selected&&l!==e.q.answer?' wa':'');
+      d.innerHTML=l+'. '+formatText(e.q.options[l]);
+      expOpts.appendChild(d);
+    });
+    const expText=document.createElement('div');expText.className='exp-text';
+    expText.textContent=e.q.explanation?'Explanation: '+e.q.explanation:'The correct answer is '+e.q.answer+'.';
+    expDiv.appendChild(expQ);expDiv.appendChild(expOpts);expDiv.appendChild(expText);
+    expTd.appendChild(expDiv);expTr.appendChild(expTd);
+    let open=false;
+    tr.addEventListener('click',()=>{open=!open;expTr.style.display=open?'':'none';expDiv.classList.toggle('show',open);});
+    tbody.appendChild(tr);tbody.appendChild(expTr);
+  });
+}
+
+function showHelp(){g('help-dialog').classList.add('show');}
+function closeHelp(){g('help-dialog').classList.remove('show');}
+function goBack(){window.location.href='../../dashboard.html';}
+
+const g=id=>document.getElementById(id);
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  g('screen-'+name).classList.add('active');
+  window.scrollTo(0,0);
+}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeConfirm();closeHelp();closeSkip();if(TEST.isPaused)togglePause();}
+  if(e.key==='Enter'&&g('confirm-dialog').classList.contains('show'))confirmYes();
+});
+
+initAuth();
 </script>
-<script src="../test-core.js"></script>
-<script>initAuth();</script>
 </body>
 </html>

@@ -290,19 +290,77 @@ function cleanText(raw){
     .replace(/\u2013/g,'–').replace(/\u2014/g,'—')
     .replace(/\u2026/g,'...');
 
+  // ── Fix char-by-char line splitting ──
   const lines = text.split('\n');
   const shortLines = lines.filter(l => l.trim().length <= 2).length;
   if(lines.length > 4 && shortLines / lines.length > 0.5){
     text = lines.map(l => l.trim()).join(' ').replace(/  +/g,' ').trim();
   }
-  return text.replace(/\n{3,}/g,'\n\n').trim();
+
+  // ── Remove duplicate consecutive expressions (with or without space) ──
+  for(let i=0; i<3; i++){
+    text = text.replace(/(.{8,}?)\s+\1/g,'$1');
+    text = text.replace(/(\d[\d,x+\-y≤≥=\s]{4,20})\1/g,'$1');
+  }
+
+  // ── Remove duplicate lines ──
+  const allLines = text.split('\n');
+  const seenLines = new Set();
+  const dedupedLines = [];
+  for(const line of allLines){
+    const key = line.trim().toLowerCase().replace(/\s+/g,' ');
+    if(key.length < 4){ dedupedLines.push(line); continue; }
+    if(!seenLines.has(key)){ seenLines.add(key); dedupedLines.push(line); }
+  }
+  text = dedupedLines.join('\n');
+
+  // ── Remove duplicate paragraphs ──
+  const paras = text.split(/\n\n+/);
+  const seenParas = new Set();
+  const dedupedParas = [];
+  for(const para of paras){
+    const key = para.trim().toLowerCase().replace(/\s+/g,' ').slice(0,100);
+    if(key.length < 10){ dedupedParas.push(para); continue; }
+    if(!seenParas.has(key)){ seenParas.add(key); dedupedParas.push(para); }
+  }
+  text = dedupedParas.join('\n\n');
+
+  // ── Format equations onto their own lines ──
+  // If inequalities/equations appear at start of text before the question, split them
+  // Pattern: equation block + question text all run together
+  text = text
+    // Add newline before numbered steps: "1)" "2)" "3)" etc in explanations
+    .replace(/\s+(\d+\))\s+/g, '\n\n$1 ')
+    // Add newline before "Step 1", "Step 2" etc
+    .replace(/\s+(Step\s+\d+[:\.]?)\s+/gi, '\n\n$1 ')
+    // Add newline before "Notice", "Therefore", "Thus", "Hence" at sentence start
+    .replace(/\s+(Notice|Therefore|Thus|Hence|So|This means|We get|The answer)\s+/g, '\n$1 ')
+    // Add newline before "We can ADD", "We can SUBTRACT" pattern
+    .replace(/\s+(We can [A-Z]+)/g, '\n\n$1')
+    // Add newline before inequality/equation lines that are concatenated with text
+    // e.g. "...28000 A manufacturer" → "...28000\n\nA manufacturer"
+    .replace(/(\d{3,})\s+([A-Z][a-z])/g, '$1\n\n$2')
+    // Separate equations that run together: "7x+6y≤38,000 4x+5y≤28,000" → newline between
+    .replace(/([\d,]+)\s+(\d+[a-z])/g, '$1\n$2');
+
+  // Clean up excess spaces and blank lines
+  text = text
+    .replace(/ {2,}/g,' ')
+    .replace(/\n{3,}/g,'\n\n')
+    .trim();
+
+  return text;
 }
+
+function removeDuplicates(text){ return cleanText(text); }
 
 function cleanField(taId, pvId){
   const el = g(taId); if(!el) return;
+  const before = el.value.length;
   el.value = cleanText(el.value);
+  const removed = before - el.value.length;
   if(pvId) updatePreview(taId, pvId);
-  showToast('Cleaned ✓','success');
+  showToast(removed > 10 ? `Cleaned ✓ — removed ${removed} duplicate chars` : 'Cleaned ✓','success');
 }
 
 function updatePreview(taId, pvId){
@@ -336,16 +394,16 @@ document.addEventListener('paste', e => {
   const t = e.target;
   if(!t.classList.contains('form-textarea')) return;
   setTimeout(() => {
-    const lines = t.value.split('\n');
-    const short = lines.filter(l => l.trim().length <= 2).length;
-    if(lines.length > 4 && short/lines.length > 0.5){
-      t.value = cleanText(t.value);
-      showToast('Auto-cleaned line breaks ✓','success');
+    const before = t.value;
+    const cleaned = cleanText(t.value);
+    if(cleaned !== before){
+      t.value = cleaned;
+      showToast('Auto-cleaned ✓ (duplicates removed)','success');
     }
-    // Trigger preview if exists
+    // Trigger preview
     const pvId = t.dataset.preview;
     if(pvId) updatePreview(t.id, pvId);
-  }, 50);
+  }, 80);
 });
 
 // ── DOCX/TXT PARSER ──
@@ -436,13 +494,20 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
   if(!segments.length) return [];
 
   // ── STEP 2: Compute block ends (answer line + trailing explanation) ──
+  // Explanations can span multiple paragraphs, so we scan until the next
+  // question's answer line rather than stopping at blank lines
   const blockEnds = segments.map(({ ansIdx }, qi) => {
+    const nextAnsIdx = qi + 1 < segments.length ? segments[qi+1].ansIdx : lines.length;
     let end = ansIdx;
-    for(let j = ansIdx + 1; j < lines.length; j++){
+    // Capture everything between this answer and the next question's answer
+    // Stop only if we hit a clear new question marker (numbered question, option block)
+    for(let j = ansIdx + 1; j < nextAnsIdx; j++){
       const l = lines[j].trim();
-      if(!l) break; // stop at blank line
-      if(qi + 1 < segments.length && j >= segments[qi+1].ansIdx) break;
-      end = j; // non-blank line after answer = part of this block's explanation
+      // Stop if we hit what looks like the start of a new question (numbered "88.")
+      if(l.match(/^\d{1,3}\.\s+\S{10,}/)) break;
+      // Stop if we hit a new option block (A. B. C. sequence)
+      if(l.match(/^A[.)]\s+/) && lines[j+1]&&lines[j+1].trim().match(/^B[.)]\s+/)) break;
+      end = j;
     }
     return end;
   });
@@ -452,11 +517,14 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
     const blockStart = qi > 0 ? blockEnds[qi-1] + 1 : 0;
     const block = lines.slice(blockStart, ansIdx + 1);
 
-    // Trailing explanation lines (after answer line)
+    // Trailing explanation lines (after answer line, up to block end)
     const trailingLines = lines.slice(ansIdx + 1, blockEnds[qi] + 1)
-      .map(l => l.trim()).filter(l => l && !detectAnswer(l));
+      .map(l => l.trim())
+      .filter(l => !detectAnswer(l));
+    // Join with newlines to preserve paragraph structure
+    const trailingText = trailingLines.join('\n').replace(/\n{3,}/g,'\n\n').trim();
 
-    // Find explanation boundary inside block
+    // Find explanation boundary inside block (before answer)
     let explIdx = -1, topic = '';
     for(let j = block.length - 2; j >= 0; j--){
       const l = block[j].trim();
@@ -467,18 +535,18 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
       }
     }
 
-    // Build explanation
+    // Build explanation — combine inline + trailing
     let explanation = '';
     if(explIdx >= 0){
       const markerLine = block[explIdx].trim()
         .replace(/^(Explanation|Solution|Rationale)\s*:\s*/i,'')
         .replace(/^#+\s*/,'').trim();
       const innerLines = block.slice(explIdx+1, block.length-1)
-        .map(l=>l.trim()).filter(Boolean);
-      explanation = [...(markerLine?[markerLine]:[]), ...innerLines, ...trailingLines]
-        .join(' ').trim();
-    } else if(trailingLines.length){
-      explanation = trailingLines.join(' ').trim();
+        .map(l=>l.trim()).filter(Boolean).join('\n');
+      const parts = [markerLine, innerLines, trailingText].filter(Boolean);
+      explanation = parts.join('\n').replace(/\n{3,}/g,'\n\n').trim();
+    } else if(trailingText){
+      explanation = trailingText;
     }
 
     // Content = before explanation boundary

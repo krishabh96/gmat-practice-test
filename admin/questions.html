@@ -11,62 +11,69 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style id="shared-styles"></style>
 <style>
+/* TABS */
 .method-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:20px}
 .method-tab{padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:transparent;font-family:'Inter',sans-serif;transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-2px}
 .method-tab:hover{color:var(--text)}.method-tab.active{color:var(--navy);border-bottom-color:var(--teal)}
 .method-panel{display:none}.method-panel.active{display:block}
 
-/* UPLOAD ZONE */
-.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:32px 24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#fafaf8}
+/* Q TYPE TABS (inside manual entry) */
+.qtype-tabs{display:flex;gap:0;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:18px}
+.qtype-tab{flex:1;padding:9px 8px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:var(--bg);font-family:'Inter',sans-serif;transition:all .15s;border-right:1px solid var(--border)}
+.qtype-tab:last-child{border-right:none}
+.qtype-tab:hover{color:var(--text);background:var(--white)}
+.qtype-tab.active{color:var(--navy);background:var(--white);border-bottom:2px solid var(--teal)}
+.qtype-panel{display:none}.qtype-panel.active{display:block}
+
+/* SECTION BADGE */
+.sec-badge-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.sec-badge-btn{padding:6px 14px;border-radius:6px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;color:var(--muted);transition:all .15s}
+.sec-badge-btn:hover{border-color:var(--teal);color:var(--teal)}
+.sec-badge-btn.active-Q{background:#e8f0f8;border-color:#003865;color:#003865}
+.sec-badge-btn.active-V{background:#fce8e8;border-color:#c62828;color:#c62828}
+.sec-badge-btn.active-D{background:#e8f5e8;border-color:#2e7d32;color:#2e7d32}
+
+/* HINTS */
+.hint-box{background:var(--bg);border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:7px;padding:11px 14px;margin-bottom:14px;font-size:12px;color:var(--muted);line-height:1.8}
+.hint-box strong{color:var(--text)}
+.hint-box code{background:var(--white);border:1px solid var(--border);padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:11px;color:var(--navy)}
+
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:28px 24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#fafaf8}
 .upload-zone:hover,.upload-zone.over{border-color:var(--teal);background:rgba(20,184,166,0.04)}
 .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upload-zone-icon{font-size:32px;margin-bottom:8px}
-.upload-zone-text{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
-.upload-zone-sub{font-size:12px;color:var(--muted)}
-.upload-config{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px}
+.upload-config{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-top:14px}
 
-/* PARSED LIST */
+/* PARSED */
 .parsed-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
 .parsed-count{font-size:14px;font-weight:700;color:var(--navy)}
-.parsed-list{border:1px solid var(--border);border-radius:8px;overflow:hidden;max-height:480px;overflow-y:auto;background:var(--white)}
-.pq-item{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;transition:background .1s}
+.parsed-list{border:1px solid var(--border);border-radius:8px;overflow:hidden;max-height:500px;overflow-y:auto;background:var(--white)}
+.pq-item{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px}
 .pq-item:last-child{border-bottom:none}.pq-item:hover{background:#f8f9fb}
 .pq-check{flex-shrink:0;margin-top:3px;width:15px;height:15px;accent-color:var(--teal);cursor:pointer}
 .pq-body{flex:1;min-width:0}
-.pq-q{font-size:13px;color:var(--text);line-height:1.5;margin-bottom:6px;white-space:pre-wrap}
+.pq-q{font-size:13px;color:var(--text);line-height:1.5;margin-bottom:5px;white-space:pre-wrap}
+.pq-expl{font-size:11px;color:var(--muted);margin-top:5px;background:var(--bg);padding:6px 8px;border-radius:4px;border-left:3px solid var(--teal);white-space:pre-wrap;max-height:80px;overflow-y:auto}
 .pq-opts{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px}
 .pq-opt{font-size:11px;padding:2px 7px;border-radius:4px;background:var(--bg);border:1px solid var(--border);color:var(--muted)}
 .pq-opt.correct{background:#e8f5e8;color:#2e7d32;border-color:#a5d6a7;font-weight:700}
 .pq-tags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.pq-expl{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5;background:var(--bg);padding:6px 8px;border-radius:4px;border-left:3px solid var(--teal)}
-.pq-diff-sel{font-size:11px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--white);cursor:pointer;font-family:'Inter',sans-serif;outline:none}
+.pq-diff-sel,.pq-type-sel{font-size:11px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--white);cursor:pointer;font-family:'Inter',sans-serif;outline:none}
 
-/* MANUAL FORM */
+/* OPTS GRID */
 .opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .opt-row{display:flex;align-items:center;gap:8px}
 .opt-ltr{font-weight:700;color:var(--teal);min-width:18px;font-size:14px}
-
-/* EQUATION HELPER */
-.eq-help{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:var(--muted);line-height:1.8}
-.eq-help strong{color:var(--text)}
-.eq-help code{background:var(--white);border:1px solid var(--border);padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:11px;color:var(--navy)}
-
-/* TABLE QUESTION */
-.table-builder{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px;display:none}
-.table-builder.show{display:block}
-.tb-title{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px}
-.tb-grid{overflow-x:auto}
-.tb-table{border-collapse:collapse;min-width:100%}
-.tb-table td,th{border:1px solid var(--border);padding:6px 10px;font-size:12px;font-family:'Inter',sans-serif}
-.tb-table th{background:var(--navy);color:#fff}
-.tb-input{border:none;background:transparent;font-size:12px;font-family:'Inter',sans-serif;width:100%;outline:none;min-width:80px}
-.tb-input:focus{background:rgba(20,184,166,0.05)}
 
 /* PROGRESS */
 .ep-wrap{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:12px;display:none}
 .ep-wrap.show{display:block}
 .ep-bar-wrap{height:6px;background:var(--border);border-radius:3px;margin:8px 0;overflow:hidden}
 .ep-bar{height:100%;background:var(--teal);border-radius:3px;transition:width .3s}
+
+/* RC PASSAGE AREA */
+.passage-area{background:#fafaf8;border:1.5px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+.passage-label{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -85,20 +92,34 @@
   <div class="method-panel active" id="method-upload">
     <div class="card">
       <div class="card-title">📄 Upload Document — Auto Extract</div>
+      <div class="hint-box">
+        <strong>Answer formats supported:</strong>
+        <code>The correct answer is B.</code> <code>Answer: B</code> <code>OA: B</code> <code>Ans: B</code> <code>Correct Answer: B</code> <code>B is correct</code><br>
+        <strong>Explanations:</strong> Text after the answer line is automatically captured as explanation — even across multiple paragraphs.<br>
+        <strong>Boldface CR:</strong> Wrap bold text with <code>**bold text**</code> in your doc — renders correctly in the test.
+      </div>
       <div class="upload-zone" id="upload-zone">
         <input type="file" id="file-input" accept=".docx,.doc,.txt,.pdf">
-        <div class="upload-zone-icon">📂</div>
-        <div class="upload-zone-text">Drag & drop or click to browse</div>
-        <div class="upload-zone-sub">Supports .docx · .txt — extracts questions, options, answers & explanations</div>
+        <div style="font-size:28px;margin-bottom:8px">📂</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Drag & drop or click to browse</div>
+        <div style="font-size:12px;color:var(--muted)">Supports .docx · .txt — extracts questions, options, answers & full explanations</div>
       </div>
       <div id="file-chosen" style="display:none;margin-top:10px;font-size:13px;color:var(--teal);font-weight:600"></div>
       <div class="upload-config">
         <div class="form-group" style="margin-bottom:0">
           <label class="form-label">Section</label>
-          <select class="form-select" id="up-section">
+          <select class="form-select" id="up-section" onchange="updateUploadType()">
             <option value="Q">Quantitative (Q)</option>
             <option value="V">Verbal (V)</option>
             <option value="D">Data Insights (DI)</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0" id="up-qtype-wrap" style="display:none">
+          <label class="form-label">Question Type</label>
+          <select class="form-select" id="up-qtype">
+            <option value="CR">Critical Reasoning (CR)</option>
+            <option value="RC">Reading Comprehension (RC)</option>
+            <option value="CR-BF">Boldface CR</option>
           </select>
         </div>
         <div class="form-group" style="margin-bottom:0">
@@ -114,16 +135,11 @@
           <label class="form-label">Assign to Sectional</label>
           <select class="form-select" id="up-sectional">
             <option value="">Untagged (assign later)</option>
-            <option value="1">Sectional 01</option>
-            <option value="2">Sectional 02</option>
-            <option value="3">Sectional 03</option>
-            <option value="4">Sectional 04</option>
-            <option value="5">Sectional 05</option>
-            <option value="6">Sectional 06</option>
-            <option value="7">Sectional 07</option>
-            <option value="8">Sectional 08</option>
-            <option value="9">Sectional 09</option>
-            <option value="10">Sectional 10</option>
+            <option value="1">Sectional 01</option><option value="2">Sectional 02</option>
+            <option value="3">Sectional 03</option><option value="4">Sectional 04</option>
+            <option value="5">Sectional 05</option><option value="6">Sectional 06</option>
+            <option value="7">Sectional 07</option><option value="8">Sectional 08</option>
+            <option value="9">Sectional 09</option><option value="10">Sectional 10</option>
           </select>
         </div>
       </div>
@@ -155,24 +171,28 @@
   <div class="method-panel" id="method-paste">
     <div class="card">
       <div class="card-title">📋 Paste & Parse</div>
-
-      <!-- Equation help -->
-      <div class="eq-help">
-        <strong>✅ Supported answer formats:</strong>
-        <code>The correct answer is B.</code> <code>Answer: B</code> <code>OA: B</code> <code>Ans: B</code> <code>Correct Answer: B</code> <code>B is correct</code><br>
-        <strong>📐 Equations (write in plain text):</strong>
-        <code>x^2</code> for x² &nbsp;·&nbsp; <code>(9/90)</code> for fractions &nbsp;·&nbsp; <code>sqrt(144)</code> for √144 &nbsp;·&nbsp; <code>10%</code> for percent<br>
-        <strong>📊 Tables (for DI):</strong> Use the Table Builder tab below, or write table data as plain text in the question field.<br>
-        <strong>🔗 MSR / TPA:</strong> Write passage text in the question field, then add options normally. The test engine displays it as a long-form question.
+      <div class="hint-box">
+        <strong>✅ Answer formats:</strong>
+        <code>The correct answer is B.</code> <code>Answer: B</code> <code>OA: B</code> <code>Ans: B</code> <code>Correct Answer: B</code><br>
+        <strong>📝 Explanation:</strong> Text after the answer line is captured automatically — paste the full explanation block, it will be extracted.<br>
+        <strong>🔤 Boldface CR:</strong> Wrap bold in <code>**text**</code> e.g. <code>**The company increased prices**</code><br>
+        <strong>📖 RC:</strong> Paste the full passage, then on a new line write <code>[STEM]</code> followed by the question stem.
       </div>
-
-      <div class="form-grid-3" style="margin-bottom:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px">
         <div class="form-group" style="margin-bottom:0">
           <label class="form-label">Section</label>
-          <select class="form-select" id="pa-section">
+          <select class="form-select" id="pa-section" onchange="updatePasteType()">
             <option value="Q">Quantitative (Q)</option>
             <option value="V">Verbal (V)</option>
             <option value="D">Data Insights (DI)</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0" id="pa-qtype-wrap">
+          <label class="form-label">Question Type</label>
+          <select class="form-select" id="pa-qtype">
+            <option value="CR">Critical Reasoning</option>
+            <option value="RC">Reading Comprehension</option>
+            <option value="CR-BF">Boldface CR</option>
           </select>
         </div>
         <div class="form-group" style="margin-bottom:0">
@@ -188,50 +208,43 @@
           <label class="form-label">Assign to Sectional</label>
           <select class="form-select" id="pa-sectional">
             <option value="">Untagged</option>
-            <option value="1">Sectional 01</option>
-            <option value="2">Sectional 02</option>
-            <option value="3">Sectional 03</option>
-            <option value="4">Sectional 04</option>
-            <option value="5">Sectional 05</option>
-            <option value="6">Sectional 06</option>
-            <option value="7">Sectional 07</option>
-            <option value="8">Sectional 08</option>
-            <option value="9">Sectional 09</option>
-            <option value="10">Sectional 10</option>
+            <option value="1">Sectional 01</option><option value="2">Sectional 02</option>
+            <option value="3">Sectional 03</option><option value="4">Sectional 04</option>
+            <option value="5">Sectional 05</option><option value="6">Sectional 06</option>
+            <option value="7">Sectional 07</option><option value="8">Sectional 08</option>
+            <option value="9">Sectional 09</option><option value="10">Sectional 10</option>
           </select>
         </div>
       </div>
-
       <div class="textarea-wrap">
         <button class="clean-btn" onclick="cleanField('pa-text','pa-preview')">✨ Clean</button>
-        <textarea class="form-textarea" id="pa-text" rows="12" data-preview="pa-preview"
+        <textarea class="form-textarea" id="pa-text" rows="14" data-preview="pa-preview"
           oninput="updatePreview('pa-text','pa-preview')"
-          placeholder="Paste any question block here. Supported formats:
+          placeholder="Paste any question block here. Examples:
 
-Standard:
-The probability that it will rain is 4/5...
-A. 1/10   B. 1/5   C. 2/5   D. 3/5   E. 4/5
-Answer: B
+── CR / Boldface CR ──
+The valet area at Chez Shay consistently handles more cars than Cancan Club. Which of the following can most reasonably be inferred?
 
-Data Sufficiency (DI):
-Is x > 0?
-(1) x^2 > 0
-(2) x + 1 > 0
-A. Statement (1) alone sufficient
-B. Statement (2) alone sufficient
-C. Both together sufficient
-D. Each alone sufficient
-E. Neither sufficient
-OA: B
+A. Patrons of Chez Shay are wealthier.
+B. Many diners who use valet at Chez Shay also valet at Cancan Club.
+C. Diners at Chez Shay prefer to pay rather than find street parking.
+D. Customers prefer Chez Shay's food.
+E. Even if free parking was available, diners would still choose valet.
 
-Table Analysis (DI):
-[Write table data in plain text, e.g:]
-Year | Revenue | Profit
-2020 | $10M    | $2M
-2021 | $15M    | $4M
-Based on the table above, what was the profit margin in 2021?
-A. 13%  B. 20%  C. 27%  D. 33%  E. 40%
-Correct Answer: C"></textarea>
+OA: C
+Explanation: The key is that Chez Shay has virtually no other parking...
+
+── RC ──
+[Paste the full passage here]
+
+[STEM]
+The passage suggests that changes in phytoplankton populations:
+
+A. Can be easily reversed with intervention.
+B. Have no effect on larger marine animals.
+...
+The correct answer is D.
+Explanation: The passage states..."></textarea>
       </div>
       <div class="preview-wrap">
         <div class="preview-label">Preview</div>
@@ -261,52 +274,104 @@ Correct Answer: C"></textarea>
       <div class="card-title">✏️ Manual Entry</div>
       <input type="hidden" id="edit-id">
 
-      <!-- Equation + Table helper -->
-      <div class="eq-help">
-        <strong>📐 Equations:</strong> Type in plain text —
-        <code>x^2 + 3x = 10</code> &nbsp;·&nbsp; <code>(9/90) = 10%</code> &nbsp;·&nbsp; <code>sqrt(64) = 8</code> &nbsp;·&nbsp; <code>$\frac{9}{90}$</code> renders as fraction in preview<br>
-        <strong>📊 Tables (for DI — TPA, MSR):</strong> Use the Table Builder below to create a table, then click "Insert into Question" to add the formatted table text.
-      </div>
-
-      <!-- Table Builder toggle -->
-      <div style="margin-bottom:12px">
-        <button class="btn btn-outline btn-sm" onclick="toggleTableBuilder()">📊 Open Table Builder</button>
-        <span style="font-size:11px;color:var(--muted);margin-left:8px">For DI table questions (TPA, MSR, Table Analysis)</span>
-      </div>
-
-      <!-- Table Builder -->
-      <div class="table-builder" id="table-builder">
-        <div class="tb-title">📊 Table Builder — build your table then insert into question</div>
-        <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-          <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-family:'Inter',sans-serif">
-            Rows: <input type="number" id="tb-rows" value="3" min="1" max="10" style="width:50px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:12px">
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-family:'Inter',sans-serif">
-            Cols: <input type="number" id="tb-cols" value="3" min="1" max="8" style="width:50px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:12px">
-          </div>
-          <button class="btn btn-outline btn-xs" onclick="buildTable()">Generate Table</button>
-          <button class="btn btn-teal btn-xs" onclick="insertTable()">↑ Insert into Question</button>
-          <button class="btn btn-outline btn-xs" onclick="g('table-builder').classList.remove('show')">Close</button>
-        </div>
-        <div class="tb-grid" id="tb-grid"></div>
-      </div>
-
+      <!-- Section selector -->
       <div class="form-group">
-        <label class="form-label">Question Text <span style="color:var(--red)">*</span></label>
-        <div class="textarea-wrap">
-          <button class="clean-btn" onclick="cleanField('f-q','f-q-pv')">✨ Clean</button>
-          <textarea class="form-textarea" id="f-q" rows="6" data-preview="f-q-pv"
-            oninput="updatePreview('f-q','f-q-pv')"
-            placeholder="Type or paste question here. For table questions, use the Table Builder above and click Insert.
-For equations: x^2 + 3y = 18 or $\frac{9}{90}$ (renders in preview)
-For DI passages: paste the full passage text here, then add options below."></textarea>
+        <label class="form-label">Section <span style="color:var(--red)">*</span></label>
+        <div class="sec-badge-row">
+          <button class="sec-badge-btn active-Q" id="sec-btn-Q" onclick="setSec('Q')">📐 Quantitative</button>
+          <button class="sec-badge-btn" id="sec-btn-V" onclick="setSec('V')">📖 Verbal</button>
+          <button class="sec-badge-btn" id="sec-btn-D" onclick="setSec('D')">📊 Data Insights</button>
         </div>
-        <div class="preview-wrap">
-          <div class="preview-label">Preview (equations render here)</div>
-          <div class="preview-box" id="f-q-pv"></div>
+        <input type="hidden" id="f-sec" value="Q">
+      </div>
+
+      <!-- Question type tabs (shown only for Verbal) -->
+      <div id="qtype-area" style="display:none;margin-bottom:18px">
+        <label class="form-label">Verbal Question Type</label>
+        <div class="qtype-tabs">
+          <button class="qtype-tab active" id="qt-CR" onclick="setQType('CR',this)">Critical Reasoning</button>
+          <button class="qtype-tab" id="qt-RC" onclick="setQType('RC',this)">Reading Comprehension</button>
+          <button class="qtype-tab" id="qt-BF" onclick="setQType('CR-BF',this)">Boldface CR</button>
+        </div>
+        <input type="hidden" id="f-qtype" value="CR">
+      </div>
+
+      <!-- CR / Q / DI fields -->
+      <div id="fields-standard">
+        <div id="cr-hint" style="display:none" class="hint-box">
+          <strong>Critical Reasoning:</strong> Paste the full argument in the Question field below. The question stem (e.g. "Which of the following...") goes at the end of the argument text.<br>
+          <strong>Boldface CR:</strong> Same as CR but wrap bold sentences with <code>**text**</code>
+        </div>
+        <div id="di-hint" style="display:none" class="hint-box">
+          <strong>Data Insights:</strong> For table questions, use the format: <code>Col1 | Col2 | Col3</code> on each row. For Data Sufficiency, include both statements in the question text.
+        </div>
+        <div class="form-group">
+          <label class="form-label" id="q-text-label">Question Text <span style="color:var(--red)">*</span></label>
+          <div class="textarea-wrap">
+            <button class="clean-btn" onclick="cleanField('f-q','f-q-pv')">✨ Clean</button>
+            <textarea class="form-textarea" id="f-q" rows="6" data-preview="f-q-pv"
+              oninput="updatePreview('f-q','f-q-pv')"
+              placeholder="Paste the full question/argument text here..."></textarea>
+          </div>
+          <div class="preview-wrap">
+            <div class="preview-label">Preview (bold renders here)</div>
+            <div class="preview-box" id="f-q-pv"></div>
+          </div>
         </div>
       </div>
 
+      <!-- RC-specific fields -->
+      <div id="fields-rc" style="display:none">
+        <div class="hint-box">
+          <strong>Reading Comprehension:</strong><br>
+          1. Paste the <strong>full passage</strong> below (left panel in test)<br>
+          2. Write the <strong>question stem</strong> (right panel in test)<br>
+          3. For highlight questions: write the word as <code>"ideally" (click to highlight)</code> in the stem<br>
+          4. Fill options A–E as usual
+        </div>
+        <div class="form-group">
+          <label class="form-label">Passage Text <span style="color:var(--red)">*</span></label>
+          <div class="passage-area">
+            <div class="textarea-wrap">
+              <button class="clean-btn" onclick="cleanField('f-passage','f-passage-pv')">✨ Clean</button>
+              <textarea class="form-textarea" id="f-passage" rows="8"
+                data-preview="f-passage-pv"
+                oninput="updatePreview('f-passage','f-passage-pv')"
+                placeholder="Paste the full reading passage here. This appears on the LEFT side of the screen during the test.
+
+The process of photosynthesis, commonly associated with plants...
+
+Phytoplankton, much like terrestrial plants, possess chlorophyll..."></textarea>
+            </div>
+            <div class="preview-wrap" style="margin-top:8px">
+              <div class="preview-label">Passage Preview</div>
+              <div class="preview-box" id="f-passage-pv" style="max-height:120px;overflow-y:auto"></div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Question Stem <span style="color:var(--red)">*</span></label>
+          <div class="textarea-wrap">
+            <button class="clean-btn" onclick="cleanField('f-stem','f-stem-pv')">✨ Clean</button>
+            <textarea class="form-textarea" id="f-stem" rows="3"
+              data-preview="f-stem-pv"
+              oninput="updatePreview('f-stem','f-stem-pv')"
+              placeholder='Write the question stem here. This appears on the RIGHT side.
+
+Examples:
+The passage suggests that changes in phytoplankton populations:
+The author uses the word "ideally" (click to highlight) primarily in order to'></textarea>
+          </div>
+          <div class="preview-wrap">
+            <div class="preview-label">Stem Preview</div>
+            <div class="preview-box" id="f-stem-pv"></div>
+          </div>
+        </div>
+        <!-- Hidden combined question field for storage -->
+        <input type="hidden" id="f-q-rc">
+      </div>
+
+      <!-- Options (shared) -->
       <div class="opts-grid">
         <div class="opt-row"><span class="opt-ltr">A.</span><input class="form-input" id="f-A" placeholder="Option A"></div>
         <div class="opt-row"><span class="opt-ltr">B.</span><input class="form-input" id="f-B" placeholder="Option B"></div>
@@ -315,7 +380,8 @@ For DI passages: paste the full passage text here, then add options below."></te
         <div class="opt-row"><span class="opt-ltr">E.</span><input class="form-input" id="f-E" placeholder="Option E (optional)"></div>
       </div>
 
-      <div class="form-grid-4" style="margin-bottom:14px">
+      <!-- Bottom fields -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px">
         <div class="form-group" style="margin-bottom:0">
           <label class="form-label">Answer <span style="color:var(--red)">*</span></label>
           <select class="form-select" id="f-ans">
@@ -331,44 +397,33 @@ For DI passages: paste the full passage text here, then add options below."></te
           </select>
         </div>
         <div class="form-group" style="margin-bottom:0">
-          <label class="form-label">Section <span style="color:var(--red)">*</span></label>
-          <select class="form-select" id="f-sec">
-            <option value="Q">Quantitative</option>
-            <option value="V">Verbal</option>
-            <option value="D">Data Insights</option>
-          </select>
-        </div>
-        <div class="form-group" style="margin-bottom:0">
           <label class="form-label">Sectional</label>
           <select class="form-select" id="f-sectional">
             <option value="">Untagged</option>
-            <option value="1">Sectional 01</option>
-            <option value="2">Sectional 02</option>
-            <option value="3">Sectional 03</option>
-            <option value="4">Sectional 04</option>
-            <option value="5">Sectional 05</option>
-            <option value="6">Sectional 06</option>
-            <option value="7">Sectional 07</option>
-            <option value="8">Sectional 08</option>
-            <option value="9">Sectional 09</option>
-            <option value="10">Sectional 10</option>
+            <option value="1">Sectional 01</option><option value="2">Sectional 02</option>
+            <option value="3">Sectional 03</option><option value="4">Sectional 04</option>
+            <option value="5">Sectional 05</option><option value="6">Sectional 06</option>
+            <option value="7">Sectional 07</option><option value="8">Sectional 08</option>
+            <option value="9">Sectional 09</option><option value="10">Sectional 10</option>
           </select>
         </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Topic / Sub-type</label>
+          <input class="form-input" id="f-topic" placeholder="e.g. CR – Inference">
+        </div>
       </div>
-
-      <div class="form-group"><label class="form-label">Topic / Sub-type</label>
-        <input class="form-input" id="f-topic" placeholder="e.g. Arithmetic – Percentages  or  DI – Table Analysis  or  DI – Two-Part Analysis"></div>
 
       <div class="form-group">
         <label class="form-label">Explanation</label>
         <div class="textarea-wrap">
           <button class="clean-btn" onclick="cleanField('f-expl','f-expl-pv')">✨ Clean</button>
-          <textarea class="form-textarea" id="f-expl" rows="3" data-preview="f-expl-pv"
+          <textarea class="form-textarea" id="f-expl" rows="4"
+            data-preview="f-expl-pv"
             oninput="updatePreview('f-expl','f-expl-pv')"
-            placeholder="Explanation shown after test. Equations like $\frac{9}{90}$ render in preview."></textarea>
+            placeholder="Paste the full explanation here. Multiple paragraphs are fine — they display correctly in the test report."></textarea>
         </div>
         <div class="preview-wrap">
-          <div class="preview-label">Preview</div>
+          <div class="preview-label">Explanation Preview</div>
           <div class="preview-box" id="f-expl-pv"></div>
         </div>
       </div>
@@ -389,150 +444,220 @@ if(!checkAuth()) throw new Error();
 document.getElementById('shared-styles').textContent = SHARED_STYLES;
 document.getElementById('topbar-wrap').innerHTML = renderTopbar('questions');
 
+// ── SECTION & TYPE SWITCHING ──
+function setSec(sec){
+  ['Q','V','D'].forEach(s=>{
+    const btn = g('sec-btn-'+s);
+    btn.className = 'sec-badge-btn' + (s===sec?' active-'+s:'');
+  });
+  g('f-sec').value = sec;
+  g('qtype-area').style.display = sec==='V' ? 'block' : 'none';
+  g('cr-hint').style.display = sec==='V' ? 'block' : 'none';
+  g('di-hint').style.display = sec==='D' ? 'block' : 'none';
+  if(sec!=='V'){
+    g('fields-rc').style.display='none';
+    g('fields-standard').style.display='block';
+  }
+}
+
+function setQType(type, btn){
+  document.querySelectorAll('.qtype-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  g('f-qtype').value=type;
+  if(type==='RC'){
+    g('fields-standard').style.display='none';
+    g('fields-rc').style.display='block';
+  } else {
+    g('fields-standard').style.display='block';
+    g('fields-rc').style.display='none';
+  }
+}
+
+function updateUploadType(){
+  const sec = g('up-section').value;
+  g('up-qtype-wrap').style.display = sec==='V' ? 'block' : 'none';
+}
+
+function updatePasteType(){
+  const sec = g('pa-section').value;
+  g('pa-qtype-wrap').style.display = sec==='V' ? 'block' : 'none';
+}
+// Init
+updateUploadType(); updatePasteType();
+
 // ── METHOD TABS ──
 function switchMethod(id, btn){
   document.querySelectorAll('.method-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.method-panel').forEach(p=>p.classList.remove('active'));
-  btn.classList.add('active');
-  g('method-'+id).classList.add('active');
+  btn.classList.add('active'); g('method-'+id).classList.add('active');
 }
 
 // ══ UPLOAD ══
-let uploadedText = '', parsedQs = [], pasteParsedQs = [];
+let uploadedText='', parsedQs=[], pasteParsedQs=[];
 
-const uz = g('upload-zone');
-uz.addEventListener('dragover', e=>{ e.preventDefault(); uz.classList.add('over'); });
-uz.addEventListener('dragleave', ()=>uz.classList.remove('over'));
-uz.addEventListener('drop', e=>{ e.preventDefault(); uz.classList.remove('over'); if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
-g('file-input').addEventListener('change', e=>{ if(e.target.files[0]) loadFile(e.target.files[0]); });
+const uz=g('upload-zone');
+uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('over');});
+uz.addEventListener('dragleave',()=>uz.classList.remove('over'));
+uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('over');if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});
+g('file-input').addEventListener('change',e=>{if(e.target.files[0])loadFile(e.target.files[0]);});
 
 async function loadFile(file){
-  const fc = g('file-chosen');
-  fc.textContent = '📄 ' + file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)';
-  fc.style.display = 'block';
-  g('up-status').textContent = 'Reading file...';
-  uploadedText = '';
-  const ext = file.name.split('.').pop().toLowerCase();
-  try {
-    if(ext === 'docx' || ext === 'doc'){
-      const ab = await file.arrayBuffer();
-      const result = await mammoth.extractRawText({ arrayBuffer: ab });
-      uploadedText = result.value;
-    } else {
-      uploadedText = await file.text();
+  const fc=g('file-chosen');
+  fc.textContent='📄 '+file.name+' ('+(file.size/1024).toFixed(1)+' KB)';
+  fc.style.display='block';
+  g('up-status').textContent='Reading file...';
+  uploadedText='';
+  const ext=file.name.split('.').pop().toLowerCase();
+  try{
+    if(ext==='docx'||ext==='doc'){
+      const ab=await file.arrayBuffer();
+      const result=await mammoth.extractRawText({arrayBuffer:ab});
+      uploadedText=result.value;
+    }else{
+      uploadedText=await file.text();
     }
-    g('up-status').textContent = '✓ Ready — ' + uploadedText.length + ' chars. Click Extract.';
-  } catch(err) {
-    g('up-status').textContent = '❌ Error: ' + err.message;
-    showToast('Could not read file: ' + err.message, 'error');
+    g('up-status').textContent='✓ Ready — '+uploadedText.length+' chars. Click Extract.';
+  }catch(err){
+    g('up-status').textContent='❌ Error: '+err.message;
+    showToast('Could not read file','error');
   }
 }
 
 function clearUpload(){
-  uploadedText=''; g('file-input').value='';
-  g('file-chosen').style.display='none'; g('up-status').textContent='';
+  uploadedText='';g('file-input').value='';
+  g('file-chosen').style.display='none';g('up-status').textContent='';
   g('parsed-card').style.display='none';
-  g('extract-progress').classList.remove('show');
-  parsedQs=[];
+  g('extract-progress').classList.remove('show');parsedQs=[];
 }
 
 async function runExtraction(){
-  if(!uploadedText){ showToast('Please upload a file first.','error'); return; }
-  const sec = g('up-section').value;
-  const diff = g('up-difficulty').value;
-  const sectional = g('up-sectional').value || null;
-  const prog = g('extract-progress');
+  if(!uploadedText){showToast('Please upload a file first.','error');return;}
+  const sec=g('up-section').value;
+  const diff=g('up-difficulty').value;
+  const sectional=g('up-sectional').value||null;
+  const qtype=g('up-qtype').value||null;
+  const prog=g('extract-progress');
   prog.classList.add('show');
-  setProgress(10,'Reading document...');
-  await sleep(80);
-  const fmt = detectDocFormat(uploadedText);
-  setProgress(30,'Format: ' + fmt);
-  await sleep(80);
-  setProgress(60,'Splitting question blocks...');
-  await sleep(80);
-  const qs = parseDocText(uploadedText, sec, diff);
-  setProgress(90,'Extracting answers & explanations...');
-  await sleep(80);
-  qs.forEach(q=>{ q.sectional = sectional; });
-  setProgress(100, qs.length + ' questions found');
-  parsedQs = qs;
+  setProgress(10,'Reading document...');await sleep(80);
+  const fmt=detectDocFormat(uploadedText);
+  setProgress(30,'Format: '+fmt);await sleep(80);
+  setProgress(60,'Splitting question blocks...');await sleep(80);
+  const qs=parseDocText(uploadedText,sec,diff);
+  setProgress(90,'Extracting answers & explanations...');await sleep(80);
+  qs.forEach(q=>{
+    q.sectional=sectional;
+    if(sec==='V'&&qtype) q.topic=(q.topic?q.topic+' – ':'')+qtype;
+  });
+  setProgress(100,qs.length+' questions found');
+  parsedQs=qs;
   if(!qs.length){
-    g('ep-text').textContent = '⚠️ No questions found';
-    g('ep-sub').textContent = 'Make sure the file contains one of the supported answer formats.';
+    g('ep-text').textContent='⚠️ No questions found';
+    g('ep-sub').textContent='Make sure the file contains one of the supported answer formats.';
     return;
   }
   renderParsedList(qs,'parsed-list','parsed-count');
   g('parsed-card').style.display='block';
-  showToast(qs.length + ' questions extracted ✓','success');
+  showToast(qs.length+' questions extracted ✓','success');
 }
 
-function setProgress(pct,text){
-  g('ep-bar').style.width=pct+'%';
-  g('ep-text').textContent=text;
-  g('ep-sub').textContent=pct+'% complete';
-}
-function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function setProgress(pct,text){g('ep-bar').style.width=pct+'%';g('ep-text').textContent=text;g('ep-sub').textContent=pct+'% complete';}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
 // ══ PASTE ══
 function parsePaste(){
-  const raw = g('pa-text').value.trim();
-  if(!raw){ showToast('Please paste some text first.','error'); return; }
-  const sec = g('pa-section').value;
-  const diff = g('pa-difficulty').value;
-  const sectional = g('pa-sectional').value || null;
-  const qs = parseDocText(raw, sec, diff);
-  qs.forEach(q=>{ q.sectional = sectional; });
-  if(!qs.length){ showToast('No questions detected. Check the answer format is supported.','error'); return; }
-  pasteParsedQs = qs;
+  const raw=g('pa-text').value.trim();
+  if(!raw){showToast('Please paste some text first.','error');return;}
+  const sec=g('pa-section').value;
+  const diff=g('pa-difficulty').value;
+  const sectional=g('pa-sectional').value||null;
+  const qtype=g('pa-qtype').value||null;
+
+  // Handle RC specially — split on [STEM]
+  if(sec==='V'&&qtype==='RC'){
+    const parsed=parseRCBlock(raw,sec,diff,sectional);
+    if(!parsed.length){showToast('No RC question found. Make sure you have [STEM] marker.','error');return;}
+    pasteParsedQs=parsed;
+    renderParsedList(parsed,'paste-list','paste-count');
+    g('paste-card').style.display='block';
+    showToast(parsed.length+' RC question(s) parsed ✓','success');
+    return;
+  }
+
+  const qs=parseDocText(raw,sec,diff);
+  qs.forEach(q=>{
+    q.sectional=sectional;
+    if(sec==='V'&&qtype) q.topic=(q.topic?q.topic+' – ':'')+qtype;
+  });
+  if(!qs.length){showToast('No questions detected.','error');return;}
+  pasteParsedQs=qs;
   renderParsedList(qs,'paste-list','paste-count');
   g('paste-card').style.display='block';
-  showToast(qs.length + ' question(s) parsed ✓','success');
+  showToast(qs.length+' question(s) parsed ✓','success');
+}
+
+// Parse RC block with [STEM] marker
+function parseRCBlock(raw,sec,diff,sectional){
+  const stemSplit=raw.split(/\[STEM\]/i);
+  if(stemSplit.length<2) return [];
+  const passage=stemSplit[0].trim();
+  const stemBlock=stemSplit[1].trim();
+  // Now parse the stem block as a normal question
+  const qs=parseDocText(stemBlock,sec,diff);
+  qs.forEach(q=>{
+    q.passage=passage;
+    q.question=q.question; // the stem becomes the question
+    q.sectional=sectional;
+    q.topic='RC';
+  });
+  return qs;
 }
 
 function clearPaste(){
-  g('pa-text').value='';
-  g('pa-preview').classList.remove('show');
-  g('paste-card').style.display='none';
-  pasteParsedQs=[];
+  g('pa-text').value='';g('pa-preview').classList.remove('show');
+  g('paste-card').style.display='none';pasteParsedQs=[];
 }
-
-function paSelectAll(sel){ g('paste-list').querySelectorAll('.pq-check').forEach(c=>c.checked=sel); }
-
+function paSelectAll(sel){g('paste-list').querySelectorAll('.pq-check').forEach(c=>c.checked=sel);}
 async function importPaste(){
-  await importFromList('paste-list', pasteParsedQs, 'paste-import-btn');
-  g('paste-card').style.display='none';
-  clearPaste();
+  await importFromList('paste-list',pasteParsedQs,'paste-import-btn');
+  g('paste-card').style.display='none';clearPaste();
 }
 
 // ══ RENDER PARSED LIST ══
-function renderParsedList(qs, listId, countId){
-  const list = g(listId);
-  const countEl = g(countId);
-  if(countEl) countEl.textContent = qs.length + ' question(s) found';
-  list.innerHTML = '';
+function renderParsedList(qs,listId,countId){
+  const list=g(listId);const countEl=g(countId);
+  if(countEl) countEl.textContent=qs.length+' question(s) found';
+  list.innerHTML='';
   qs.forEach((q,i)=>{
-    const item = document.createElement('div');
-    item.className='pq-item'; item.dataset.diff=q.difficulty;
-    const optHtml = Object.entries(q.options||{}).map(([l,v])=>
+    const item=document.createElement('div');
+    item.className='pq-item';item.dataset.diff=q.difficulty;
+    const optHtml=Object.entries(q.options||{}).map(([l,v])=>
       `<span class="pq-opt${l===q.answer?' correct':''}">${l}. ${String(v).slice(0,30)}${String(v).length>30?'…':''}</span>`
     ).join('');
-    const explHtml = q.explanation ? `<div class="pq-expl">📝 ${q.explanation.slice(0,120)}${q.explanation.length>120?'…':''}</div>` : '';
-    const secNum = q.sectional ? `<span style="font-size:10px;color:var(--teal-d);padding:2px 6px;background:var(--teal-l);border-radius:4px">S${String(q.sectional).padStart(2,'0')}</span>` : '';
+    // Show explanation preview — key fix
+    const explHtml=q.explanation?
+      `<div class="pq-expl">📝 <strong>Explanation:</strong>\n${q.explanation.slice(0,300)}${q.explanation.length>300?'…':''}</div>`:'';
+    const secNum=q.sectional?`<span style="font-size:10px;color:var(--teal-d);padding:2px 6px;background:var(--teal-l);border-radius:4px">S${String(q.sectional).padStart(2,'0')}</span>`:'';
+    const typePill=q.topic?`<span style="font-size:10px;background:#e8f0f8;color:#003865;padding:2px 7px;border-radius:4px;font-weight:600">${q.topic}</span>`:'';
     item.innerHTML=`
       <input type="checkbox" class="pq-check" data-idx="${i}" checked>
       <div class="pq-body">
-        <div class="pq-q">${(q.question||'').slice(0,160)}${(q.question||'').length>160?'…':''}</div>
+        <div class="pq-q">${(q.question||'').slice(0,200)}${(q.question||'').length>200?'…':''}</div>
         <div class="pq-opts">${optHtml}</div>
         ${explHtml}
-        <div class="pq-tags">
+        <div class="pq-tags" style="margin-top:5px">
           <span class="dpill ${q.difficulty}">${q.difficulty}</span>
           <span class="spill spill-${q.section}">${q.section}</span>
-          ${q.topic?`<span style="font-size:10px;color:var(--muted);padding:2px 6px;background:var(--bg);border-radius:4px;border:1px solid var(--border)">${q.topic}</span>`:''}
-          ${secNum}
+          ${typePill}${secNum}
           <select class="pq-diff-sel" onchange="qs[${i}].difficulty=this.value">
             <option ${q.difficulty==='Easy'?'selected':''}>Easy</option>
             <option ${q.difficulty==='Medium'?'selected':''}>Medium</option>
             <option ${q.difficulty==='Hard'?'selected':''}>Hard</option>
+          </select>
+          <select class="pq-type-sel" onchange="qs[${i}].topic=this.value">
+            <option value="">No type</option>
+            <option value="CR" ${(q.topic||'').includes('CR')&&!(q.topic||'').includes('BF')&&!(q.topic||'').includes('RC')?'selected':''}>CR</option>
+            <option value="RC" ${(q.topic||'').includes('RC')?'selected':''}>RC</option>
+            <option value="CR-BF" ${(q.topic||'').includes('BF')?'selected':''}>Boldface CR</option>
           </select>
         </div>
       </div>`;
@@ -540,146 +665,131 @@ function renderParsedList(qs, listId, countId){
   });
 }
 
-function selectAll(sel){ g('parsed-list').querySelectorAll('.pq-check').forEach(c=>c.checked=sel); }
-
+function selectAll(sel){g('parsed-list').querySelectorAll('.pq-check').forEach(c=>c.checked=sel);}
 async function importSelected(){
-  await importFromList('parsed-list', parsedQs, 'import-btn');
-  g('parsed-card').style.display='none'; parsedQs=[];
+  await importFromList('parsed-list',parsedQs,'import-btn');
+  g('parsed-card').style.display='none';parsedQs=[];
 }
 
-async function importFromList(listId, qsArray, btnId){
-  const checks = g(listId).querySelectorAll('.pq-check');
-  const toImport = [];
-  checks.forEach(c=>{ if(c.checked) toImport.push({...qsArray[parseInt(c.dataset.idx)]}); });
-  if(!toImport.length){ showToast('No questions selected.','error'); return; }
-  const btn = g(btnId);
-  if(btn){ btn.disabled=true; btn.textContent='Saving...'; }
-  try {
+async function importFromList(listId,qsArray,btnId){
+  const checks=g(listId).querySelectorAll('.pq-check');
+  const toImport=[];
+  checks.forEach(c=>{if(c.checked)toImport.push({...qsArray[parseInt(c.dataset.idx)]});});
+  if(!toImport.length){showToast('No questions selected.','error');return;}
+  const btn=g(btnId);
+  if(btn){btn.disabled=true;btn.textContent='Saving...';}
+  try{
     await DB.addMany(toImport);
-    showToast(toImport.length + ' questions saved to Supabase ✓','success');
-  } catch(e) {
-    showToast('Error saving: ' + e.message,'error');
-    console.error(e);
-  } finally {
-    if(btn){ btn.disabled=false; btn.textContent='💾 Save to Supabase →'; }
+    showToast(toImport.length+' questions saved to Supabase ✓','success');
+  }catch(e){
+    showToast('Error: '+e.message,'error');console.error(e);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='💾 Save to Supabase →';}
   }
-}
-
-// ══ TABLE BUILDER ══
-function toggleTableBuilder(){
-  const tb = g('table-builder');
-  tb.classList.toggle('show');
-  if(tb.classList.contains('show') && !g('tb-grid').innerHTML) buildTable();
-}
-
-function buildTable(){
-  const rows = parseInt(g('tb-rows').value) || 3;
-  const cols = parseInt(g('tb-cols').value) || 3;
-  const grid = g('tb-grid');
-  let html = '<table class="tb-table"><thead><tr>';
-  for(let c=0;c<cols;c++) html += `<th><input class="tb-input" placeholder="Header ${c+1}" id="tb-h${c}"></th>`;
-  html += '</tr></thead><tbody>';
-  for(let r=0;r<rows;r++){
-    html += '<tr>';
-    for(let c=0;c<cols;c++) html += `<td><input class="tb-input" placeholder="Row ${r+1}, Col ${c+1}" id="tb-r${r}c${c}"></td>`;
-    html += '</tr>';
-  }
-  html += '</tbody></table>';
-  grid.innerHTML = html;
-}
-
-function insertTable(){
-  const rows = parseInt(g('tb-rows').value) || 3;
-  const cols = parseInt(g('tb-cols').value) || 3;
-  // Build header
-  const headers = [];
-  for(let c=0;c<cols;c++){
-    const el = g('tb-h'+c);
-    headers.push(el ? el.value || ('Col '+(c+1)) : 'Col '+(c+1));
-  }
-  // Build separator
-  const sep = headers.map(()=>'---').join(' | ');
-  // Build rows
-  const rowLines = [];
-  for(let r=0;r<rows;r++){
-    const cells = [];
-    for(let c=0;c<cols;c++){
-      const el = g('tb-r'+r+'c'+c);
-      cells.push(el ? el.value || '' : '');
-    }
-    rowLines.push(cells.join(' | '));
-  }
-  const tableText = headers.join(' | ') + '\n' + sep + '\n' + rowLines.join('\n');
-  const qa = g('f-q');
-  qa.value = (qa.value ? qa.value + '\n\n' : '') + tableText + '\n\n';
-  updatePreview('f-q','f-q-pv');
-  g('table-builder').classList.remove('show');
-  showToast('Table inserted into question ✓','success');
 }
 
 // ══ MANUAL ENTRY ══
 async function saveManual(){
-  const question = g('f-q').value.trim();
-  const optA = g('f-A').value.trim(), optB = g('f-B').value.trim();
-  if(!question){ showToast('Question text is required.','error'); return; }
-  if(!optA||!optB){ showToast('At least options A and B are required.','error'); return; }
-  const q = {
-    question, answer: g('f-ans').value,
-    difficulty: g('f-diff').value, section: g('f-sec').value,
-    sectional: g('f-sectional').value || null,
-    topic: g('f-topic').value.trim(),
-    explanation: g('f-expl').value.trim(),
-    options:{ A:optA, B:optB,
+  const sec=g('f-sec').value;
+  const qtype=g('f-qtype').value;
+  const isRC=sec==='V'&&qtype==='RC';
+
+  // Build question text
+  let questionText='';
+  if(isRC){
+    const passage=g('f-passage').value.trim();
+    const stem=g('f-stem').value.trim();
+    if(!passage){showToast('Passage text is required for RC.','error');return;}
+    if(!stem){showToast('Question stem is required for RC.','error');return;}
+    // Store passage+stem combined with separator for the test engine
+    questionText=stem;
+    g('f-q-rc').value=passage; // will be stored as passage field
+  }else{
+    questionText=g('f-q').value.trim();
+    if(!questionText){showToast('Question text is required.','error');return;}
+  }
+
+  const optA=g('f-A').value.trim(),optB=g('f-B').value.trim();
+  if(!optA||!optB){showToast('At least options A and B are required.','error');return;}
+
+  const q={
+    question:questionText,
+    answer:g('f-ans').value,
+    difficulty:g('f-diff').value,
+    section:sec,
+    sectional:g('f-sectional').value||null,
+    topic:g('f-topic').value.trim()||(sec==='V'?qtype:''),
+    explanation:g('f-expl').value.trim(),
+    options:{A:optA,B:optB,
       C:g('f-C').value.trim()||undefined,
       D:g('f-D').value.trim()||undefined,
-      E:g('f-E').value.trim()||undefined }
+      E:g('f-E').value.trim()||undefined}
   };
-  ['C','D','E'].forEach(l=>{ if(!q.options[l]) delete q.options[l]; });
-  const btn = g('save-btn');
-  btn.disabled=true; btn.textContent='Saving...';
-  try {
-    const editId = g('edit-id').value;
-    if(editId){ await DB.update(editId, q); showToast('Question updated ✓','success'); cancelEdit(); }
-    else { await DB.add(q); showToast('Question saved to Supabase ✓','success'); resetManual(); }
-  } catch(e) {
-    showToast('Error: ' + e.message,'error'); console.error(e);
-  } finally {
-    btn.disabled=false; btn.textContent='💾 Save to Supabase';
+  ['C','D','E'].forEach(l=>{if(!q.options[l])delete q.options[l];});
+
+  // Add passage for RC
+  if(isRC) q.passage=g('f-q-rc').value;
+
+  const btn=g('save-btn');
+  btn.disabled=true;btn.textContent='Saving...';
+  try{
+    const editId=g('edit-id').value;
+    if(editId){await DB.update(editId,q);showToast('Question updated ✓','success');cancelEdit();}
+    else{await DB.add(q);showToast('Question saved to Supabase ✓','success');resetManual();}
+  }catch(e){
+    showToast('Error: '+e.message,'error');console.error(e);
+  }finally{
+    btn.disabled=false;btn.textContent='💾 Save to Supabase';
   }
 }
 
 function resetManual(){
   g('edit-id').value='';
-  ['f-q','f-A','f-B','f-C','f-D','f-E','f-topic','f-expl'].forEach(id=>{ const el=g(id); if(el) el.value=''; });
-  g('f-ans').value='A'; g('f-diff').value='Medium';
-  g('f-sec').value='Q'; g('f-sectional').value='';
-  ['f-q-pv','f-expl-pv'].forEach(id=>{ const el=g(id); if(el) el.classList.remove('show'); });
+  ['f-q','f-A','f-B','f-C','f-D','f-E','f-topic','f-expl','f-passage','f-stem'].forEach(id=>{
+    const el=g(id);if(el)el.value='';
+  });
+  g('f-ans').value='A';g('f-diff').value='Medium';
+  g('f-sectional').value='';g('f-topic').value='';
+  ['f-q-pv','f-expl-pv','f-passage-pv','f-stem-pv'].forEach(id=>{
+    const el=g(id);if(el)el.classList.remove('show');
+  });
   g('cancel-edit-btn').style.display='none';
 }
-function cancelEdit(){ resetManual(); }
+function cancelEdit(){resetManual();}
 
 // Pre-fill for edit from bank
-const editId = new URLSearchParams(window.location.search).get('edit');
+const editId=new URLSearchParams(window.location.search).get('edit');
 if(editId){
   document.querySelectorAll('.method-tab')[2].click();
   DB.getQs().then(qs=>{
-    const q = qs.find(x=>x.id===editId);
-    if(!q) return;
+    const q=qs.find(x=>x.id===editId);
+    if(!q)return;
     g('edit-id').value=q.id;
-    g('f-q').value=q.question||'';
-    g('f-A').value=(q.options&&q.options.A)||'';
-    g('f-B').value=(q.options&&q.options.B)||'';
-    g('f-C').value=(q.options&&q.options.C)||'';
-    g('f-D').value=(q.options&&q.options.D)||'';
+    setSec(q.section||'Q');
+    if(q.section==='V'){
+      const qtype=(q.topic||'').includes('RC')?'RC':(q.topic||'').includes('BF')?'CR-BF':'CR';
+      setQType(qtype,g('qt-'+(qtype==='CR-BF'?'BF':qtype)));
+      if(qtype==='RC'){
+        g('f-passage').value=q.passage||'';
+        g('f-stem').value=q.question||'';
+        updatePreview('f-passage','f-passage-pv');
+        updatePreview('f-stem','f-stem-pv');
+      }else{
+        g('f-q').value=q.question||'';
+        updatePreview('f-q','f-q-pv');
+      }
+    }else{
+      g('f-q').value=q.question||'';
+      updatePreview('f-q','f-q-pv');
+    }
+    g('f-A').value=(q.options&&q.options.A)||'';g('f-B').value=(q.options&&q.options.B)||'';
+    g('f-C').value=(q.options&&q.options.C)||'';g('f-D').value=(q.options&&q.options.D)||'';
     g('f-E').value=(q.options&&q.options.E)||'';
-    g('f-ans').value=q.answer||'A';
-    g('f-diff').value=q.difficulty||'Medium';
-    g('f-sec').value=q.section||'Q';
-    g('f-sectional').value=q.sectional||'';
-    g('f-topic').value=q.topic||'';
+    g('f-ans').value=q.answer||'A';g('f-diff').value=q.difficulty||'Medium';
+    g('f-sectional').value=q.sectional||'';g('f-topic').value=q.topic||'';
     g('f-expl').value=q.explanation||'';
+    updatePreview('f-expl','f-expl-pv');
     g('cancel-edit-btn').style.display='inline-flex';
-    updatePreview('f-q','f-q-pv'); updatePreview('f-expl','f-expl-pv');
     showToast('Editing question — make changes and save.','info');
   });
 }
