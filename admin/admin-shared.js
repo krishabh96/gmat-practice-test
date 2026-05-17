@@ -8,6 +8,10 @@ const SECTION_TARGETS = { Q:21, V:23, D:20 };
 const SECTION_NAMES   = { Q:'Quantitative', V:'Verbal', D:'Data Insights' };
 const SECTION_DESC    = { Q:'Problem Solving', V:'CR & Reading Comp', D:'DS & Data Analysis' };
 
+// ── Supabase credentials ──
+const SUPA_URL = 'https://uavoffiwmocvvymtrsat.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhdm9mZml3bW9jdnZ5bXRyc2F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MjkxMjAsImV4cCI6MjA5NDQwNTEyMH0.YSob4QEO0lIZl9GNdjEKS4RHFSB7yhc7eLekV6PuWAY';
+
 // ── AUTH ──
 function checkAuth() {
   if(sessionStorage.getItem('admin_auth') !== '1') {
@@ -30,7 +34,12 @@ function adminLogout() {
 
 // ── STORAGE ──
 // ── Supabase client (shared across all admin pages) ──
-const _adminSb = supabase.createClient(SUPA_URL, SUPA_KEY);
+// ── Supabase client (lazy — created on first use) ──
+let _adminSb = null;
+function getDb(){
+  if(!_adminSb) _adminSb = supabase.createClient(SUPA_URL, SUPA_KEY);
+  return _adminSb;
+}
 
 // ── DB: Supabase-backed question store ──
 // All methods are async — await them in calling code
@@ -38,7 +47,7 @@ const DB = {
 
   // ── READ ──
   async getQs(filters = {}) {
-    let q = _adminSb.from('questions').select('*');
+    let q = getDb().from('questions').select('*');
     if(filters.section)   q = q.eq('section', filters.section);
     if(filters.sectional) q = q.eq('sectional', filters.sectional);
     if(filters.difficulty) q = q.eq('difficulty', filters.difficulty);
@@ -52,7 +61,7 @@ const DB = {
 
   // ── COUNTS ──
   async counts() {
-    const { data, error } = await _adminSb.from('questions').select('section, sectional');
+    const { data, error } = await getDb().from('questions').select('section, sectional');
     if(error) return { total:0, tagged:0, untagged:0, Q:0, V:0, D:0 };
     const qs = data || [];
     return {
@@ -69,7 +78,7 @@ const DB = {
   async add(q) {
     q.id = q.id || 'Q_' + Date.now() + '_' + Math.floor(Math.random()*9999);
     q.options = typeof q.options === 'string' ? q.options : JSON.stringify(q.options);
-    const { data, error } = await _adminSb.from('questions').insert([q]).select().single();
+    const { data, error } = await getDb().from('questions').insert([q]).select().single();
     if(error){ console.error('DB.add error:', error); throw error; }
     return data;
   },
@@ -81,7 +90,7 @@ const DB = {
       id: q.id || 'Q_' + Date.now() + '_' + Math.floor(Math.random()*9999),
       options: typeof q.options === 'string' ? q.options : JSON.stringify(q.options)
     }));
-    const { data, error } = await _adminSb.from('questions').insert(rows).select();
+    const { data, error } = await getDb().from('questions').insert(rows).select();
     if(error){ console.error('DB.addMany error:', error); throw error; }
     return data || [];
   },
@@ -91,28 +100,28 @@ const DB = {
     if(upd.options && typeof upd.options !== 'string'){
       upd.options = JSON.stringify(upd.options);
     }
-    const { error } = await _adminSb.from('questions').update(upd).eq('id', id);
+    const { error } = await getDb().from('questions').update(upd).eq('id', id);
     if(error){ console.error('DB.update error:', error); return false; }
     return true;
   },
 
   // ── DELETE ──
   async delete(id) {
-    const { error } = await _adminSb.from('questions').delete().eq('id', id);
+    const { error } = await getDb().from('questions').delete().eq('id', id);
     if(error){ console.error('DB.delete error:', error); return false; }
     return true;
   },
 
   // ── DELETE MANY ──
   async deleteMany(ids) {
-    const { error } = await _adminSb.from('questions').delete().in('id', ids);
+    const { error } = await getDb().from('questions').delete().in('id', ids);
     if(error){ console.error('DB.deleteMany error:', error); return false; }
     return true;
   },
 
   // ── CLEAR ALL ──
   async clearAll() {
-    const { error } = await _adminSb.from('questions').delete().neq('id', '');
+    const { error } = await getDb().from('questions').delete().neq('id', '');
     if(error){ console.error('DB.clearAll error:', error); return false; }
     return true;
   },
