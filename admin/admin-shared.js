@@ -78,6 +78,9 @@ const DB = {
   async add(q) {
     q.id = q.id || 'Q_' + Date.now() + '_' + Math.floor(Math.random()*9999);
     q.options = typeof q.options === 'string' ? q.options : JSON.stringify(q.options);
+    // Convert empty string sectional to null (Supabase expects integer or null)
+    if(q.sectional === '' || q.sectional === undefined) q.sectional = null;
+    else q.sectional = parseInt(q.sectional) || null;
     const { data, error } = await getDb().from('questions').insert([q]).select().single();
     if(error){ console.error('DB.add error:', error); throw error; }
     return data;
@@ -85,11 +88,18 @@ const DB = {
 
   // ── ADD MANY ──
   async addMany(qs) {
-    const rows = qs.map(q => ({
-      ...q,
-      id: q.id || 'Q_' + Date.now() + '_' + Math.floor(Math.random()*9999),
-      options: typeof q.options === 'string' ? q.options : JSON.stringify(q.options)
-    }));
+    const rows = qs.map(q => {
+      // Convert empty string sectional to null
+      let sectional = q.sectional;
+      if(sectional === '' || sectional === undefined) sectional = null;
+      else sectional = parseInt(sectional) || null;
+      return {
+        ...q,
+        id: q.id || 'Q_' + Date.now() + '_' + Math.floor(Math.random()*9999),
+        options: typeof q.options === 'string' ? q.options : JSON.stringify(q.options),
+        sectional
+      };
+    });
     const { data, error } = await getDb().from('questions').insert(rows).select();
     if(error){ console.error('DB.addMany error:', error); throw error; }
     return data || [];
@@ -99,6 +109,10 @@ const DB = {
   async update(id, upd) {
     if(upd.options && typeof upd.options !== 'string'){
       upd.options = JSON.stringify(upd.options);
+    }
+    if('sectional' in upd){
+      if(upd.sectional === '' || upd.sectional === undefined) upd.sectional = null;
+      else upd.sectional = parseInt(upd.sectional) || null;
     }
     const { error } = await getDb().from('questions').update(upd).eq('id', id);
     if(error){ console.error('DB.update error:', error); return false; }
@@ -519,7 +533,7 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
       options,
       answer,
       explanation,
-      sectional:   ''
+      sectional:   null
     });
   });
 
