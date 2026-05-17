@@ -432,7 +432,8 @@ document.addEventListener('paste', e => {
 //           Choice X is correct, B is correct, standalone letter after options
 
 function detectAnswer(text){
-  const t = text.trim();
+  // Strip ** bold markers before matching
+  const t = text.trim().replace(/\*\*/g,'');
   const patterns = [
     /[Tt]he\s+correct\s+answer\s+is\s*[:\-]?\s*([A-E])/,
     /[Cc]orrect\s+[Aa]nswer\s*[:\-]\s*([A-E])/,
@@ -448,19 +449,31 @@ function detectAnswer(text){
 }
 
 function isJunkLine(line){
-  const t = line.trim();
+  const t = line.trim().replace(/\*\*/g,'');
   if(!t) return true;
+  // Markdown headings (when # is preserved)
+  if(t.match(/^#{1,4}\s/)) return true;
+  // Plain heading lines that mammoth produces (strips # markers)
+  if(t.match(/^Question\s+\d+$/i)) return true;
+  if(t.match(/^(PART|SECTION)\s+(I{1,3}|[IVX]+|\d+)\b/i)) return true;
+  if(t.match(/^(EASY|MEDIUM|HARD)\s+(CR|RC|DI)\s+QUESTIONS?/i)) return true;
+  // Meta lines like *(Difficulty: Easy | Type: CR)* or (Difficulty: Easy | Type: CR)
+  if(t.match(/^\*?\(?(Difficulty|Type)\s*:/i)) return true;
+  // Italic subtitle lines like *18 Critical Reasoning + ...*
+  if(t.match(/^\*.+\*$/) && t.length < 120 && !t.includes('?')) return true;
+  if(t.match(/^---+$/)) return true;
   if(t.match(/^Difficulty:/i)) return true;
   if(t.match(/^Format\s+\d/i)) return true;
-  if(t.match(/^(Tips|Rules|Optional|Part|Section|Chapter)\b/i)) return true;
   if(t.match(/^Sasta\s+GMAT/i)) return true;
-  // Title line pattern: "Word — Word" no question mark, no leading digit
-  if(t.match(/^[A-Za-z].{1,30}[—–].+/) && !t.includes('?') && !t.match(/^\d/)) return true;
+  if(t.match(/^(Tips|Rules|Optional|Part|Section|Chapter)\b/i)) return true;
+  if(t.match(/^GMAT\s+(Verbal|Quant|Data|Practice)/i)) return true;
+  // Section headers
+  if(t.match(/^PART I|PART II|CRITICAL REASONING|READING COMPREHENSION/i) && t.length < 60) return true;
   return false;
 }
 
 function isExplLine(line){
-  const t = line.trim().toLowerCase();
+  const t = line.trim().replace(/\*\*/g,'').toLowerCase();
   return t.startsWith('explanation') || t.startsWith('solution') || t.startsWith('rationale');
 }
 
@@ -469,44 +482,44 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
   const lines = rawText.split('\n');
   let lastDiff = defaultDifficulty || 'Medium';
 
-  // ── STEP 1: Find all answer line positions + track difficulty ──
+  // ── STEP 1: Find all answer line positions ──
   const segments = [];
   lines.forEach((line, i) => {
-    const dl = line.toLowerCase();
-    if(dl.includes('difficulty') && dl.includes('easy'))   lastDiff = 'Easy';
-    if(dl.includes('difficulty') && dl.includes('medium')) lastDiff = 'Medium';
-    if(dl.includes('difficulty') && dl.includes('hard'))   lastDiff = 'Hard';
+    const clean = line.replace(/\*\*/g,'').toLowerCase();
+    if(clean.includes('difficulty') && clean.includes('easy'))   lastDiff = 'Easy';
+    if(clean.includes('difficulty') && clean.includes('medium')) lastDiff = 'Medium';
+    if(clean.includes('difficulty') && clean.includes('hard'))   lastDiff = 'Hard';
 
     const ans = detectAnswer(line);
     if(ans){ segments.push({ ansIdx: i, ans, diff: lastDiff }); return; }
 
-    // Standalone single letter ONLY if previous lines have options
-    const t = line.trim();
+    // Standalone single letter only if previous lines have options
+    const t = line.trim().replace(/\*\*/g,'');
     if(t.match(/^[A-E]$/)){
-      const prev = lines.slice(Math.max(0,i-8), i);
-      const hasOpts = prev.some(l =>
-        l.trim().match(/^[A-E][.)]\s+\S/) || l.trim().match(/^-\s+\S/)
-      );
+      const prev = lines.slice(Math.max(0,i-10), i);
+      const hasOpts = prev.some(l => l.trim().replace(/\*\*/g,'').match(/^[A-E][.)]\s+\S/));
       if(hasOpts) segments.push({ ansIdx: i, ans: t, diff: lastDiff });
     }
   });
 
   if(!segments.length) return [];
 
-  // ── STEP 2: Compute block ends (answer line + trailing explanation) ──
-  // Explanations can span multiple paragraphs, so we scan until the next
-  // question's answer line rather than stopping at blank lines
+  // ── STEP 2: Compute block ends ──
+  // Stop at next "Question N" heading OR markdown heading
+  // Mammoth strips # from headings, so we detect "Question 1", "Question 2" etc.
+  const isHeadingLine = (l) => {
+    const t = l.trim().replace(/\*\*/g,'');
+    if(t.match(/^#{1,4}\s/)) return true;           // markdown heading
+    if(t.match(/^Question\s+\d+$/i)) return true;   // "Question 1" plain text
+    if(t.match(/^Q\s*\d+\s*[:\-–]?\s*$/i)) return true; // "Q1" or "Q 1"
+    return false;
+  };
+
   const blockEnds = segments.map(({ ansIdx }, qi) => {
-    const nextAnsIdx = qi + 1 < segments.length ? segments[qi+1].ansIdx : lines.length;
+    const nextAnsIdx = qi+1 < segments.length ? segments[qi+1].ansIdx : lines.length;
     let end = ansIdx;
-    // Capture everything between this answer and the next question's answer
-    // Stop only if we hit a clear new question marker (numbered question, option block)
-    for(let j = ansIdx + 1; j < nextAnsIdx; j++){
-      const l = lines[j].trim();
-      // Stop if we hit what looks like the start of a new question (numbered "88.")
-      if(l.match(/^\d{1,3}\.\s+\S{10,}/)) break;
-      // Stop if we hit a new option block (A. B. C. sequence)
-      if(l.match(/^A[.)]\s+/) && lines[j+1]&&lines[j+1].trim().match(/^B[.)]\s+/)) break;
+    for(let j = ansIdx+1; j < nextAnsIdx; j++){
+      if(isHeadingLine(lines[j])) break;
       end = j;
     }
     return end;
@@ -514,20 +527,19 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
 
   // ── STEP 3: Extract each question ──
   segments.forEach(({ ansIdx, ans: answer, diff }, qi) => {
-    const blockStart = qi > 0 ? blockEnds[qi-1] + 1 : 0;
-    const block = lines.slice(blockStart, ansIdx + 1);
+    const blockStart = qi > 0 ? blockEnds[qi-1]+1 : 0;
+    const block = lines.slice(blockStart, ansIdx+1);
 
-    // Trailing explanation lines (after answer line, up to block end)
-    const trailingLines = lines.slice(ansIdx + 1, blockEnds[qi] + 1)
-      .map(l => l.trim())
-      .filter(l => !detectAnswer(l));
-    // Join with newlines to preserve paragraph structure
-    const trailingText = trailingLines.join('\n').replace(/\n{3,}/g,'\n\n').trim();
+    // Trailing explanation (after answer line, before next heading)
+    const trailingText = lines.slice(ansIdx+1, blockEnds[qi]+1)
+      .map(l => l.replace(/\*\*/g,'').trim())
+      .filter(l => l && !detectAnswer(l))
+      .join('\n').replace(/\n{3,}/g,'\n\n').trim();
 
-    // Find explanation boundary inside block (before answer)
+    // Find explanation marker inside block
     let explIdx = -1, topic = '';
-    for(let j = block.length - 2; j >= 0; j--){
-      const l = block[j].trim();
+    for(let j = block.length-2; j >= 0; j--){
+      const l = block[j].trim().replace(/\*\*/g,'');
       if(!l) continue;
       if(isExplLine(block[j])){ explIdx = j; break; }
       if(l.startsWith('#') && !detectAnswer(l)){
@@ -535,32 +547,30 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
       }
     }
 
-    // Build explanation — combine inline + trailing
+    // Build explanation
     let explanation = '';
     if(explIdx >= 0){
-      const markerLine = block[explIdx].trim()
-        .replace(/^(Explanation|Solution|Rationale)\s*:\s*/i,'')
-        .replace(/^#+\s*/,'').trim();
+      const markerLine = block[explIdx].trim().replace(/\*\*/g,'')
+        .replace(/^(Explanation|Solution|Rationale)\s*:\s*/i,'').trim();
       const innerLines = block.slice(explIdx+1, block.length-1)
-        .map(l=>l.trim()).filter(Boolean).join('\n');
-      const parts = [markerLine, innerLines, trailingText].filter(Boolean);
-      explanation = parts.join('\n').replace(/\n{3,}/g,'\n\n').trim();
+        .map(l=>l.replace(/\*\*/g,'').trim()).filter(Boolean).join('\n');
+      explanation = [markerLine, innerLines, trailingText].filter(Boolean)
+        .join('\n').replace(/\n{3,}/g,'\n\n').trim();
     } else if(trailingText){
       explanation = trailingText;
     }
 
-    // Content = before explanation boundary
-    const contentEnd = explIdx >= 0 ? explIdx : block.length - 1;
+    const contentEnd = explIdx >= 0 ? explIdx : block.length-1;
     const content = block.slice(0, contentEnd);
 
-    // Extract options
+    // ── Extract options ──
+    // KEY FIX: options have blank lines between them (one option per paragraph in docx)
+    // Scan ALL lines — blank lines between options are fine
     const options = {}, optIdxs = [];
     content.forEach((l, j) => {
-      const s = l.trim();
-      // A. text  /  A) text  /  (A) text
+      const s = l.trim().replace(/\*\*/g,'');
       const ltr = s.match(/^[\(\[]?([A-E])[\)\].]\s+(.+)/);
       if(ltr && !detectAnswer(s)){ options[ltr[1]] = ltr[2].trim(); optIdxs.push(j); return; }
-      // - text  (bullet, from mammoth/docx)
       if(s.match(/^-\s+\S/) && !detectAnswer(s)){
         const text = s.replace(/^-\s+/,'').trim();
         if(text && optIdxs.length < 5){
@@ -572,7 +582,7 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
 
     if(Object.keys(options).length < 2) return;
 
-    // Extract question text
+    // ── Extract question text ──
     const firstOpt = optIdxs.length ? Math.min(...optIdxs) : content.length;
     const qText = content.slice(0, firstOpt)
       .map(l => l.replace(/\*\*/g,'').replace(/^\t+/,'')
@@ -582,31 +592,50 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
 
     if(!qText || qText.length < 8) return;
 
-    // Topic fallback: short title-case line after options
+    // Extract per-question difficulty from meta line in this block
+    let qDiff = diff;
+    for(const l of content){
+      const dl = l.replace(/\*\*/g,'').toLowerCase();
+      if(dl.includes('difficulty') && dl.includes('easy'))   qDiff='Easy';
+      if(dl.includes('difficulty') && dl.includes('medium')) qDiff='Medium';
+      if(dl.includes('difficulty') && dl.includes('hard'))   qDiff='Hard';
+    }
+
+    // Extract topic from *(Type: CR — Strengthen/Weaken)* meta line
+    if(!topic){
+      for(const l of content){
+        const s = l.replace(/\*\*/g,'').replace(/[*()]/g,'').trim();
+        const typeMatch = s.match(/Type:\s*(.+)/i);
+        if(typeMatch){ topic = typeMatch[1].trim(); break; }
+      }
+    }
+
+    // Fallback topic from short title-case line after options
     if(!topic){
       for(let j = content.length-1; j >= firstOpt; j--){
-        const l = content[j].trim();
-        if(l.match(/^[A-Z][a-zA-Z\s]+$/) && l.length > 4 && l.length < 55 && !l.match(/[?.!]/)){
+        const l = content[j].trim().replace(/\*\*/g,'');
+        if(l.match(/^[A-Z][a-zA-Z\s]+$/) && l.length>4 && l.length<55 && !l.match(/[?.!]/)){
           topic = l; break;
         }
       }
     }
 
     questions.push({
-      id: 'Q_' + Date.now() + '_' + qi + '_' + Math.floor(Math.random()*9999),
-      section:     defaultSection || 'Q',
-      difficulty:  diff,
-      topic:       topic.trim(),
-      question:    qText,
+      id: 'Q_'+Date.now()+'_'+qi+'_'+Math.floor(Math.random()*9999),
+      section:    defaultSection || 'Q',
+      difficulty: qDiff,
+      topic:      topic.trim(),
+      question:   qText,
       options,
       answer,
       explanation,
-      sectional:   null
+      sectional:  null
     });
   });
 
   return questions;
 }
+
 
 // Detect which answer format a doc uses
 function detectDocFormat(text){
