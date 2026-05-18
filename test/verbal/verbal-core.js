@@ -546,6 +546,8 @@ function saveSession(){
          topic:e.q.topic, options:e.q.options, explanation:e.q.explanation}
     })),
     correct, total:es.length,
+    markedGuess: TEST.markedGuess.size,
+    markedGuessArr: [...TEST.markedGuess],
     pct: es.length ? Math.round(correct/es.length*100) : 0,
     avgTime: es.length ? Math.round(es.reduce((s,e)=>s+e.time,0)/es.length) : 0,
     elapsed: Math.floor(elapsed/60)+'m '+(elapsed%60)+'s'
