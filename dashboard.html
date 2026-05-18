@@ -595,7 +595,7 @@ function renderSessions(sessions){
       <div class="sc"><span class="acc-pill ${accCls}">${acc}%</span></div>
       <div class="sc">${s.correct||0}/${s.total||'—'}</div>
       <div class="sc dim">${s.elapsed||'—'}</div>
-      <div class="sc"><button class="btn-report" onclick="openReport(${s.id})">View</button></div>`;
+      <div class="sc"><button class="btn-report" onclick="viewScoreReport(${s.id})">View Report</button></div>`;
     body.appendChild(row);
   });
 }
@@ -643,6 +643,10 @@ function openReport(id){
   g('report-modal').classList.add('open');
 }
 function closeReport(){g('report-modal').classList.remove('open');}
+function viewScoreReport(id){
+  const u = currentUser?.id || 'guest';
+  window.location.href = 'score-report.html?id='+id+'&u='+u;
+}
 
 // ── PAYMENT ──
 function openPayModal(){g('pay-modal').classList.add('open');}
