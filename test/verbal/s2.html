@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GMAT Verbal — Sectional 02 — Sasta GMAT Prep</title>
+<title>GMAT Verbal — Sectional 01 — Sasta GMAT Prep</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-height:100vh;font-size:15px;overflow:hidden}
@@ -193,7 +193,7 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
   <div class="inst-wrap">
     <div class="inst-title" id="inst-title">Verbal Reasoning Instructions</div>
     <div class="inst-body">
-      <p>You are about to start the <strong>Verbal Reasoning</strong> section — <strong>Sectional Test 02</strong>.</p>
+      <p>You are about to start the <strong>Verbal Reasoning</strong> section — <strong>Sectional Test 01</strong>.</p>
       <p>You will have <strong>45.0 minutes</strong> to complete <strong>23 questions</strong>.</p>
       <p>There are two types of questions in the Verbal section: <strong>Critical Reasoning</strong> and <strong>Reading Comprehension</strong>.</p>
       <p>For each question, select the best of the answer choices given.</p>
@@ -443,43 +443,6 @@ let TEST = {
   isPaused:false, editEditsLeft:3, editingIdx:-1, editSelLetter:null
 };
 
-// ── Adaptive Engine ──
-const Adaptive = {
-  diff:'Medium', last2:[], used:new Set(),
-  pools:{Easy:[],Medium:[],Hard:[]},
-  init(qs){
-    const by={Easy:[],Medium:[],Hard:[]};
-    qs.forEach(q=>by[q.difficulty]&&by[q.difficulty].push(q));
-    this.pools.Easy=shuffle([...by.Easy]);
-    this.pools.Medium=shuffle([...by.Medium]);
-    this.pools.Hard=shuffle([...by.Hard]);
-    this.diff='Medium';this.last2=[];this.used=new Set();
-  },
-  update(r){
-    if(r==='skip')return;
-    this.last2.push(r);if(this.last2.length>2)this.last2.shift();
-    const l=this.last2;
-    if(l.length===2&&l.every(x=>x==='correct')){
-      if(this.diff==='Easy')this.diff='Medium';
-      else if(this.diff==='Medium')this.diff='Hard';
-    }else if(l.length===2&&l.every(x=>x==='wrong')){
-      if(this.diff==='Hard')this.diff='Medium';
-      else if(this.diff==='Medium')this.diff='Easy';
-    }
-  },
-  next(){
-    let q=this._pick(this.diff);if(q)return q;
-    const fb=this.diff==='Hard'?['Medium','Easy']:this.diff==='Easy'?['Medium','Hard']:['Hard','Easy'];
-    for(const d of fb){q=this._pick(d);if(q)return q;}
-    return null;
-  },
-  _pick(d){
-    const a=this.pools[d].filter(q=>!this.used.has(q.id));
-    if(!a.length)return null;
-    this.used.add(a[0].id);return a[0];
-  }
-};
-
 // ── Auth ──
 async function initAuth(){
   const{data:{session}}=await _sb.auth.getSession();
@@ -489,7 +452,7 @@ async function initAuth(){
   showScreen('instruction');
 }
 
-// ── Load pool ──
+// ── Load pool from Supabase ──
 async function loadPool(){
   const{data,error}=await _sb.from('questions').select('*')
     .eq('section',SECTION).eq('sectional',SECTIONAL_NUM);
@@ -503,36 +466,175 @@ async function loadPool(){
 // ── Detect question type ──
 function detectType(q){
   const t=(q.topic||'').toLowerCase();
-  const qtext=(q.question||'').toLowerCase();
-  if(t.includes('rc')||t.includes('reading')||t.includes('passage')||
-     q.passage||(qtext.includes('passage') && qtext.length>300)){
-    return Q_TYPE.RC;
-  }
+  if(t.includes('rc')||t.includes('reading')||q.passage) return Q_TYPE.RC;
   return Q_TYPE.CR;
+}
+
+// ── Queue Builder ──
+// Builds the full 23-question queue upfront:
+// - RC passages appear as a consecutive block (3-4 Qs)
+// - CR questions fill the gaps adaptively
+// - Passages are distributed evenly across the test (not all at start/end)
+//
+// Real GMAT pattern for 23 Verbal Qs:
+// Q1-6: CR block | Q7-10: RC passage 1 | Q11-16: CR block | Q17-20: RC passage 2 | Q21-23: CR block
+// (adjusted based on how many passages are in the pool)
+
+function buildQueue(pool) {
+  // Separate CR and RC questions
+  const crQs = shuffle(pool.filter(q => detectType(q) === Q_TYPE.CR));
+  const rcQs  = pool.filter(q => detectType(q) === Q_TYPE.RC);
+
+  // Group RC questions by passage
+  const passageGroups = {};
+  rcQs.forEach(q => {
+    const key = q.passage
+      ? q.passage.slice(0, 100)   // use first 100 chars as passage key
+      : (q.id || 'ungrouped');
+    if(!passageGroups[key]) passageGroups[key] = [];
+    passageGroups[key].push(q);
+  });
+
+  // Convert to array of passage blocks, shuffle passage order
+  const passages = shuffle(Object.values(passageGroups));
+
+  // If no RC questions, just return shuffled CR
+  if(!passages.length) {
+    return buildAdaptiveList(crQs, TOTAL_QS);
+  }
+
+  // Distribute passages evenly across the 23-question test
+  // E.g. with 4 passages of 4 Qs each = 16 RC, 7 CR
+  // Pattern: [CR block] [RC passage] [CR block] [RC passage] ... [CR block]
+  const numPassages = passages.length;
+  const totalRCQs   = passages.reduce((s, p) => s + p.length, 0);
+  const totalCRQs   = Math.min(crQs.length, TOTAL_QS - totalRCQs);
+  const totalQs     = Math.min(TOTAL_QS, totalCRQs + totalRCQs);
+
+  // CR slots: split into (numPassages + 1) segments between passages
+  // e.g. 4 passages → 5 CR segments
+  const crPerSegment = Math.floor(totalCRQs / (numPassages + 1));
+  const crExtra      = totalCRQs % (numPassages + 1); // extra CRs go to first segment
+
+  // Build CR pool with adaptive difficulty tracking
+  const crPool = { Easy: [], Medium: [], Hard: [] };
+  crQs.forEach(q => crPool[q.difficulty] && crPool[q.difficulty].push(q));
+  let crDiff  = 'Medium', crLast2 = [];
+  const usedIds = new Set();
+
+  function nextCR() {
+    const order = crDiff === 'Hard'   ? ['Hard','Medium','Easy']
+                : crDiff === 'Easy'   ? ['Easy','Medium','Hard']
+                : ['Medium','Hard','Easy'];
+    for(const d of order) {
+      const avail = crPool[d].filter(q => !usedIds.has(q.id));
+      if(avail.length) { usedIds.add(avail[0].id); return avail[0]; }
+    }
+    return null;
+  }
+
+  function updateDiff(result) {
+    if(result === 'skip') return;
+    crLast2.push(result);
+    if(crLast2.length > 2) crLast2.shift();
+    if(crLast2.length === 2 && crLast2.every(r => r === 'correct')) {
+      if(crDiff === 'Easy')   crDiff = 'Medium';
+      else if(crDiff === 'Medium') crDiff = 'Hard';
+    } else if(crLast2.length === 2 && crLast2.every(r => r === 'wrong')) {
+      if(crDiff === 'Hard')   crDiff = 'Medium';
+      else if(crDiff === 'Medium') crDiff = 'Easy';
+    }
+  }
+
+  // Assemble final queue
+  const queue = [];
+
+  passages.forEach((passageBlock, pi) => {
+    // CR segment before this passage
+    const segSize = crPerSegment + (pi === 0 ? crExtra : 0);
+    for(let i = 0; i < segSize && queue.length < totalQs; i++) {
+      const q = nextCR();
+      if(q) queue.push({ q, type: Q_TYPE.CR, updateDiff });
+    }
+    // RC passage block (all questions from this passage together)
+    for(const rcQ of passageBlock) {
+      if(queue.length < totalQs) queue.push({ q: rcQ, type: Q_TYPE.RC, updateDiff: ()=>{} });
+    }
+  });
+
+  // Final CR segment after all passages
+  while(queue.length < totalQs) {
+    const q = nextCR();
+    if(!q) break;
+    queue.push({ q, type: Q_TYPE.CR, updateDiff });
+  }
+
+  return queue;
+}
+
+function buildAdaptiveList(crQs, total) {
+  // Pure CR test (no RC questions in pool)
+  const pool = { Easy:[], Medium:[], Hard:[] };
+  crQs.forEach(q => pool[q.difficulty] && pool[q.difficulty].push(q));
+  const used = new Set();
+  let diff = 'Medium', last2 = [];
+  const queue = [];
+  for(let i = 0; i < total; i++) {
+    const order = diff==='Hard'?['Hard','Medium','Easy']:diff==='Easy'?['Easy','Medium','Hard']:['Medium','Hard','Easy'];
+    let picked = null;
+    for(const d of order) {
+      const a = pool[d].filter(q=>!used.has(q.id));
+      if(a.length){ used.add(a[0].id); picked=a[0]; break; }
+    }
+    if(!picked) break;
+    queue.push({ q:picked, type:Q_TYPE.CR,
+      updateDiff:(r)=>{
+        if(r==='skip') return;
+        last2.push(r); if(last2.length>2) last2.shift();
+        if(last2.length===2&&last2.every(x=>x==='correct')){ if(diff==='Easy')diff='Medium'; else if(diff==='Medium')diff='Hard'; }
+        if(last2.length===2&&last2.every(x=>x==='wrong')){ if(diff==='Hard')diff='Medium'; else if(diff==='Medium')diff='Easy'; }
+      }
+    });
+  }
+  return queue;
 }
 
 // ── Start test ──
 async function startTest(){
   showScreen('loading');
   g('loading-msg').textContent='Fetching question pool from Supabase...';
-  const pool=await loadPool();
+  const pool = await loadPool();
   if(!pool.length){
     showScreen('instruction');
     alert('No questions found for Verbal Sectional '+SECTIONAL_NUM+'. Please add questions via Admin panel.');
     return;
   }
-  TEST.pool=pool;
-  Adaptive.init(pool);
-  TEST.entries=[];TEST.idx=0;TEST.secsLeft=45*60;TEST.sel=null;
-  TEST.savedForLater=new Set();TEST.markedGuess=new Set();
-  TEST.isPaused=false;TEST.editEditsLeft=3;
+
+  // Build the ordered queue (RC passages grouped, CR adaptive)
+  const queue = buildQueue(pool);
+  if(!queue.length){ showScreen('instruction'); alert('Could not build question queue.'); return; }
+
+  console.log('✅ Queue built:', queue.length, 'questions');
+  console.log('   CR:', queue.filter(e=>e.type===Q_TYPE.CR).length,
+              '| RC:', queue.filter(e=>e.type===Q_TYPE.RC).length);
+  queue.forEach((e,i) => console.log(`  Q${i+1} [${e.type}] ${(e.q.topic||'').slice(0,30)} diff:${e.q.difficulty}`));
+
+  TEST.queue   = queue;    // full pre-built queue
+  TEST.entries = [];
+  TEST.idx     = 0;
+  TEST.secsLeft = 45*60; TEST.sel = null;
+  TEST.savedForLater = new Set(); TEST.markedGuess = new Set();
+  TEST.isPaused = false; TEST.editEditsLeft = 3;
   clearInterval(TEST.interval);
-  const first=Adaptive.next();
-  if(!first){showScreen('instruction');alert('Pool error.');return;}
-  TEST.entries.push({q:first,selected:null,result:null,time:0,edited:false,type:detectType(first)});
+
+  // Load first question from queue
+  const first = queue[0];
+  TEST.entries.push({ q:first.q, selected:null, result:null, time:0, edited:false, type:first.type });
+
   renderQuestion();
   startTimer();
 }
+
 
 // ── Render question ──
 function renderQuestion(){
@@ -667,22 +769,34 @@ function confirmYes(){closeConfirm();advance(false);}
 function closeSkip(){g('skip-dialog').classList.remove('show');}
 function confirmSkip(){closeSkip();advance(true);}
 
-function advance(skip=false){
-  const e=TEST.entries[TEST.idx];
-  e.time=Math.round((Date.now()-TEST.qStart)/1000);
-  // Save marked/saved state
-  if(g('cr-mark-guess').checked||g('rc-mark-guess').checked) TEST.markedGuess.add(TEST.idx);
+function advance(skip = false) {
+  const e = TEST.entries[TEST.idx];
+  e.time = Math.round((Date.now() - TEST.qStart) / 1000);
+
+  const mg = g('cr-mark-guess').checked || g('rc-mark-guess').checked;
+  if(mg) TEST.markedGuess.add(TEST.idx);
   else TEST.markedGuess.delete(TEST.idx);
 
-  if(skip){e.selected=null;e.result='skip';Adaptive.update('skip');}
-  else{e.selected=TEST.sel;e.result=TEST.sel===e.q.answer?'correct':'wrong';Adaptive.update(e.result);}
+  if(skip) {
+    e.selected = null; e.result = 'skip';
+    // still call updateDiff for the queue slot
+    TEST.queue[TEST.idx]?.updateDiff('skip');
+  } else {
+    e.selected = TEST.sel;
+    e.result = TEST.sel === e.q.answer ? 'correct' : 'wrong';
+    // update adaptive difficulty for next CR question
+    TEST.queue[TEST.idx]?.updateDiff(e.result);
+  }
 
   TEST.idx++;
-  if(TEST.idx>=TOTAL_QS){endTest();return;}
-  const next=Adaptive.next();
-  if(!next){endTest();return;}
-  TEST.entries.push({q:next,selected:null,result:null,time:0,edited:false,type:detectType(next)});
-  TEST.sel=null;
+  if(TEST.idx >= TEST.queue.length || TEST.idx >= TOTAL_QS) { endTest(); return; }
+
+  // Get next question from pre-built queue
+  const next = TEST.queue[TEST.idx];
+  if(!next) { endTest(); return; }
+
+  TEST.entries.push({ q: next.q, selected: null, result: null, time: 0, edited: false, type: next.type });
+  TEST.sel = null;
   renderQuestion();
 }
 
