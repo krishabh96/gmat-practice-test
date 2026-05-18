@@ -482,6 +482,71 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
   const lines = rawText.split('\n');
   let lastDiff = defaultDifficulty || 'Medium';
 
+  // ── PRE-STEP: Build a passage map ──
+  // Detect RC passage blocks like "EASY RC PASSAGE (Questions 19–22)"
+  // or [PASSAGE]...[/PASSAGE] explicit markers
+  // Maps question number → passage text
+  const passageMap = {};
+
+  // Method 1: Explicit [PASSAGE] markers
+  const passageMarkerRe = /\[PASSAGE\]([\s\S]*?)\[\/PASSAGE\]/gi;
+  let pm;
+  while((pm = passageMarkerRe.exec(rawText)) !== null){
+    // Find which question numbers follow this passage
+    const afterPassage = rawText.slice(pm.index + pm[0].length);
+    const qNums = [...afterPassage.matchAll(/Question\s+(\d+)/gi)].slice(0,6).map(m=>parseInt(m[1]));
+    qNums.forEach(n => passageMap[n] = pm[1].trim());
+  }
+
+  // Method 2: RC passage header pattern (from our docx format)
+  // Detects lines like "EASY RC PASSAGE (Questions 19–22)" or "RC PASSAGE A (Questions 23–26)"
+  const passageHeaderRe = /^.*(RC PASSAGE|READING COMPREHENSION PASSAGE).*(Questions?\s+(\d+)[–\-](\d+))/i;
+  lines.forEach((line, i) => {
+    const m = line.match(passageHeaderRe);
+    if(!m) return;
+    const fromQ = parseInt(m[3]);
+    const toQ   = parseInt(m[4]);
+    // Collect passage text: lines after header until first blank run + question heading
+    const passageLines = [];
+    let blankCount = 0;
+    for(let j = i+1; j < lines.length; j++){
+      const l = lines[j].trim();
+      // Stop at "Question N" heading
+      if(l.match(/^Question\s+\d+$/i)) break;
+      // Stop at next passage header
+      if(l.match(/RC PASSAGE|EASY RC|MEDIUM RC|HARD RC/i) && l.length < 80) break;
+      if(!l){ blankCount++; if(blankCount > 5 && passageLines.length > 10) break; }
+      else { blankCount = 0; passageLines.push(lines[j]); }
+    }
+    const passageText = passageLines
+      .filter(l => {
+        const t = l.trim();
+        if(!t) return false;
+        if(t.match(/^\*?\(?(Difficulty|Topic|Type)\s*:/i)) return false;
+        if(t.match(/^Note:/i)) return false;
+        return true;
+      })
+      .join('\n').replace(/\n{3,}/g,'\n\n').trim();
+
+    if(passageText.length > 50){
+      for(let n = fromQ; n <= toQ; n++) passageMap[n] = passageText;
+    }
+  });
+
+  // Method 3: Topic field containing "RC" → look backwards for passage text
+  // (handled after extraction below)
+
+  // Track question number from "Question N" headings
+  let currentQNum = 0;
+  const qNumAtLine = {}; // lineIdx → question number
+  lines.forEach((line, i) => {
+    const m = line.trim().match(/^Question\s+(\d+)$/i);
+    if(m){ currentQNum = parseInt(m[1]); qNumAtLine[i] = currentQNum; }
+  });
+
+  // Build reverse map: answerLineIdx → question number
+  // We'll assign this during segment processing
+
   // ── STEP 1: Find all answer line positions ──
   const segments = [];
   lines.forEach((line, i) => {
@@ -491,7 +556,17 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
     if(clean.includes('difficulty') && clean.includes('hard'))   lastDiff = 'Hard';
 
     const ans = detectAnswer(line);
-    if(ans){ segments.push({ ansIdx: i, ans, diff: lastDiff }); return; }
+    if(ans){
+      // Find which question number this answer belongs to
+      // by looking backwards for the nearest "Question N" line
+      let qNum = 0;
+      for(let j = i; j >= Math.max(0, i-50); j--){
+        const m = lines[j].trim().match(/^Question\s+(\d+)$/i);
+        if(m){ qNum = parseInt(m[1]); break; }
+      }
+      segments.push({ ansIdx: i, ans, diff: lastDiff, qNum });
+      return;
+    }
 
     // Standalone single letter only if previous lines have options
     const t = line.trim().replace(/\*\*/g,'');
@@ -526,7 +601,7 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
   });
 
   // ── STEP 3: Extract each question ──
-  segments.forEach(({ ansIdx, ans: answer, diff }, qi) => {
+  segments.forEach(({ ansIdx, ans: answer, diff, qNum }, qi) => {
     const blockStart = qi > 0 ? blockEnds[qi-1]+1 : 0;
     const block = lines.slice(blockStart, ansIdx+1);
 
@@ -620,6 +695,10 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
       }
     }
 
+    // ── Attach passage for RC questions ──
+    const passage = passageMap[qNum] || null;
+    const isRC = passage || (topic||'').toLowerCase().includes('rc');
+
     questions.push({
       id: 'Q_'+Date.now()+'_'+qi+'_'+Math.floor(Math.random()*9999),
       section:    defaultSection || 'Q',
@@ -629,6 +708,7 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
       options,
       answer,
       explanation,
+      passage,          // ← RC passage text (null for CR/Q/DI)
       sectional:  null
     });
   });
