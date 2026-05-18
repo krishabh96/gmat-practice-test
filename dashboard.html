@@ -446,9 +446,9 @@ let currentUser=null;
 let userTier='free';
 
 const SECTION_CONFIG={
-  Q:{name:'Quantitative',file:'test.html',qs:21,badge:'sec-Q'},
-  V:{name:'Verbal',file:'test-verbal.html',qs:23,badge:'sec-V'},
-  D:{name:'Data Insights',file:'test-di.html',qs:20,badge:'sec-D'}
+  Q:{name:'Quantitative',folder:'test/quant',qs:21,badge:'sec-Q'},
+  V:{name:'Verbal',folder:'test/verbal',qs:23,badge:'sec-V'},
+  D:{name:'Data Insights',folder:'test/di',qs:20,badge:'sec-D'}
 };
 
 // ── AUTH ──
@@ -562,7 +562,7 @@ function renderTestGrids(sessions){
 
 function startTest(sec,num){
   localStorage.setItem('current_test',JSON.stringify({section:sec,num}));
-  window.location.href=SECTION_CONFIG[sec].file;
+  window.location.href=SECTION_CONFIG[sec].folder+'/s'+num+'.html';
 }
 
 // ── TAB SWITCHING ──
