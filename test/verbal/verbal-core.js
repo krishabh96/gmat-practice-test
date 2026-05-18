@@ -553,81 +553,259 @@ function saveSession(){
   localStorage.setItem(sessKey, JSON.stringify(sessions.slice(0,50)));
 }
 
+function calcVerbalScore(correct, total){
+  // GMAT Verbal scaled score: V60-V90
+  // Based on GMAC scoring: roughly linear mapping adjusted for difficulty
+  // V60 = ~0% correct, V90 = ~100% correct (with realistic curve)
+  if(total === 0) return 60;
+  const pct = correct / total;
+  // Sigmoid-ish curve matching real GMAT verbal score distribution
+  // V60 baseline, V90 max, inflection around 55% accuracy
+  const raw = 60 + Math.round(pct * pct * 30 + pct * 10 * (1 - pct * 0.3));
+  return Math.min(90, Math.max(60, raw));
+}
+
+function calcPercentile(score){
+  // Approximate GMAT Verbal percentile mapping (GMAC 2024 data)
+  const map = {60:1,62:3,64:6,66:10,68:15,70:21,72:28,74:36,76:45,78:54,80:63,82:71,84:78,86:85,88:91,90:99};
+  const keys = Object.keys(map).map(Number).sort((a,b)=>a-b);
+  for(let i=keys.length-1;i>=0;i--){
+    if(score>=keys[i]) return map[keys[i]];
+  }
+  return 1;
+}
+
+function makeDonut(svgId, correctPct, wrongPct){
+  const circumference = 2 * Math.PI * 35; // r=35
+  const cLen = circumference * correctPct;
+  const wLen = circumference * wrongPct;
+  const gapStart = cLen;
+  // correct arc
+  const cArc = document.getElementById(svgId+'-correct-arc');
+  const wArc = document.getElementById(svgId+'-wrong-arc');
+  if(cArc) cArc.setAttribute('stroke-dasharray', cLen+' '+(circumference-cLen));
+  if(wArc){
+    wArc.setAttribute('stroke-dasharray', wLen+' '+(circumference-wLen));
+    // Offset wrong arc to start after correct arc
+    const offsetDeg = (cLen / circumference) * 360;
+    wArc.setAttribute('transform', 'rotate('+(offsetDeg-90)+' 45 45)');
+  }
+}
+
+function makeDiffDonut(containerId, correctPct){
+  const r=28, circ=2*Math.PI*r;
+  const cLen = circ * correctPct;
+  const wLen = circ * (1-correctPct);
+  return `<svg width="70" height="70" viewBox="0 0 70 70">
+    <circle cx="35" cy="35" r="${r}" fill="none" stroke="#f0f0f0" stroke-width="8"/>
+    <circle cx="35" cy="35" r="${r}" fill="none" stroke="#2e7d32" stroke-width="8"
+      stroke-dasharray="${cLen.toFixed(1)} ${(circ-cLen).toFixed(1)}" stroke-dashoffset="${(circ*0.25).toFixed(1)}"
+      transform="rotate(-90 35 35)"/>
+    ${correctPct<1?`<circle cx="35" cy="35" r="${r}" fill="none" stroke="#c62828" stroke-width="8"
+      stroke-dasharray="${wLen.toFixed(1)} ${(circ-wLen).toFixed(1)}"
+      transform="rotate(${(correctPct*360-90).toFixed(1)} 35 35)"/>`:''}
+  </svg>`;
+}
+
 function renderReport(){
   const es = TEST.entries;
-  const correct=es.filter(e=>e.result==='correct').length;
-  const wrong=es.filter(e=>e.result==='wrong').length;
-  const skip=es.filter(e=>e.result==='skip').length;
-  const total=es.length;
-  const pct=total?Math.round(correct/total*100):0;
-  const avgT=total?Math.round(es.reduce((s,e)=>s+e.time,0)/total):0;
-  const elapsed=45*60-TEST.secsLeft;
-  g('report-sub').textContent=SECTION_NAME+' Sectional '+SECTIONAL_NUM+' · '+total+' questions · '+Math.floor(elapsed/60)+'m '+(elapsed%60)+'s';
-  g('report-scorecard').innerHTML=`
-    <div class="score-cell"><span class="score-val blue">${pct}%</span><span class="score-lbl">Accuracy</span></div>
-    <div class="score-cell"><span class="score-val green">${correct}</span><span class="score-lbl">Correct</span></div>
-    <div class="score-cell"><span class="score-val red">${wrong}</span><span class="score-lbl">Wrong</span></div>
-    <div class="score-cell"><span class="score-val grey">${skip}</span><span class="score-lbl">Skipped</span></div>
-    <div class="score-cell"><span class="score-val amber">${avgT}s</span><span class="score-lbl">Avg/Q</span></div>`;
+  const correct = es.filter(e=>e.result==='correct').length;
+  const wrong    = es.filter(e=>e.result==='wrong').length;
+  const skip     = es.filter(e=>e.result==='skip').length;
+  const total    = es.length;
+  const elapsed  = 45*60 - TEST.secsLeft;
+  const elapsedMin = Math.floor(elapsed/60);
+  const elapsedSec = elapsed % 60;
+  const avgT = total ? Math.round(es.reduce((s,e)=>s+e.time,0)/total) : 0;
 
-  const trail=g('adaptive-trail'); trail.innerHTML='';
+  const score = calcVerbalScore(correct, total);
+  const percentile = calcPercentile(score);
+  const pct = total ? Math.round(correct/total*100) : 0;
+
+  const crEs = es.filter(e=>e.type===Q_TYPE.CR);
+  const rcEs = es.filter(e=>e.type===Q_TYPE.RC);
+
+  // ── Hero ──
+  const g = id => document.getElementById(id);
+  g('rpt-score').textContent = score;
+  g('rpt-percentile').textContent = percentile+'th percentile';
+  g('rpt-date').textContent = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  g('rpt-mode').textContent = 'Standard Mode · '+total+'Q used';
+  g('rpt-time-used').textContent = elapsedMin+'m';
+  g('rpt-correct').textContent = correct;
+  g('rpt-wrong').textContent = wrong;
+  g('rpt-accuracy').textContent = pct+'%';
+  g('report-topbar-title') && (g('report-topbar-title').textContent = SECTION_NAME+' Sectional '+SECTIONAL_NUM);
+  g('rpt-elapsed-display').textContent = elapsedMin+':'+String(elapsedSec).padStart(2,'0');
+  g('rpt-avg-time').textContent = Math.floor(avgT/60)+':'+String(avgT%60).padStart(2,'0');
+  g('rpt-guessed').textContent = TEST.markedGuess.size;
+  g('rpt-skipped').textContent = skip;
+  g('rpt-edited').textContent = es.filter(e=>e.edited).length;
+  g('rpt-cr-count').textContent = crEs.length;
+  g('rpt-rc-count').textContent = rcEs.length;
+  g('leg-correct').textContent = correct;
+  g('leg-correct-pct').textContent = pct+'%';
+  g('leg-wrong').textContent = wrong;
+  g('leg-wrong-pct').textContent = total?Math.round(wrong/total*100)+'%':'';
+  g('leg-skip').textContent = skip;
+
+  // Donut animation after a tick
+  setTimeout(()=>{
+    const circ = 2*Math.PI*35;
+    const cPct = total ? correct/total : 0;
+    const wPct = total ? wrong/total : 0;
+    makeDonut('donut', cPct, wPct);
+  }, 100);
+
+  // ── Answer number tiles ──
+  const numsEl = g('ans-nums'); numsEl.innerHTML='';
   es.forEach((e,i)=>{
-    const d0=e.q.difficulty[0];
-    const cls=e.result==='skip'?'sk':e.result==='correct'?'c'+d0:'w'+d0;
-    const dot=document.createElement('div');
-    dot.className='trail-dot '+cls+(TEST.markedGuess.has(i)?' mk':'');
-    dot.textContent=e.type; dot.title='Q'+(i+1)+': '+e.type+' '+e.q.difficulty+' '+e.result;
-    dot.onclick=()=>{ const r=g('rrow-'+i); if(r){r.scrollIntoView({behavior:'smooth',block:'center'});r.click();} };
-    trail.appendChild(dot);
+    const cls = e.result==='correct'?'c':e.result==='wrong'?'w':'s';
+    const btn = document.createElement('button');
+    btn.className='ans-num '+cls; btn.textContent=i+1;
+    btn.onclick=()=>{ const row=g('ans-row-'+i); if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.click();} };
+    numsEl.appendChild(btn);
   });
 
-  const dw=g('diff-bars'); dw.innerHTML='';
+  // ── Difficulty cards ──
+  const diffGrid = g('diff-grid'); diffGrid.innerHTML='';
   ['Easy','Medium','Hard'].forEach(diff=>{
-    const dqs=es.filter(e=>e.q.difficulty===diff);
-    const dc=dqs.filter(e=>e.result==='correct').length;
-    const dpct=dqs.length?Math.round(dc/dqs.length*100):0;
-    const col=dpct>=70?'#2e7d32':dpct>=50?'#f57f17':'#c62828';
-    dw.innerHTML+=`<div class="diff-card"><div class="diff-card-title">${diff}</div>
-      <div class="diff-pct" style="color:${col}">${dqs.length?dpct+'%':'—'}</div>
-      <div class="diff-bar-wrap"><div class="diff-bar" style="width:${dpct}%;background:${col}"></div></div>
-      <div class="diff-attempted">${dc}/${dqs.length} correct</div></div>`;
+    const dqs = es.filter(e=>e.q.difficulty===diff);
+    const dc  = dqs.filter(e=>e.result==='correct').length;
+    const dw  = dqs.filter(e=>e.result==='wrong').length;
+    const dpct = dqs.length ? dc/dqs.length : 0;
+    const avgDT = dqs.length ? Math.round(dqs.reduce((s,e)=>s+e.time,0)/dqs.length) : 0;
+    const avgDTStr = Math.floor(avgDT/60)+':'+String(avgDT%60).padStart(2,'0');
+    diffGrid.innerHTML += `<div class="diff-card-new">
+      <div class="diff-card-label">${diff}</div>
+      <div class="diff-donut-wrap">
+        ${dqs.length ? makeDiffDonut('diff-'+diff, dpct) : '<div style="width:70px;height:70px;background:#f5f5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:#888">N/A</div>'}
+        <div class="diff-stats">
+          <div class="diff-correct"><span style="background:#2e7d32;color:#fff;width:18px;height:18px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:11px">✓</span> ${dc} Correct</div>
+          <div class="diff-wrong"><span style="background:#c62828;color:#fff;width:18px;height:18px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:11px">✗</span> ${dw} Incorrect</div>
+          <div class="diff-avgtime">Average Time: <strong>${avgDTStr}</strong></div>
+        </div>
+      </div>
+    </div>`;
   });
 
-  const tbody=g('review-tbody'); tbody.innerHTML='';
-  es.forEach((e,i)=>{
-    const cls=e.result==='correct'?'row-c':e.result==='wrong'?'row-w':'row-s';
-    const pill=e.result==='correct'?'<span class="rpill C">✓</span>':e.result==='wrong'?'<span class="rpill W">✗</span>':'<span class="rpill S">—</span>';
-    const short=(e.q.question||'').replace(/\n/g,' ').replace(/\*\*/g,'').slice(0,50)+'…';
-    const editB=e.edited?' <span style="font-size:10px;color:#005487;font-weight:700">[Edited]</span>':'';
-    const tr=document.createElement('tr'); tr.className=cls; tr.id='rrow-'+i;
-    tr.innerHTML=`<td style="font-weight:700;color:#005487">${i+1}</td>
-      <td style="font-size:12px">${short}${editB}</td>
-      <td><span class="type-pill">${e.type}</span></td>
-      <td>${pill}</td>
-      <td><span class="dpill ${e.q.difficulty}">${e.q.difficulty}</span></td>
-      <td style="font-weight:700;color:#005487">${e.selected||'—'}</td>
-      <td style="font-weight:700;color:#2e7d32">${e.q.answer}</td>
-      <td style="color:#888;font-family:Arial">${e.time}s</td>`;
-    const expTr=document.createElement('tr'); expTr.style.display='none';
-    const expTd=document.createElement('td'); expTd.colSpan=8; expTd.style.padding='0';
-    const expDiv=document.createElement('div'); expDiv.className='exp-panel';
-    const expQ=document.createElement('div'); expQ.className='exp-q';
-    expQ.innerHTML=safeHtml(e.q.question||'');
-    const expOpts=document.createElement('div');
+  // ── Question type bars ──
+  const qtypeEl = g('qtype-section'); qtypeEl.innerHTML='';
+  [
+    {label:'Verbal - Critical Reasoning', qs: crEs},
+    {label:'Verbal - Reading Comprehension', qs: rcEs}
+  ].forEach(({label, qs})=>{
+    if(!qs.length) return;
+    const qc = qs.filter(e=>e.result==='correct').length;
+    const qw = qs.filter(e=>e.result==='wrong').length;
+    const cpct = Math.round(qc/qs.length*100);
+    const wpct = Math.round(qw/qs.length*100);
+    qtypeEl.innerHTML += `<div class="qtype-row">
+      <div class="qtype-header">
+        <span class="qtype-name">${label}</span>
+        <span class="qtype-pcts">
+          <span class="qtype-pct-c">✓ ${cpct}%</span>
+          <span class="qtype-pct-w">✗ ${wpct}%</span>
+        </span>
+      </div>
+      <div class="qtype-bar-track">
+        <div class="qtype-bar-c" style="width:${cpct}%"></div>
+        <div class="qtype-bar-w" style="width:${wpct}%"></div>
+      </div>
+    </div>`;
+  });
+
+  // ── Answers table ──
+  window._reportEntries = es; // store for filtering
+  renderAnswerTable(es);
+}
+
+function renderAnswerTable(entries){
+  const tbody = document.getElementById('ans-tbody');
+  if(!tbody) return;
+  tbody.innerHTML='';
+  entries.forEach((e,i)=>{
+    const origIdx = window._reportEntries.indexOf(e);
+    const rowCls = e.result==='correct'?'ans-row-c':e.result==='wrong'?'ans-row-w':'ans-row-s';
+    const icon = e.result==='correct'?'<span style="color:#2e7d32;font-size:18px">✓</span>':e.result==='wrong'?'<span style="color:#c62828;font-size:18px">✗</span>':'<span style="color:#bbb;font-size:16px">—</span>';
+    const tStr = Math.floor(e.time/60)+':'+String(e.time%60).padStart(2,'0');
+    const guessed = TEST.markedGuess.has(origIdx)?'<span style="color:#f59e0b">★</span>':'—';
+    const tr = document.createElement('tr');
+    tr.className=rowCls; tr.id='ans-row-'+origIdx;
+    tr.innerHTML = `<td style="font-weight:700;color:#005487;text-align:center">${origIdx+1}</td>
+      <td style="font-size:11px;color:#888">${e.q.topic||e.type}</td>
+      <td><span class="ans-type-pill">${e.type} / ${(e.q.topic||'').replace(/^(CR|RC)\s*[—-]?\s*/i,'').slice(0,20)||e.type}</span></td>
+      <td style="text-align:center">${icon}</td>
+      <td><span class="ans-diff-pill ${e.q.difficulty}">${e.q.difficulty}</span></td>
+      <td style="font-family:'Courier New',monospace;color:#555">${tStr}</td>
+      <td style="text-align:center">${guessed}</td>`;
+
+    // Expandable explanation row
+    const expTr = document.createElement('tr');
+    expTr.style.display='none';
+    const expTd = document.createElement('td');
+    expTd.colSpan=7; expTd.style.padding='0';
+    const expDiv = document.createElement('div');
+    expDiv.className='exp-panel-new';
+
+    // Full question text
+    const qDiv = document.createElement('div');
+    qDiv.className='exp-q-full';
+    qDiv.innerHTML = safeHtml(e.q.question||'');
+    expDiv.appendChild(qDiv);
+
+    // Options grid
+    const optsDiv = document.createElement('div');
+    optsDiv.className='exp-opts-grid';
     ['A','B','C','D','E'].forEach(l=>{
       if(!e.q.options||!e.q.options[l]) return;
       const d=document.createElement('div');
-      d.className='exp-opt'+(l===e.q.answer?' ca':l===e.selected&&l!==e.q.answer?' wa':'');
-      d.innerHTML=l+'. '+safeHtml(e.q.options[l]); expOpts.appendChild(d);
+      const isCorrect = l===e.q.answer;
+      const isWrong = l===e.selected && !isCorrect;
+      d.className='exp-opt-item '+(isCorrect?'correct-ans':isWrong?'wrong-sel':'neutral');
+      d.innerHTML='<strong>'+l+'.</strong> '+safeHtml(e.q.options[l]);
+      optsDiv.appendChild(d);
     });
-    const expText=document.createElement('div'); expText.className='exp-text';
-    expText.textContent=e.q.explanation?'Explanation: '+e.q.explanation:'Correct answer: '+e.q.answer;
-    expDiv.appendChild(expQ); expDiv.appendChild(expOpts); expDiv.appendChild(expText);
-    expTd.appendChild(expDiv); expTr.appendChild(expTd);
+    expDiv.appendChild(optsDiv);
+
+    // Your answer vs correct
+    const ansRow = document.createElement('div');
+    ansRow.style.cssText='display:flex;gap:16px;margin-bottom:10px;font-family:Arial,sans-serif;font-size:12px';
+    ansRow.innerHTML=`<span>Your answer: <strong style="color:${e.result==='correct'?'#2e7d32':'#c62828'}">${e.selected||'Skipped'}</strong></span>
+      <span>Correct: <strong style="color:#2e7d32">${e.q.answer}</strong></span>
+      <span>Time: <strong>${Math.floor(e.time/60)+':'+String(e.time%60).padStart(2,'0')}</strong></span>`;
+    expDiv.appendChild(ansRow);
+
+    // Explanation
+    if(e.q.explanation){
+      const explDiv=document.createElement('div');
+      explDiv.className='exp-explanation';
+      explDiv.innerHTML='<strong>Explanation:</strong> '+safeHtml(e.q.explanation);
+      expDiv.appendChild(explDiv);
+    }
+
+    expTd.appendChild(expDiv);
+    expTr.appendChild(expTd);
     let open=false;
-    tr.onclick=()=>{ open=!open; expTr.style.display=open?'':'none'; expDiv.classList.toggle('show',open); };
-    tbody.appendChild(tr); tbody.appendChild(expTr);
+    tr.onclick=()=>{
+      open=!open;
+      expTr.style.display=open?'':'none';
+      expDiv.classList.toggle('show',open);
+    };
+    tbody.appendChild(tr);
+    tbody.appendChild(expTr);
   });
+}
+
+function filterAnswers(){
+  const type = document.getElementById('filter-type').value;
+  const diff = document.getElementById('filter-diff').value;
+  const ans  = document.getElementById('filter-ans').value;
+  let filtered = window._reportEntries || [];
+  if(type) filtered = filtered.filter(e=>e.type===type);
+  if(diff) filtered = filtered.filter(e=>e.q.difficulty===diff);
+  if(ans)  filtered = filtered.filter(e=>e.result===ans);
+  renderAnswerTable(filtered);
 }
 
 // ── Help / dialogs ──

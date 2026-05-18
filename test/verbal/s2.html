@@ -134,11 +134,124 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 .edit-opts{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
 
 /* ── REPORT ── */
-#screen-report .report-header{background:#005487;color:#fff;padding:22px 36px;flex-shrink:0}
-.report-header-title{font-family:Arial,sans-serif;font-size:20px;font-weight:700;margin-bottom:4px}
-.report-header-sub{font-family:Arial,sans-serif;font-size:13px;color:rgba(255,255,255,.7)}
-#screen-report .report-scroll{flex:1;overflow-y:auto;padding:24px 36px}
-.report-scorecard{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#ddd;border:1px solid #ddd;border-radius:3px;overflow:hidden;margin-bottom:24px}
+/* ── REPORT SCREEN ── */
+#screen-report{background:#f0f2f5}
+#screen-report .report-topbar{background:#fff;border-bottom:1px solid #e0e0e0;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;font-family:Arial,sans-serif}
+.report-topbar-left{font-size:13px;color:#888}
+.report-topbar-left a{color:#005487;text-decoration:none;cursor:pointer}
+.report-topbar-title{font-size:15px;font-weight:700;color:#111}
+.report-topbar-right{display:flex;gap:10px}
+.rpt-btn{padding:7px 18px;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;border:none}
+.rpt-btn-outline{background:#fff;color:#005487;border:1.5px solid #005487}
+.rpt-btn-outline:hover{background:#f0f6fb}
+.rpt-btn-solid{background:#005487;color:#fff}
+.rpt-btn-solid:hover{background:#006ba3}
+#screen-report .report-scroll{flex:1;overflow-y:auto;padding:28px 32px;max-width:1100px;margin:0 auto;width:100%}
+
+/* Score hero */
+.score-hero{background:linear-gradient(135deg,#1a237e 0%,#1565c0 60%,#1976d2 100%);border-radius:12px;padding:32px 36px;color:#fff;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
+.score-hero-left{}
+.score-hero-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:8px;font-family:Arial,sans-serif}
+.score-hero-num{font-size:72px;font-weight:900;line-height:1;font-family:Arial,sans-serif;letter-spacing:-2px}
+.score-hero-denom{font-size:28px;font-weight:400;color:rgba(255,255,255,.6)}
+.score-hero-badges{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.score-badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;font-family:Arial,sans-serif}
+.score-badge.pct{background:rgba(255,255,255,.2)}
+.score-hero-right{display:flex;gap:24px;flex-wrap:wrap}
+.score-meta-box{background:rgba(255,255,255,.12);border-radius:8px;padding:14px 20px;text-align:center;min-width:90px}
+.score-meta-val{font-size:22px;font-weight:700;font-family:Arial,sans-serif;display:block;line-height:1}
+.score-meta-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.6);margin-top:4px;font-family:Arial,sans-serif}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px}
+.stat-card{background:#fff;border-radius:8px;padding:20px 24px;border:1px solid #e8e8e8}
+.stat-card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:16px;font-family:Arial,sans-serif}
+
+/* Donut chart */
+.donut-wrap{display:flex;align-items:center;gap:20px}
+.donut-svg{flex-shrink:0}
+.donut-legend{display:flex;flex-direction:column;gap:8px}
+.donut-leg-item{display:flex;align-items:center;gap:8px;font-family:Arial,sans-serif;font-size:13px}
+.donut-leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.donut-leg-count{font-weight:700;font-size:15px}
+.donut-leg-pct{color:#888;font-size:11px}
+
+/* Time stat */
+.time-display{text-align:center;padding:8px 0}
+.time-big{font-size:36px;font-weight:700;font-family:'Courier New',monospace;color:#005487;letter-spacing:2px}
+.time-sep{color:#888;font-size:18px;margin:0 4px}
+.time-total{font-size:20px;color:#ccc;font-family:'Courier New',monospace;letter-spacing:2px}
+.time-lbl{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-top:6px;font-family:Arial,sans-serif}
+
+/* Activity stats */
+.activity-list{display:flex;flex-direction:column;gap:10px}
+.activity-item{display:flex;justify-content:space-between;align-items:center;font-family:Arial,sans-serif;font-size:13px;color:#555;padding:6px 0;border-bottom:1px solid #f5f5f5}
+.activity-item:last-child{border-bottom:none}
+.activity-val{font-weight:700;color:#111;font-size:15px}
+
+/* Difficulty section */
+.section-title{font-family:Arial,sans-serif;font-size:15px;font-weight:700;color:#111;margin-bottom:14px}
+.diff-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px}
+.diff-card-new{background:#fff;border-radius:8px;padding:20px 24px;border:1px solid #e8e8e8}
+.diff-card-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:14px;font-family:Arial,sans-serif}
+.diff-donut-wrap{display:flex;align-items:center;gap:14px}
+.diff-stats{font-family:Arial,sans-serif}
+.diff-correct{font-size:14px;color:#2e7d32;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.diff-wrong{font-size:14px;color:#c62828;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.diff-avgtime{font-size:12px;color:#888;margin-top:8px}
+.diff-avgtime strong{color:#111}
+
+/* Question type bars */
+.qtype-section{background:#fff;border-radius:8px;padding:20px 24px;border:1px solid #e8e8e8;margin-bottom:24px}
+.qtype-row{margin-bottom:16px}
+.qtype-row:last-child{margin-bottom:0}
+.qtype-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-family:Arial,sans-serif}
+.qtype-name{font-size:13px;font-weight:600;color:#333}
+.qtype-pcts{font-size:12px}
+.qtype-pct-c{color:#2e7d32;font-weight:700}
+.qtype-pct-w{color:#c62828;font-weight:700;margin-left:10px}
+.qtype-bar-track{height:10px;background:#f5f5f5;border-radius:5px;overflow:hidden;display:flex}
+.qtype-bar-c{height:100%;background:#2e7d32;border-radius:5px 0 0 5px;transition:width .8s ease}
+.qtype-bar-w{height:100%;background:#c62828;border-radius:0 5px 5px 0;transition:width .8s ease}
+
+/* Answer numbers row */
+.ans-nums{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.ans-num{width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;border:none}
+.ans-num.c{background:#2e7d32;color:#fff}
+.ans-num.w{background:#c62828;color:#fff}
+.ans-num.s{background:#bbb;color:#fff}
+
+/* Answers table */
+.ans-table-section{background:#fff;border-radius:8px;border:1px solid #e8e8e8;margin-bottom:24px;overflow:hidden}
+.ans-table-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;font-family:Arial,sans-serif}
+.ans-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.ans-filter-group{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#888;font-family:Arial,sans-serif}
+.ans-filter-select{border:1px solid #ddd;border-radius:4px;padding:4px 8px;font-size:12px;font-family:Arial,sans-serif;color:#333;cursor:pointer;background:#fff}
+.ans-tbl{width:100%;border-collapse:collapse;font-family:Arial,sans-serif;font-size:13px}
+.ans-tbl th{background:#f8f8f8;padding:10px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;border-bottom:1px solid #eee;white-space:nowrap}
+.ans-tbl td{padding:12px 14px;border-bottom:1px solid #f5f5f5;vertical-align:middle}
+.ans-tbl tr:hover td{background:#fafafa;cursor:pointer}
+.ans-tbl tr.ans-row-c{border-left:3px solid #2e7d32}
+.ans-tbl tr.ans-row-w{border-left:3px solid #c62828}
+.ans-tbl tr.ans-row-s{border-left:3px solid #bbb}
+.ans-result-icon{font-size:16px}
+.ans-type-pill{background:#e8f0f8;color:#003865;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;white-space:nowrap}
+.ans-diff-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px}
+.ans-diff-pill.Easy{background:#e8f5e8;color:#2e7d32}
+.ans-diff-pill.Medium{background:#fff8e1;color:#f57f17}
+.ans-diff-pill.Hard{background:#fce8e8;color:#c62828}
+
+/* Expandable explanation panel */
+.exp-panel-new{display:none;padding:16px 20px;background:#fafafa;border-top:1px solid #eee}
+.exp-panel-new.show{display:block}
+.exp-q-full{font-size:13px;line-height:1.7;color:#222;margin-bottom:12px;font-family:'Times New Roman',Georgia,serif;white-space:pre-wrap}
+.exp-opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.exp-opt-item{font-size:12px;padding:6px 10px;border-radius:4px;font-family:Arial,sans-serif;line-height:1.5}
+.exp-opt-item.correct-ans{background:#e8f5e8;color:#2e7d32;font-weight:700;border-left:3px solid #2e7d32}
+.exp-opt-item.wrong-sel{background:#fce8e8;color:#c62828;text-decoration:line-through;border-left:3px solid #c62828}
+.exp-opt-item.neutral{background:#f5f5f5;color:#555}
+.exp-explanation{font-size:13px;line-height:1.7;color:#444;padding:12px 14px;background:#fff;border-radius:4px;border-left:3px solid #005487;font-family:Arial,sans-serif}
+.exp-explanation strong{color:#005487}
 .score-cell{background:#fff;padding:16px 12px;text-align:center}
 .score-val{font-family:Arial,sans-serif;font-size:26px;font-weight:700;display:block;line-height:1;margin-bottom:4px}
 .score-val.blue{color:#005487}.score-val.green{color:#2e7d32}.score-val.red{color:#c62828}.score-val.amber{color:#f59e0b}.score-val.grey{color:#888}
@@ -337,29 +450,163 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 
 <!-- ══ REPORT ══ -->
 <div id="screen-report" class="screen">
-  <div class="gmat-topbar">
-    <div class="gmat-topbar-left">Verbal Reasoning — Results</div>
-    <div class="gmat-topbar-right"><button class="help-btn" onclick="goBack()">✕</button></div>
-  </div>
-  <div class="report-header">
-    <div class="report-header-title">Performance Report</div>
-    <div class="report-header-sub" id="report-sub"></div>
+  <div class="report-topbar">
+    <div class="report-topbar-left">
+      <a onclick="goBack()">← Back to Tests List</a>
+      <span style="margin:0 6px;color:#ccc">/</span>
+      <span id="report-topbar-title" style="color:#111;font-weight:600">Verbal Sectional 1</span>
+    </div>
+    <div class="report-topbar-right">
+      <button class="rpt-btn rpt-btn-outline" onclick="goBack()">← Dashboard</button>
+      <button class="rpt-btn rpt-btn-solid" onclick="location.reload()">Retake Test</button>
+    </div>
   </div>
   <div class="report-scroll">
-    <div class="report-scorecard" id="report-scorecard"></div>
-    <div class="rep-sec-title">Adaptive Path</div>
-    <div class="adaptive-trail" id="adaptive-trail"></div>
-    <div class="rep-sec-title">Accuracy by Difficulty</div>
-    <div class="diff-bars" id="diff-bars"></div>
-    <div class="rep-sec-title">Question-by-Question Review</div>
-    <table class="review-table">
-      <thead><tr><th>#</th><th>Question</th><th>Type</th><th>Result</th><th>Difficulty</th><th>Your Ans</th><th>Correct</th><th>Time</th></tr></thead>
-      <tbody id="review-tbody"></tbody>
-    </table>
-    <div style="display:flex;gap:12px;padding-bottom:40px">
-      <button class="gmat-btn gmat-btn-blue" onclick="goBack()">← Back to Dashboard</button>
-      <button class="gmat-btn" onclick="location.reload()">Retake Test</button>
+    <!-- Score Hero -->
+    <div class="score-hero" id="score-hero">
+      <div class="score-hero-left">
+        <div class="score-hero-label">Your Verbal Score</div>
+        <div><span class="score-hero-num" id="rpt-score">—</span><span class="score-hero-denom"> / 90</span></div>
+        <div class="score-hero-badges">
+          <span class="score-badge pct" id="rpt-percentile">—</span>
+          <span class="score-badge" id="rpt-date">—</span>
+          <span class="score-badge" id="rpt-mode">Standard Mode</span>
+        </div>
+      </div>
+      <div class="score-hero-right">
+        <div class="score-meta-box">
+          <span class="score-meta-val" id="rpt-time-used">—</span>
+          <div class="score-meta-lbl">Time Used</div>
+        </div>
+        <div class="score-meta-box">
+          <span class="score-meta-val" id="rpt-correct">—</span>
+          <div class="score-meta-lbl">Correct</div>
+        </div>
+        <div class="score-meta-box">
+          <span class="score-meta-val" id="rpt-wrong">—</span>
+          <div class="score-meta-lbl">Incorrect</div>
+        </div>
+        <div class="score-meta-box">
+          <span class="score-meta-val" id="rpt-accuracy">—</span>
+          <div class="score-meta-lbl">Accuracy</div>
+        </div>
+      </div>
     </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <!-- Donut -->
+      <div class="stat-card">
+        <div class="stat-card-title">Overall Result</div>
+        <div class="donut-wrap">
+          <svg class="donut-svg" width="90" height="90" viewBox="0 0 90 90">
+            <circle cx="45" cy="45" r="35" fill="none" stroke="#f5f5f5" stroke-width="10"/>
+            <circle id="donut-correct-arc" cx="45" cy="45" r="35" fill="none" stroke="#2e7d32" stroke-width="10"
+              stroke-dasharray="0 220" stroke-dashoffset="55" transform="rotate(-90 45 45)" style="transition:stroke-dasharray 1s ease"/>
+            <circle id="donut-wrong-arc" cx="45" cy="45" r="35" fill="none" stroke="#c62828" stroke-width="10"
+              stroke-dasharray="0 220" stroke-dashoffset="55" transform="rotate(-90 45 45)" style="transition:stroke-dasharray 1s ease"/>
+          </svg>
+          <div class="donut-legend">
+            <div class="donut-leg-item">
+              <div class="donut-leg-dot" style="background:#2e7d32"></div>
+              <span>Correct</span>
+              <span class="donut-leg-count" id="leg-correct">—</span>
+              <span class="donut-leg-pct" id="leg-correct-pct"></span>
+            </div>
+            <div class="donut-leg-item">
+              <div class="donut-leg-dot" style="background:#c62828"></div>
+              <span>Incorrect</span>
+              <span class="donut-leg-count" id="leg-wrong">—</span>
+              <span class="donut-leg-pct" id="leg-wrong-pct"></span>
+            </div>
+            <div class="donut-leg-item">
+              <div class="donut-leg-dot" style="background:#bbb"></div>
+              <span>Skipped</span>
+              <span class="donut-leg-count" id="leg-skip">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time -->
+      <div class="stat-card">
+        <div class="stat-card-title">Test Time</div>
+        <div class="time-display">
+          <div>
+            <span class="time-big" id="rpt-elapsed-display">—</span>
+            <span class="time-sep" style="color:#ddd;font-size:24px;margin:0 8px">|</span>
+            <span class="time-total">45:00</span>
+          </div>
+          <div class="time-lbl">Used / Allotted</div>
+          <div style="margin-top:16px;font-family:Arial,sans-serif;font-size:13px;color:#888">
+            Avg time/question: <strong id="rpt-avg-time" style="color:#111">—</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity -->
+      <div class="stat-card">
+        <div class="stat-card-title">Test Activity</div>
+        <div class="activity-list">
+          <div class="activity-item"><span>Marked as Guessed</span><span class="activity-val" id="rpt-guessed">0</span></div>
+          <div class="activity-item"><span>Questions Skipped</span><span class="activity-val" id="rpt-skipped">0</span></div>
+          <div class="activity-item"><span>Answers Edited</span><span class="activity-val" id="rpt-edited">0</span></div>
+          <div class="activity-item"><span>CR Questions</span><span class="activity-val" id="rpt-cr-count">—</span></div>
+          <div class="activity-item"><span>RC Questions</span><span class="activity-val" id="rpt-rc-count">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results by Difficulty -->
+    <div class="section-title">Results by difficulty</div>
+    <div class="diff-grid" id="diff-grid"></div>
+
+    <!-- Results by Question Type -->
+    <div class="section-title">Results by question type</div>
+    <div class="qtype-section" id="qtype-section"></div>
+
+    <!-- Answers -->
+    <div class="section-title">Answers</div>
+    <div class="ans-nums" id="ans-nums"></div>
+
+    <div class="ans-table-section">
+      <div class="ans-table-header">
+        <div style="font-family:Arial,sans-serif;font-size:14px;font-weight:700;color:#111">Verbal</div>
+        <div class="ans-filters">
+          <div class="ans-filter-group">Type <select class="ans-filter-select" id="filter-type" onchange="filterAnswers()">
+            <option value="">-- All --</option>
+            <option value="CR">CR</option>
+            <option value="RC">RC</option>
+          </select></div>
+          <div class="ans-filter-group">Difficulty <select class="ans-filter-select" id="filter-diff" onchange="filterAnswers()">
+            <option value="">-- All --</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select></div>
+          <div class="ans-filter-group">Answer <select class="ans-filter-select" id="filter-ans" onchange="filterAnswers()">
+            <option value="">-- All --</option>
+            <option value="correct">Correct</option>
+            <option value="wrong">Incorrect</option>
+            <option value="skip">Skipped</option>
+          </select></div>
+        </div>
+      </div>
+      <table class="ans-tbl">
+        <thead><tr>
+          <th style="width:40px">Nº</th>
+          <th style="width:60px">ID</th>
+          <th>Type</th>
+          <th>Answer</th>
+          <th>Difficulty</th>
+          <th style="width:80px">Time</th>
+          <th style="width:60px">Guessed</th>
+        </tr></thead>
+        <tbody id="ans-tbody"></tbody>
+      </table>
+    </div>
+
+    <div style="padding-bottom:60px"></div>
   </div>
 </div>
 
