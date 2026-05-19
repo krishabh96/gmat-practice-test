@@ -453,8 +453,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <span class="rv-crumb" id="rv-crumb-type">Critical Reasoning</span>
       <span class="rv-crumb-sep">|</span>
       <span id="rv-crumb-qtype" style="color:rgba(255,255,255,.6);font-size:11px"></span>
-      <span class="rv-crumb-sep">|</span>
-      <span id="rv-crumb-qid" style="color:rgba(255,255,255,.4);font-size:11px"></span>
+
     </div>
     <div></div>
   </div>
@@ -774,7 +773,7 @@ function rvRender(){
     RV.session.section==='V'?'Verbal Reasoning':RV.session.section==='Q'?'Quantitative':'Data Insights';
   document.getElementById('rv-crumb-type').textContent = e.type==='RC'?'Reading Comprehension':'Critical Reasoning';
   document.getElementById('rv-crumb-qtype').textContent = (q.topic||'').replace(/^(CR|RC)\s*[—\-–]?\s*/i,'').slice(0,25)||'';
-  document.getElementById('rv-crumb-qid').textContent = 'Q'+(idx+1);
+
 
   // Nav dot highlight
   document.querySelectorAll('.rv-dot').forEach((d,i) => d.classList.toggle('cur', i===idx));
@@ -798,10 +797,41 @@ function rvRender(){
   const body = document.getElementById('rv-body');
   body.innerHTML = '';
 
-  // Question text
+  // Clean question text — strip passage header lines that leak in
+  function cleanQText(text){
+    if(!text) return '';
+    return text.split('\n')
+      .filter(line => {
+        const t = line.trim();
+        if(!t) return false;
+        // Remove passage header lines like "HARD RC PASSAGE (Questions 31-34)"
+        if(/^(EASY|MEDIUM|HARD)\s+(RC|CR|DI)\s+(PASSAGE|QUESTIONS?)/i.test(t)) return false;
+        if(/^(PART|SECTION)\s+(I{1,3}|II|III|\d+)/i.test(t)) return false;
+        if(/\(Questions?\s+\d+/i.test(t) && t.length < 80) return false;
+        // Remove difficulty/topic meta lines
+        if(/^\(?(Difficulty|Topic|Type)\s*[:|]/i.test(t)) return false;
+        // Remove "Question N" heading lines
+        if(/^Question\s+\d+$/i.test(t)) return false;
+        // Remove section headers
+        if(/^(PART|SECTION)\s+(I{1,3}|\d+)/i.test(t)) return false;
+        return true;
+      })
+      .join('\n').trim();
+  }
+
+  // For RC questions: show passage ABOVE the question stem
+  if(e.type === 'RC' && q.passage){
+    // Passage block
+    const passDiv = document.createElement('div');
+    passDiv.style.cssText = 'background:#f8f9fa;border-left:3px solid #1a5f8a;padding:16px 20px;margin-bottom:20px;font-size:14px;line-height:1.85;color:#222;font-family:"Times New Roman",Georgia,serif;border-radius:0 4px 4px 0;max-height:280px;overflow-y:auto';
+    passDiv.innerHTML = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#1a5f8a;margin-bottom:10px;font-family:Arial,sans-serif">Reading Passage</div>' + safeHtml(q.passage);
+    body.appendChild(passDiv);
+  }
+
+  // Question text (stem only, cleaned)
   const qDiv = document.createElement('div');
   qDiv.className = 'rv-qtext';
-  qDiv.innerHTML = safeHtml(q.question||'');
+  qDiv.innerHTML = safeHtml(cleanQText(q.question||''));
   body.appendChild(qDiv);
 
   // Options — show neutrally first, no highlighting
@@ -844,9 +874,30 @@ function rvRender(){
 
   const expBox = document.createElement('div');
   expBox.className = 'rv-exp-box';
-  expBox.innerHTML = q.explanation
-    ? safeHtml(q.explanation)
-    : '<em style="color:#9e9e9e">No explanation available for this question.</em>';
+  if(q.explanation){
+    // Clean explanation — strip any passage text that leaked in
+    const cleanExp = q.explanation.split('\n')
+      .filter(line => {
+        const t = line.trim();
+        if(!t) return false;
+        // Remove ALL section header / passage header lines
+        if(/^(EASY|MEDIUM|HARD)\s+(RC|CR|DI)\s+(PASSAGE|QUESTIONS?)/i.test(t)) return false;
+        if(/^(EASY|MEDIUM|HARD)\s+RC\s+PASSAGE/i.test(t)) return false;
+        if(/^(RC|CR)\s+PASSAGE/i.test(t)) return false;
+        if(/^PART\s+(I{1,3}|II|III|IV|\d+)/i.test(t)) return false;
+        if(/^SECTION\s+(I{1,3}|\d+)/i.test(t)) return false;
+        if(/^(CRITICAL|VERBAL|READING)\s+(REASONING|COMPREHENSION)/i.test(t)) return false;
+        if(/\(Questions?\s+\d+/i.test(t) && t.length < 80) return false;
+        if(/^\(?(Difficulty|Topic|Type)\s*[:|]/i.test(t)) return false;
+        if(/^Question\s+\d+$/i.test(t)) return false;
+        if(/^Note:/i.test(t)) return false;
+        return true;
+      })
+      .join('\n').trim();
+    expBox.innerHTML = safeHtml(cleanExp) || '<em style="color:#9e9e9e">No explanation available.</em>';
+  } else {
+    expBox.innerHTML = '<em style="color:#9e9e9e">No explanation available for this question.</em>';
+  }
   expWrap.appendChild(expBox);
   body.appendChild(expWrap);
 
