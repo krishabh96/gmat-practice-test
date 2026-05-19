@@ -895,7 +895,7 @@ function rvRender(){
 
   // For RC: split layout (passage left, question+options right)
   // For CR: full width as before
-  if(e.type === 'RC' && q.passage){
+  if(e.type === 'RC'){
     // Make the body fill remaining height
     body.style.cssText = 'flex:1;overflow:hidden;display:flex;flex-direction:column;padding:0;max-width:100%';
 
@@ -905,7 +905,7 @@ function rvRender(){
     // LEFT: passage
     const leftDiv = document.createElement('div');
     leftDiv.className = 'rv-rc-left';
-    leftDiv.innerHTML = '<div class="rv-rc-left-lbl">Reading Passage</div>' + safeHtml(q.passage);
+    leftDiv.innerHTML = '<div class="rv-rc-left-lbl">Reading Passage</div>' + (q.passage ? safeHtml(q.passage) : '<p style="color:#888;font-style:italic;font-size:13px;font-family:Arial,sans-serif;padding:16px 0">Passage not available for this question. Retake the test to save passage data.</p>');
     split.appendChild(leftDiv);
 
     // RIGHT: question + options + exp
