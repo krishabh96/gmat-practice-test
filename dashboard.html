@@ -131,8 +131,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .sec-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:var(--teal-l);color:var(--teal-d)}
 
 .sessions-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:24px}
-.sess-head{display:grid;grid-template-columns:110px 1fr 76px 76px 76px 96px;background:var(--navy);color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:10px 20px;gap:10px}
-.sess-row{display:grid;grid-template-columns:110px 1fr 76px 76px 76px 96px;padding:13px 20px;gap:10px;border-bottom:1px solid var(--border);align-items:center;transition:background .1s;cursor:default}
+.sess-head{display:grid;grid-template-columns:110px 1fr 76px 76px 76px 110px 110px;background:var(--navy);color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:10px 20px;gap:10px}
+.sess-row{display:grid;grid-template-columns:110px 1fr 76px 76px 76px 110px 110px;padding:13px 20px;gap:10px;border-bottom:1px solid var(--border);align-items:center;transition:background .1s;cursor:default}
 .sess-row:last-child{border-bottom:none}
 .sc{font-size:13px;color:var(--text)}
 .sc.dim{color:var(--muted);font-size:12px}
@@ -146,6 +146,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .acc-low{background:var(--red-bg);color:var(--red)}
 .btn-report{font-size:11px;font-weight:700;padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s}
 .btn-report:hover{background:#1e293b}
+.btn-review{font-size:11px;font-weight:700;padding:5px 12px;background:#fff;color:var(--navy);border:1.5px solid var(--navy);border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+.btn-review:hover{background:var(--navy);color:#fff}
 .empty-sess{padding:48px 24px;text-align:center;color:var(--muted)}
 .empty-sess .ei{font-size:36px;margin-bottom:12px}
 .empty-sess p{font-size:14px;line-height:1.6}
@@ -226,7 +228,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   .tests-grid{grid-template-columns:repeat(2,1fr)}
   .analytics-grid{grid-template-columns:1fr}
   .note-grid{grid-template-columns:1fr}
-  .sess-head,.sess-row{grid-template-columns:80px 1fr 60px 60px 60px 76px;padding:10px 12px;font-size:11px}
+  .sess-head,.sess-row{grid-template-columns:80px 1fr 60px 60px 60px 90px 90px;padding:10px 12px;font-size:11px}
   .topbar,.premium-banner{padding-left:16px;padding-right:16px}
   .page{padding:16px 16px 60px}
   .welcome-streak{display:none}
@@ -363,7 +365,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="sessions-wrap">
       <div class="sess-head">
         <div>Date</div><div>Test</div><div>Score</div>
-        <div>Correct</div><div>Time</div><div>Report</div>
+        <div>Correct</div><div>Time</div><div>Report</div><div>Review</div>
       </div>
       <div id="sessions-body"></div>
     </div>
@@ -397,6 +399,26 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- REVIEW MODAL -->
+<div class="review-modal-ov" id="review-modal-ov" onclick="if(event.target===this)closeReview()">
+  <div class="review-modal">
+    <div class="review-modal-top">
+      <div>
+        <div class="review-modal-title" id="review-title">Test Review</div>
+        <div class="review-modal-sub" id="review-sub"></div>
+      </div>
+      <button class="review-close" onclick="closeReview()">✕</button>
+    </div>
+    <div class="review-stats-bar">
+      <div class="review-stat"><span class="review-stat-val" id="rv-score" style="color:var(--teal)">—</span><span class="review-stat-lbl">Accuracy</span></div>
+      <div class="review-stat"><span class="review-stat-val" id="rv-correct" style="color:#15803D">—</span><span class="review-stat-lbl">Correct</span></div>
+      <div class="review-stat"><span class="review-stat-val" id="rv-wrong" style="color:#DC2626">—</span><span class="review-stat-lbl">Incorrect</span></div>
+      <div class="review-stat"><span class="review-stat-val" id="rv-skip" style="color:#9CA3AF">—</span><span class="review-stat-lbl">Skipped</span></div>
+    </div>
+    <div class="review-qs" id="review-qs"></div>
   </div>
 </div>
 
@@ -595,7 +617,8 @@ function renderSessions(sessions){
       <div class="sc"><span class="acc-pill ${accCls}">${acc}%</span></div>
       <div class="sc">${s.correct||0}/${s.total||'—'}</div>
       <div class="sc dim">${s.elapsed||'—'}</div>
-      <div class="sc"><button class="btn-report" onclick="viewScoreReport(${s.id})">View Report</button></div>`;
+      <div class="sc"><button class="btn-report" onclick="viewScoreReport(${s.id})">View Report</button></div>
+      <div class="sc"><button class="btn-review" onclick="openReview(${s.id})">Review Test</button></div>`;
     body.appendChild(row);
   });
 }
@@ -643,6 +666,136 @@ function openReport(id){
   g('report-modal').classList.add('open');
 }
 function closeReport(){g('report-modal').classList.remove('open');}
+
+// ── REVIEW TEST ──
+function openReview(id){
+  const sessions = loadSessions();
+  const s = sessions.find(x=>x.id===id);
+  if(!s){ showToast('Session not found'); return; }
+
+  const es = s.entries || [];
+  const correct = es.filter(e=>e.result==='correct').length;
+  const wrong   = es.filter(e=>e.result==='wrong').length;
+  const skip    = es.filter(e=>e.result==='skip').length;
+  const pct     = es.length ? Math.round(correct/es.length*100) : 0;
+  const secName = (SECTION_CONFIG[s.section]?.name||s.section);
+  const date    = new Date(s.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+
+  g('review-title').textContent = secName+' Sectional '+s.testNum+' — Review';
+  g('review-sub').textContent   = date+' · '+es.length+' questions · '+s.elapsed+' used';
+  g('rv-score').textContent     = pct+'%';
+  g('rv-correct').textContent   = correct;
+  g('rv-wrong').textContent     = wrong;
+  g('rv-skip').textContent      = skip;
+
+  const container = g('review-qs');
+  container.innerHTML = '';
+
+  if(!es.length){
+    container.innerHTML = '<div style="padding:32px;text-align:center;color:#888;font-size:14px">No question data available.</div>';
+    g('review-modal-ov').classList.add('open');
+    return;
+  }
+
+  es.forEach((e, i) => {
+    const q = e.q || {};
+    const result = e.result || 'skip';
+    const numCls = result==='correct'?'c':result==='wrong'?'w':'s';
+    const preview = (q.question||'Question '+(i+1)).replace(/
+/g,' ').replace(/\*\*/g,'').slice(0,80)+'…';
+    const diff    = q.difficulty || 'Medium';
+    const type    = e.type || 'CR';
+    const timeStr = e.time ? (Math.floor(e.time/60)+':'+(String(e.time%60).padStart(2,'0'))) : '—';
+
+    const card = document.createElement('div');
+    card.className = 'rq-card';
+
+    // Header row
+    const hdr = document.createElement('div');
+    hdr.className = 'rq-header';
+    hdr.innerHTML = `
+      <div class="rq-num ${numCls}">${i+1}</div>
+      <div class="rq-preview">${preview}</div>
+      <div class="rq-meta">
+        <span class="rq-type-tag">${type}</span>
+        <span class="rq-diff-tag ${diff}">${diff}</span>
+        <span class="rq-time">${timeStr}</span>
+        <button class="rq-toggle" id="rq-btn-${i}">Show Explanation</button>
+      </div>`;
+
+    // Body (hidden by default)
+    const body = document.createElement('div');
+    body.className = 'rq-body';
+    body.id = 'rq-body-'+i;
+
+    // Full question
+    const qDiv = document.createElement('div');
+    qDiv.className = 'rq-question';
+    qDiv.innerHTML = (q.question||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/
+/g,'<br>');
+    body.appendChild(qDiv);
+
+    // Options
+    const optsDiv = document.createElement('div');
+    optsDiv.className = 'rq-options';
+    ['A','B','C','D','E'].forEach(l => {
+      if(!q.options||!q.options[l]) return;
+      const isCorrect = l === q.answer;
+      const isWrong   = l === e.selected && !isCorrect;
+      const cls = isCorrect ? 'ca' : isWrong ? 'ws' : 'neutral';
+      const d = document.createElement('div');
+      d.className = 'rq-opt '+cls;
+      d.innerHTML = `<span class="rq-opt-letter">${l}.</span><span>${q.options[l]}</span>`;
+      optsDiv.appendChild(d);
+    });
+    body.appendChild(optsDiv);
+
+    // Your ans / correct ans
+    const ansLine = document.createElement('div');
+    ansLine.className = 'rq-ans-line';
+    const yourColor = result==='correct'?'#15803D':result==='wrong'?'#DC2626':'#9CA3AF';
+    ansLine.innerHTML = `
+      <span>Your answer: <strong style="color:${yourColor}">${e.selected||'Skipped'}</strong></span>
+      <span>Correct answer: <strong style="color:#15803D">${q.answer||'—'}</strong></span>
+      <span>Time spent: <strong>${timeStr}</strong></span>`;
+    body.appendChild(ansLine);
+
+    // Explanation
+    if(q.explanation){
+      const expDiv = document.createElement('div');
+      expDiv.className = 'rq-explanation';
+      expDiv.innerHTML = '<strong>Explanation: </strong>'+q.explanation.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      body.appendChild(expDiv);
+    } else {
+      const noExp = document.createElement('div');
+      noExp.style.cssText = 'font-size:12px;color:#9CA3AF;padding:8px 0;font-family:Inter,sans-serif';
+      noExp.textContent = 'No explanation available for this question.';
+      body.appendChild(noExp);
+    }
+
+    card.appendChild(hdr);
+    card.appendChild(body);
+
+    // Toggle
+    let open = false;
+    hdr.onclick = () => {
+      open = !open;
+      body.classList.toggle('open', open);
+      const btn = document.getElementById('rq-btn-'+i);
+      if(btn) btn.textContent = open ? 'Hide Explanation' : 'Show Explanation';
+    };
+
+    container.appendChild(card);
+  });
+
+  g('review-modal-ov').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeReview(){
+  g('review-modal-ov').classList.remove('open');
+  document.body.style.overflow = '';
+}
 function viewScoreReport(id){
   const u = currentUser?.id || 'guest';
   window.location.href = 'score-report.html?id='+id+'&u='+u;
