@@ -543,7 +543,8 @@ function saveSession(){
     entries:es.map(e=>({
       result:e.result, selected:e.selected, time:e.time, edited:e.edited, type:e.type,
       q:{question:e.q.question, answer:e.q.answer, difficulty:e.q.difficulty,
-         topic:e.q.topic, options:e.q.options, explanation:e.q.explanation}
+         topic:e.q.topic, options:e.q.options, explanation:e.q.explanation,
+         passage:e.q.passage||null}
     })),
     correct, total:es.length,
     markedGuess: TEST.markedGuess.size,

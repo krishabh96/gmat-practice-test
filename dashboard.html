@@ -150,7 +150,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .btn-review:hover{background:var(--navy);color:#fff}
 
 /* ── REVIEW FULL SCREEN ── */
-#rv-screen{position:fixed;inset:0;background:#fff;z-index:500;display:none;flex-direction:column;font-family:Arial,sans-serif}
+#rv-screen{position:fixed;inset:0;background:#fff;z-index:500;display:none;flex-direction:column;font-family:Arial,sans-serif;overflow:hidden}
 #rv-screen.open{display:flex}
 .rv-topbar{background:#1a5f8a;color:#fff;height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;font-size:12px}
 .rv-crumbs{display:flex;align-items:center;gap:6px}
@@ -160,7 +160,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .rv-dot{width:28px;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;border:none}
 .rv-dot.c{background:#2e7d32;color:#fff}.rv-dot.w{background:#c62828;color:#fff}.rv-dot.s{background:#9e9e9e;color:#fff}
 .rv-dot.cur{outline:3px solid #1a5f8a;outline-offset:2px}
-.rv-body{flex:1;overflow-y:auto;padding:28px 48px;max-width:1060px;margin:0 auto;width:100%}
+.rv-body{flex:1;overflow:hidden;display:flex;flex-direction:column;width:100%}
 .rv-qtext{font-size:15px;line-height:1.9;color:#111;margin-bottom:22px;font-family:'Times New Roman',Georgia,serif;white-space:pre-wrap}
 .rv-qtext strong{font-weight:700}
 .rv-opts{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
@@ -280,6 +280,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   .tabs-header{flex-wrap:wrap}
   .tab-btn{padding:10px 8px}
 }
+
+/* RC split screen in review */
+.rv-rc-split{display:flex;flex:1;overflow:hidden;height:100%}
+.rv-rc-left{width:50%;border-right:1px solid #ddd;overflow-y:auto;padding:24px 28px;font-size:14px;line-height:1.85;color:#222;font-family:'Times New Roman',Georgia,serif}
+.rv-rc-left-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#1a5f8a;margin-bottom:14px;font-family:Arial,sans-serif}
+.rv-rc-right{width:50%;overflow-y:auto;padding:24px 28px}
+.rv-rc-qtext{font-size:15px;line-height:1.85;color:#111;margin-bottom:20px;font-family:'Times New Roman',Georgia,serif}
 </style>
 </head>
 <body>
@@ -819,22 +826,7 @@ function rvRender(){
       .join('\n').trim();
   }
 
-  // For RC questions: show passage ABOVE the question stem
-  if(e.type === 'RC' && q.passage){
-    // Passage block
-    const passDiv = document.createElement('div');
-    passDiv.style.cssText = 'background:#f8f9fa;border-left:3px solid #1a5f8a;padding:16px 20px;margin-bottom:20px;font-size:14px;line-height:1.85;color:#222;font-family:"Times New Roman",Georgia,serif;border-radius:0 4px 4px 0;max-height:280px;overflow-y:auto';
-    passDiv.innerHTML = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#1a5f8a;margin-bottom:10px;font-family:Arial,sans-serif">Reading Passage</div>' + safeHtml(q.passage);
-    body.appendChild(passDiv);
-  }
-
-  // Question text (stem only, cleaned)
-  const qDiv = document.createElement('div');
-  qDiv.className = 'rv-qtext';
-  qDiv.innerHTML = safeHtml(cleanQText(q.question||''));
-  body.appendChild(qDiv);
-
-  // Options — show neutrally first, no highlighting
+  // Build options div first (used in both RC split and CR full)
   const optsDiv = document.createElement('div');
   optsDiv.className = 'rv-opts';
   optsDiv.id = 'rv-opts-'+idx;
@@ -899,7 +891,46 @@ function rvRender(){
     expBox.innerHTML = '<em style="color:#9e9e9e">No explanation available for this question.</em>';
   }
   expWrap.appendChild(expBox);
-  body.appendChild(expWrap);
+
+
+  // For RC: split layout (passage left, question+options right)
+  // For CR: full width as before
+  if(e.type === 'RC' && q.passage){
+    // Make the body fill remaining height
+    body.style.cssText = 'flex:1;overflow:hidden;display:flex;flex-direction:column;padding:0;max-width:100%';
+
+    const split = document.createElement('div');
+    split.className = 'rv-rc-split';
+
+    // LEFT: passage
+    const leftDiv = document.createElement('div');
+    leftDiv.className = 'rv-rc-left';
+    leftDiv.innerHTML = '<div class="rv-rc-left-lbl">Reading Passage</div>' + safeHtml(q.passage);
+    split.appendChild(leftDiv);
+
+    // RIGHT: question + options + exp
+    const rightDiv = document.createElement('div');
+    rightDiv.className = 'rv-rc-right';
+
+    const qDiv = document.createElement('div');
+    qDiv.className = 'rv-rc-qtext';
+    qDiv.innerHTML = safeHtml(cleanQText(q.question||''));
+    rightDiv.appendChild(qDiv);
+
+    rightDiv.appendChild(optsDiv);
+    rightDiv.appendChild(expWrap);
+    split.appendChild(rightDiv);
+    body.appendChild(split);
+  } else {
+    // CR: full width with padding
+    body.style.cssText = 'overflow-y:auto;padding:28px 48px;max-width:1060px;margin:0 auto;width:100%';
+    const qDiv = document.createElement('div');
+    qDiv.className = 'rv-qtext';
+    qDiv.innerHTML = safeHtml(cleanQText(q.question||''));
+    body.insertBefore(qDiv, optsDiv);
+    body.appendChild(optsDiv);
+    body.appendChild(expWrap);
+  }
 
   body.scrollTop = 0;
 }
