@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GMAT Quantitative — Sectional 07 — Sasta GMAT Prep</title>
+<title>GMAT Quantitative — Sectional 01 — Sasta GMAT Prep</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-height:100vh;font-size:15px;overflow:hidden}
@@ -173,7 +173,7 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 <!-- LOADING -->
 <div id="screen-loading" class="screen">
   <div class="gmat-topbar">
-    <div class="gmat-topbar-left">GMAT Quantitative — Sectional 07</div>
+    <div class="gmat-topbar-left">GMAT Quantitative — Sectional 01</div>
   </div>
   <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;font-family:Arial,sans-serif">
     <div class="load-spinner"></div>
@@ -185,7 +185,7 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 <!-- TEST -->
 <div id="screen-test" class="screen">
   <div class="gmat-topbar">
-    <div class="gmat-topbar-left">GMAT Quantitative — Sectional 07</div>
+    <div class="gmat-topbar-left">GMAT Quantitative — Sectional 01</div>
     <div class="gmat-topbar-right">
       <span style="font-size:11px;color:rgba(255,255,255,.7)">Time Remaining</span>
       <div class="gmat-timer" id="test-timer">45:00</div>
@@ -230,7 +230,7 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 <!-- EDIT -->
 <div id="screen-edit" class="screen">
   <div class="gmat-topbar">
-    <div class="gmat-topbar-left">GMAT Quantitative — Sectional 07 — Review Answers</div>
+    <div class="gmat-topbar-left">GMAT Quantitative — Sectional 01 — Review Answers</div>
     <div class="gmat-topbar-right">
       <span style="font-size:11px;color:rgba(255,255,255,.7)">Time Remaining</span>
       <div class="gmat-timer" id="edit-timer">45:00</div>
@@ -262,7 +262,7 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 <!-- REPORT -->
 <div id="screen-report" class="screen">
   <div class="gmat-topbar">
-    <div class="gmat-topbar-left">GMAT Quantitative — Sectional 07 — Results</div>
+    <div class="gmat-topbar-left">GMAT Quantitative — Sectional 01 — Results</div>
     <div class="gmat-topbar-right"><button class="help-btn" onclick="goBack()">✕</button></div>
   </div>
   <div class="report-header">
@@ -271,6 +271,7 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
   </div>
   <div class="report-scroll">
     <div class="report-scorecard" id="report-scorecard"></div>
+    <div id="report-diagnostic"></div>
     <div class="rep-section-title">Adaptive Path — Click any dot to review</div>
     <div class="adaptive-trail" id="adaptive-trail"></div>
     <div class="rep-section-title">Accuracy by Difficulty</div>
@@ -325,7 +326,7 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 <!-- HELP -->
 <div class="dialog-overlay" id="help-dialog">
   <div class="dialog-box">
-    <div class="dialog-header">Help — GMAT Quantitative — Sectional 07</div>
+    <div class="dialog-header">Help — GMAT Quantitative — Sectional 01</div>
     <div class="dialog-body" style="font-family:Arial,sans-serif;font-size:13px;line-height:1.7">
       <strong>Navigation:</strong><br>
       • Select an answer then click <strong>Next</strong> — a confirmation dialog appears<br>
@@ -352,7 +353,7 @@ const SECTIONAL_NUM = 7;
 const TOTAL_QS     = 21;
 const SECTION_NAME = 'Quantitative Reasoning';
 </script>
-<script src="../test-core.js"></script>
+<script src="./quant-core.js"></script>
 <script>initAuth();</script>
 </body>
 </html>
