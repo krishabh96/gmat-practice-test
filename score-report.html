@@ -286,6 +286,9 @@ table.atbl tr:hover td{background:#FAFAFA;cursor:pointer}
       </div>
     </div>
 
+    <!-- DIAGNOSTIC -->
+    <div id="sr-diagnostic"></div>
+
     <!-- DIFFICULTY -->
     <div class="sec-title">Results by difficulty</div>
     <div class="diff3" id="diff3"></div>
@@ -351,14 +354,71 @@ function loadSession(){
 }
 
 // ── Score calculation ──
-function calcScore(correct, total){
+function gmatIRTScore(entries, section){
+  if(!entries||!entries.length) return 60;
+  const total=entries.length;
+  const cfg={
+    V:{base:75,easyPenalty:2.2,medPenalty:1.5,hardPenalty:0.9,easyReward:0.8,medReward:1.2,hardReward:1.8,unansweredFlat:4.5,positionBias:1.6},
+    Q:{base:75,easyPenalty:3.2,medPenalty:2.2,hardPenalty:0.8,easyReward:0.9,medReward:1.4,hardReward:2.1,unansweredFlat:5.0,positionBias:2.0},
+    D:{base:74,easyPenalty:1.8,medPenalty:1.3,hardPenalty:0.7,easyReward:0.7,medReward:1.1,hardReward:1.6,unansweredFlat:4.0,positionBias:1.4},
+  };
+  const c=cfg[section]||cfg.V;
+  let ability=c.base, consecutiveWrong=0, consecutiveRight=0, unansweredCount=0;
+  entries.forEach((e,idx)=>{
+    const pos=idx+1, isEarly=pos<=7, isLate=pos>total*0.67;
+    const diff=e.q?.difficulty||'Medium', result=e.result||'skip';
+    const posMult=isEarly?c.positionBias:isLate?1.1:1.0;
+    const penaltyBase=diff==='Easy'?c.easyPenalty:diff==='Hard'?c.hardPenalty:c.medPenalty;
+    const rewardBase=diff==='Easy'?c.easyReward:diff==='Hard'?c.hardReward:c.medReward;
+    if(result==='skip'||result==='unanswered'){
+      ability-=c.unansweredFlat*posMult; unansweredCount++; consecutiveWrong++; consecutiveRight=0;
+    } else if(result==='wrong'){
+      const consec=consecutiveWrong>=2?Math.pow(1.3,consecutiveWrong-1):1.0;
+      ability-=penaltyBase*posMult*consec; consecutiveWrong++; consecutiveRight=0;
+    } else {
+      const recovery=consecutiveWrong>=3?0.7:1.0;
+      ability+=rewardBase*recovery; consecutiveRight++; consecutiveWrong=0;
+    }
+    ability=Math.max(60,Math.min(92,ability));
+  });
+  if(unansweredCount>0) ability-=unansweredCount*1.5;
+  return Math.min(90,Math.max(60,Math.round(ability)));
+}
+
+function buildDiagnosticReport(entries, section){
+  if(!entries||!entries.length) return null;
+  const total=entries.length;
+  const correct=entries.filter(e=>e.result==='correct').length;
+  const skipped=entries.filter(e=>e.result==='skip').length;
+  const earlyCorrect=entries.slice(0,7).filter(e=>e.result==='correct').length;
+  const earlyWrong=entries.slice(0,7).filter(e=>e.result!=='correct').length;
+  const easyWrong=entries.filter(e=>e.q?.difficulty==='Easy'&&e.result!=='correct').length;
+  let maxStreak=0,curStreak=0;
+  entries.forEach(e=>{if(e.result!=='correct'){curStreak++;maxStreak=Math.max(maxStreak,curStreak);}else curStreak=0;});
+  let curve='';
+  if(earlyWrong>=3) curve='Early-section struggles (Q1–7: '+earlyCorrect+'/7 correct) established a lower difficulty trajectory that constrained your scoring ceiling. ';
+  else if(earlyCorrect>=6) curve='Strong early performance (Q1–7: '+earlyCorrect+'/7) established a high difficulty trajectory. ';
+  else curve='Mixed early performance (Q1–7: '+earlyCorrect+'/7) created a moderate starting trajectory. ';
+  if(maxStreak>=3) curve+='A consecutive wrong streak of '+maxStreak+' triggered exponential IRT penalties, significantly compressing your final score.';
+  else if(easyWrong>=2) curve+='Missing '+easyWrong+' Easy question'+(easyWrong>1?'s':'')+' carries disproportionate penalties — a single Easy miss can lower your ceiling more than two Hard misses.';
+  else if(correct/total>=0.78) curve+='Consistent accuracy across difficulties ensured steady ability growth with minimal penalty compounding.';
+  else curve+='Sporadic errors across difficulty levels prevented sustained upward momentum in your ability estimate.';
+  let pacing='';
+  if(skipped>0) pacing=skipped+' unanswered question'+(skipped>1?'s':'')+' received a flat penalty worse than a wrong answer. Always guess — even a random answer is better than leaving blank.';
+  else if(maxStreak>=4&&entries.slice(-6).filter(e=>e.result!=='correct').length>=3) pacing='A late-game wrong streak (last 6 questions) suggests time pressure compounding penalties at the worst possible moment.';
+  else pacing='No unanswered questions. Section pacing was well-managed.';
+  return {curve,pacing,maxStreak,easyWrong,earlyCorrect};
+}
+
+function calcScore(correct, total, entries, section){
+  if(entries&&entries.length) return gmatIRTScore(entries, section||'V');
   if(!total) return 60;
-  const p = correct / total;
-  return Math.min(90, Math.max(60, Math.round(60 + p*p*30 + p*10*(1-p*0.3))));
+  const p=correct/total;
+  return Math.min(90,Math.max(60,Math.round(60+p*p*28+p*10*(1-p*0.25))));
 }
 function calcPct(score){
-  const map = {60:1,62:3,64:6,66:10,68:15,70:21,72:28,74:36,76:45,78:54,80:63,82:71,84:78,86:85,88:91,90:99};
-  const keys = Object.keys(map).map(Number).sort((a,b)=>a-b);
+  const map={60:1,61:2,62:3,63:5,64:7,65:9,66:11,67:14,68:17,69:20,70:24,71:28,72:32,73:36,74:41,75:46,76:51,77:56,78:60,79:65,80:69,81:73,82:77,83:80,84:83,85:86,86:89,87:91,88:93,89:96,90:99};
+  const keys=Object.keys(map).map(Number).sort((a,b)=>a-b);
   for(let i=keys.length-1;i>=0;i--) if(score>=keys[i]) return map[keys[i]];
   return 1;
 }
@@ -407,7 +467,8 @@ function render(){
   const skip    = es.filter(e=>e.result==='skip').length;
   const total   = es.length;
   const pct     = total ? Math.round(correct/total*100) : 0;
-  const score   = calcScore(correct, total);
+  const score   = calcScore(correct, total, es, s.section);
+  const diag    = buildDiagnosticReport(es, s.section);
   const percentile = calcPct(score);
   const elapsed = s.elapsed || '—';
   const avgT    = s.avgTime || 0;
@@ -445,6 +506,18 @@ function render(){
   g('a-edit').textContent = edited;
   g('a-cr').textContent = crEs.length;
   g('a-rc').textContent = rcEs.length;
+
+  // Diagnostic
+  const diagEl = document.getElementById('sr-diagnostic');
+  if(diagEl && diag){
+    diagEl.innerHTML = `
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:18px 22px;margin-bottom:20px;font-family:'Inter',sans-serif">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#6B7280;margin-bottom:8px">Performance Curve Analysis</div>
+        <div style="font-size:13px;line-height:1.7;color:#374151;margin-bottom:14px">${diag.curve}</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#6B7280;margin-bottom:6px">Pacing Indicator</div>
+        <div style="font-size:13px;line-height:1.7;color:${diag.pacing.startsWith('No unanswered')?'#15803D':'#DC2626'}">${diag.pacing}</div>
+      </div>`;
+  }
 
   // Difficulty
   const diff3 = g('diff3'); diff3.innerHTML='';

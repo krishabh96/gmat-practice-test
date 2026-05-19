@@ -395,6 +395,118 @@ function submitFinal() {
   showScreen('report');
 }
 
+// ─────────────────────────────────────────────────────────────
+// GMAT FOCUS EDITION — IRT SCORING ENGINE
+// Mimics GMAC's Item Response Theory adaptive algorithm
+// Scale: 60–90 for all three sections
+// ─────────────────────────────────────────────────────────────
+
+function gmatIRTScore(entries, section) {
+  // section: 'V' (23 Qs), 'Q' (21 Qs), 'D' (20 Qs)
+  if(!entries || !entries.length) return 60;
+
+  const total = entries.length;
+
+  // ── SECTION CONFIG ──
+  const cfg = {
+    V: { base: 75, easyPenalty: 2.2,  medPenalty: 1.5,  hardPenalty: 0.9,  easyReward: 0.8, medReward: 1.2, hardReward: 1.8, unansweredFlat: 4.5, positionBias: 1.6 },
+    Q: { base: 75, easyPenalty: 3.2,  medPenalty: 2.2,  hardPenalty: 0.8,  easyReward: 0.9, medReward: 1.4, hardReward: 2.1, unansweredFlat: 5.0, positionBias: 2.0 },
+    D: { base: 74, easyPenalty: 1.8,  medPenalty: 1.3,  hardPenalty: 0.7,  easyReward: 0.7, medReward: 1.1, hardReward: 1.6, unansweredFlat: 4.0, positionBias: 1.4 },
+  };
+  const c = cfg[section] || cfg.V;
+
+  let ability = c.base;          // current ability estimate (theta)
+  let consecutiveWrong = 0;      // track consecutive wrong for exponential drop
+  let consecutiveRight = 0;
+  let unansweredCount  = 0;
+
+  entries.forEach((e, idx) => {
+    const pos      = idx + 1;
+    const isEarly  = pos <= 7;
+    const isLate   = pos > total * 0.67;
+    const diff     = (e.q?.difficulty || 'Medium');
+    const result   = e.result || 'skip';
+
+    // Position bias multiplier — early questions matter more
+    const posMult  = isEarly ? c.positionBias : isLate ? 1.1 : 1.0;
+
+    // Difficulty weights
+    const penaltyBase = diff==='Easy' ? c.easyPenalty : diff==='Hard' ? c.hardPenalty : c.medPenalty;
+    const rewardBase  = diff==='Easy' ? c.easyReward  : diff==='Hard' ? c.hardReward  : c.medReward;
+
+    if(result === 'skip' || result === 'unanswered') {
+      // Unanswered: flat severe penalty
+      ability -= c.unansweredFlat * posMult;
+      unansweredCount++;
+      consecutiveWrong++;
+      consecutiveRight = 0;
+    } else if(result === 'wrong') {
+      // Base penalty × position × consecutive multiplier
+      const consec = consecutiveWrong >= 2
+        ? Math.pow(1.3, consecutiveWrong - 1)   // exponential for streaks
+        : 1.0;
+      ability -= penaltyBase * posMult * consec;
+      consecutiveWrong++;
+      consecutiveRight = 0;
+    } else {
+      // Correct
+      // Bonus for recovering after wrong streak
+      const recovery = consecutiveWrong >= 3 ? 0.7 : 1.0;
+      ability += rewardBase * recovery;
+      consecutiveRight++;
+      consecutiveWrong = 0;
+    }
+
+    // Cap ability drift — can't go below floor or above ceiling mid-test
+    ability = Math.max(60, Math.min(92, ability));
+  });
+
+  // Final scaling: map ability to 60–90 scale
+  // Apply end-of-test unanswered flat deduction
+  if(unansweredCount > 0){
+    ability -= unansweredCount * 1.5; // additional late deduction on top
+  }
+
+  return Math.min(90, Math.max(60, Math.round(ability)));
+}
+
+function gmatPercentile(score, section){
+  const tables={
+    Q:{60:1,61:2,62:4,63:6,64:9,65:12,66:15,67:19,68:23,69:27,70:32,71:37,72:42,73:47,74:52,75:57,76:62,77:67,78:72,79:76,80:80,81:83,82:86,83:89,84:91,85:93,86:95,87:97,88:98,89:99,90:99},
+    V:{60:1,61:2,62:3,63:5,64:7,65:9,66:11,67:14,68:17,69:20,70:24,71:28,72:32,73:36,74:41,75:46,76:51,77:56,78:60,79:65,80:69,81:73,82:77,83:80,84:83,85:86,86:89,87:91,88:93,89:96,90:99},
+    D:{60:1,61:2,62:4,63:6,64:8,65:11,66:14,67:17,68:21,69:25,70:29,71:34,72:39,73:44,74:49,75:54,76:59,77:64,78:69,79:73,80:77,81:81,82:84,83:87,84:90,85:92,86:94,87:96,88:97,89:98,90:99},
+  };
+  const map=tables[section]||tables.Q;
+  const keys=Object.keys(map).map(Number).sort((a,b)=>a-b);
+  for(let i=keys.length-1;i>=0;i--) if(score>=keys[i]) return map[keys[i]];
+  return 1;
+}
+
+function buildDiagnostic(entries, section){
+  if(!entries||!entries.length) return null;
+  const total=entries.length;
+  const correct=entries.filter(e=>e.result==='correct').length;
+  const skipped=entries.filter(e=>e.result==='skip').length;
+  const earlyCorrect=entries.slice(0,7).filter(e=>e.result==='correct').length;
+  const easyWrong=entries.filter(e=>e.q?.difficulty==='Easy'&&e.result!=='correct').length;
+  let maxStreak=0,cur=0;
+  entries.forEach(e=>{if(e.result!=='correct'){cur++;maxStreak=Math.max(maxStreak,cur);}else cur=0;});
+  let curve='';
+  if(7-earlyCorrect>=3) curve='Early struggles (Q1-7: '+earlyCorrect+'/7) constrained your difficulty trajectory. ';
+  else if(earlyCorrect>=6) curve='Strong early performance (Q1-7: '+earlyCorrect+'/7) established a high-difficulty path. ';
+  else curve='Mixed early performance (Q1-7: '+earlyCorrect+'/7) created a moderate trajectory. ';
+  if(maxStreak>=3) curve+='A consecutive wrong streak of '+maxStreak+' triggered exponential IRT penalties.';
+  else if(easyWrong>=2&&section==='Q') curve+='Missing '+easyWrong+' Easy Quant questions carries the heaviest IRT penalty — each Easy error lowers your ceiling more than multiple Hard misses.';
+  else if(easyWrong>=2) curve+='Missing '+easyWrong+' Easy questions carries disproportionate penalties in the IRT model.';
+  else if(correct/total>=0.78) curve+='Consistent accuracy ensured steady ability growth with minimal penalty compounding.';
+  else curve+='Sporadic errors prevented sustained upward momentum in your ability estimate.';
+  let pacing='';
+  if(skipped>0) pacing=skipped+' unanswered question'+(skipped>1?'s':'')+' received a flat penalty worse than a wrong answer — always guess rather than leaving blank.';
+  else if(maxStreak>=4&&entries.slice(-6).filter(e=>e.result!=='correct').length>=3) pacing='Late-game wrong streak suggests time pressure. Aim to finish 2-3 minutes early.';
+  else pacing='No unanswered questions. Section pacing was well-managed.';
+  return {curve,pacing};
+}
+
 function saveSession() {
   const es = TEST.entries;
   const correct = es.filter(e => e.result === 'correct').length;
@@ -409,12 +521,14 @@ function saveSession() {
     entries: es.map(e => ({
       result: e.result, selected: e.selected, time: e.time, edited: e.edited,
       q: { question: e.q.question, answer: e.q.answer, difficulty: e.q.difficulty,
-           topic: e.q.topic, options: e.q.options, explanation: e.q.explanation }
+           topic: e.q.topic, options: e.q.options, explanation: e.q.explanation, passage: e.q.passage||null }
     })),
     correct, total,
     pct: total ? Math.round(correct/total*100) : 0,
     avgTime: total ? Math.round(es.reduce((s,e) => s+e.time, 0)/total) : 0,
-    elapsed: em + 'm ' + esec + 's'
+    elapsed: em + 'm ' + esec + 's',
+    markedGuess: TEST.markedGuess ? TEST.markedGuess.size : 0,
+    markedGuessArr: TEST.markedGuess ? [...TEST.markedGuess] : []
   });
   localStorage.setItem(sessKey, JSON.stringify(sessions.slice(0, 50)));
 }
@@ -434,12 +548,26 @@ function renderReport() {
 
   g('report-sub').textContent = `${SECTION_NAME} Sectional ${SECTIONAL_NUM} · ${total} questions · ${em}m ${esec}s · ${edited} edited`;
 
+  const irtScore   = gmatIRTScore(es, SECTION);
+  const pctile     = gmatPercentile(irtScore, SECTION);
+  const diagnostic = buildDiagnostic(es, SECTION);
+
   g('report-scorecard').innerHTML = `
-    <div class="score-cell"><span class="score-val blue">${pct}%</span><span class="score-lbl">Accuracy</span></div>
+    <div class="score-cell"><span class="score-val blue" style="font-size:28px;font-weight:900">${irtScore}</span><span class="score-lbl">Score (60-90)</span></div>
+    <div class="score-cell"><span class="score-val" style="color:#7c3aed;font-size:20px">${pctile}th</span><span class="score-lbl">Percentile</span></div>
     <div class="score-cell"><span class="score-val green">${correct}</span><span class="score-lbl">Correct</span></div>
     <div class="score-cell"><span class="score-val red">${wrong}</span><span class="score-lbl">Wrong</span></div>
-    <div class="score-cell"><span class="score-val grey">${skip}</span><span class="score-lbl">Skipped</span></div>
     <div class="score-cell"><span class="score-val amber">${avgT}s</span><span class="score-lbl">Avg/Q</span></div>`;
+
+  const diagEl = g('report-diagnostic');
+  if(diagEl && diagnostic){
+    diagEl.innerHTML = '<div style="background:#fff;border:1px solid #ddd;border-radius:6px;padding:16px 20px;margin-bottom:20px;font-family:Arial,sans-serif">'
+      + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:8px">Performance Curve Analysis</div>'
+      + '<div style="font-size:13px;line-height:1.7;color:#333;margin-bottom:12px">' + diagnostic.curve + '</div>'
+      + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:6px">Pacing Indicator</div>'
+      + '<div style="font-size:13px;line-height:1.7;color:' + (diagnostic.pacing.startsWith('No unanswered')?'#2e7d32':'#c62828') + '">' + diagnostic.pacing + '</div>'
+      + '</div>';
+  }
 
   // Trail
   const trail = g('adaptive-trail'); trail.innerHTML = '';
