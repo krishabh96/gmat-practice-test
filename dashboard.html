@@ -703,8 +703,7 @@ function openReview(id){
     const q = e.q || {};
     const result = e.result || 'skip';
     const numCls = result==='correct'?'c':result==='wrong'?'w':'s';
-    const preview = (q.question||'Question '+(i+1)).replace(/
-/g,' ').replace(/\*\*/g,'').slice(0,80)+'…';
+    const preview = (q.question||'Question '+(i+1)).replace(/\n/g,' ').replace(/\*\*/g,'').slice(0,80)+'…';
     const diff    = q.difficulty || 'Medium';
     const type    = e.type || 'CR';
     const timeStr = e.time ? (Math.floor(e.time/60)+':'+(String(e.time%60).padStart(2,'0'))) : '—';
@@ -733,8 +732,7 @@ function openReview(id){
     // Full question
     const qDiv = document.createElement('div');
     qDiv.className = 'rq-question';
-    qDiv.innerHTML = (q.question||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/
-/g,'<br>');
+    qDiv.innerHTML = (q.question||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
     body.appendChild(qDiv);
 
     // Options
