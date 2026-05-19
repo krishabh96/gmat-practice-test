@@ -148,6 +148,48 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .btn-report:hover{background:#1e293b}
 .btn-review{font-size:11px;font-weight:700;padding:5px 12px;background:#fff;color:var(--navy);border:1.5px solid var(--navy);border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
 .btn-review:hover{background:var(--navy);color:#fff}
+
+/* ── REVIEW FULL SCREEN ── */
+#rv-screen{position:fixed;inset:0;background:#fff;z-index:500;display:none;flex-direction:column;font-family:Arial,sans-serif}
+#rv-screen.open{display:flex}
+.rv-topbar{background:#1a5f8a;color:#fff;height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;font-size:12px}
+.rv-crumbs{display:flex;align-items:center;gap:6px}
+.rv-crumb{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:3px;padding:2px 10px;font-size:11px;font-weight:600;white-space:nowrap}
+.rv-crumb-sep{color:rgba(255,255,255,.4);font-size:14px}
+.rv-nav-dots{display:flex;gap:4px;flex-wrap:wrap;padding:8px 16px;background:#f5f5f5;border-bottom:1px solid #e0e0e0;flex-shrink:0}
+.rv-dot{width:28px;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;border:none}
+.rv-dot.c{background:#2e7d32;color:#fff}.rv-dot.w{background:#c62828;color:#fff}.rv-dot.s{background:#9e9e9e;color:#fff}
+.rv-dot.cur{outline:3px solid #1a5f8a;outline-offset:2px}
+.rv-body{flex:1;overflow-y:auto;padding:28px 48px;max-width:1060px;margin:0 auto;width:100%}
+.rv-qtext{font-size:15px;line-height:1.9;color:#111;margin-bottom:22px;font-family:'Times New Roman',Georgia,serif;white-space:pre-wrap}
+.rv-qtext strong{font-weight:700}
+.rv-opts{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+.rv-opt{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;border:1.5px solid #ccc;border-radius:2px;cursor:pointer;background:#fff;transition:all .1s;font-size:14px;line-height:1.6;color:#111;font-family:Arial,sans-serif}
+.rv-opt:hover:not(.rv-opt-locked){border-color:#1a5f8a;background:#f0f6fb}
+.rv-opt-locked{cursor:default}
+.rv-opt.was-selected{border-color:#555;background:#f0f0f0}
+.rv-opt.is-correct{border-color:#2e7d32;background:#e8f5e8;color:#1b5e20;font-weight:600}
+.rv-opt.is-wrong{border-color:#c62828;background:#fce8e8;color:#b71c1c;text-decoration:line-through}
+.rv-opt.is-neutral{border-color:#e0e0e0;background:#fafafa;color:#888}
+.rv-opt-circle{width:18px;height:18px;border-radius:50%;border:2px solid #999;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.rv-opt.was-selected .rv-opt-circle{border-color:#555;background:#555}
+.rv-opt.is-correct .rv-opt-circle{border-color:#2e7d32;background:#2e7d32}
+.rv-opt.is-wrong .rv-opt-circle{border-color:#c62828;background:#c62828}
+.rv-exp-wrap{display:none;margin-top:4px;margin-bottom:20px}
+.rv-exp-wrap.show{display:block}
+.rv-exp-box{font-size:14px;line-height:1.85;color:#333;padding:16px 20px;background:#f9f9f9;border-left:4px solid #1a5f8a;border-radius:0 4px 4px 0;font-family:Arial,sans-serif}
+.rv-your-ans{font-size:12px;color:#666;margin-bottom:10px;font-family:Arial,sans-serif}
+.rv-your-ans strong{color:#111}
+.rv-bottombar{background:#1a5f8a;color:#fff;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0}
+.rv-bb-left{display:flex;align-items:center;gap:6px}
+.rv-bb-btn{background:transparent;border:none;color:rgba(255,255,255,.85);font-size:12px;cursor:pointer;padding:5px 10px;border-radius:3px;display:flex;align-items:center;gap:5px;font-family:Arial,sans-serif;transition:background .1s}
+.rv-bb-btn:hover{background:rgba(255,255,255,.12)}
+.rv-bb-btn.active{color:#fff;font-weight:700}
+.rv-close-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 18px;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:Arial,sans-serif}
+.rv-close-btn:hover{background:rgba(255,255,255,.25)}
+.rv-next-btn{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.5);color:#fff;padding:6px 20px;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:Arial,sans-serif}
+.rv-next-btn:hover{background:rgba(255,255,255,.25)}
+.rv-pos{font-size:12px;color:rgba(255,255,255,.6)}
 .empty-sess{padding:48px 24px;text-align:center;color:var(--muted)}
 .empty-sess .ei{font-size:36px;margin-bottom:12px}
 .empty-sess p{font-size:14px;line-height:1.6}
@@ -402,23 +444,43 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 </div>
 
-<!-- REVIEW MODAL -->
-<div class="review-modal-ov" id="review-modal-ov" onclick="if(event.target===this)closeReview()">
-  <div class="review-modal">
-    <div class="review-modal-top">
-      <div>
-        <div class="review-modal-title" id="review-title">Test Review</div>
-        <div class="review-modal-sub" id="review-sub"></div>
-      </div>
-      <button class="review-close" onclick="closeReview()">✕</button>
+<!-- REVIEW FULL SCREEN -->
+<div id="rv-screen">
+  <div class="rv-topbar">
+    <div class="rv-crumbs">
+      <span class="rv-crumb" id="rv-crumb-section">Verbal Reasoning</span>
+      <span class="rv-crumb-sep">|</span>
+      <span class="rv-crumb" id="rv-crumb-type">Critical Reasoning</span>
+      <span class="rv-crumb-sep">|</span>
+      <span id="rv-crumb-qtype" style="color:rgba(255,255,255,.6);font-size:11px"></span>
+      <span class="rv-crumb-sep">|</span>
+      <span id="rv-crumb-qid" style="color:rgba(255,255,255,.4);font-size:11px"></span>
     </div>
-    <div class="review-stats-bar">
-      <div class="review-stat"><span class="review-stat-val" id="rv-score" style="color:var(--teal)">—</span><span class="review-stat-lbl">Accuracy</span></div>
-      <div class="review-stat"><span class="review-stat-val" id="rv-correct" style="color:#15803D">—</span><span class="review-stat-lbl">Correct</span></div>
-      <div class="review-stat"><span class="review-stat-val" id="rv-wrong" style="color:#DC2626">—</span><span class="review-stat-lbl">Incorrect</span></div>
-      <div class="review-stat"><span class="review-stat-val" id="rv-skip" style="color:#9CA3AF">—</span><span class="review-stat-lbl">Skipped</span></div>
+    <div></div>
+  </div>
+  <div class="rv-nav-dots" id="rv-nav-dots"></div>
+  <div class="rv-body" id="rv-body"></div>
+  <div class="rv-bottombar">
+    <div class="rv-bb-left">
+      <button class="rv-bb-btn" id="rv-guess-btn" onclick="rvToggleGuess()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+        Mark as a guess
+      </button>
+      <button class="rv-bb-btn" id="rv-exp-btn" onclick="rvToggleExp()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        Show Explanation
+      </button>
     </div>
-    <div class="review-qs" id="review-qs"></div>
+    <div class="rv-pos" id="rv-pos">1 of 23</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="rv-close-btn" onclick="closeReview()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+        Close Review
+      </button>
+      <button class="rv-next-btn" id="rv-next-btn" onclick="rvNext()">
+        Next <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/></svg>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -669,133 +731,188 @@ function openReport(id){
 }
 function closeReport(){g('report-modal').classList.remove('open');}
 
-// ── REVIEW TEST ──
+// ── REVIEW TEST (full screen, GMAT-style) ──
+let RV = { entries:[], idx:0, session:null, revealed:[], expOpen:false };
+
 function openReview(id){
   const sessions = loadSessions();
   const s = sessions.find(x=>x.id===id);
   if(!s){ showToast('Session not found'); return; }
+  if(!s.entries||!s.entries.length){ showToast('No question data saved for this session'); return; }
 
-  const es = s.entries || [];
-  const correct = es.filter(e=>e.result==='correct').length;
-  const wrong   = es.filter(e=>e.result==='wrong').length;
-  const skip    = es.filter(e=>e.result==='skip').length;
-  const pct     = es.length ? Math.round(correct/es.length*100) : 0;
-  const secName = (SECTION_CONFIG[s.section]?.name||s.section);
-  const date    = new Date(s.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  RV.session  = s;
+  RV.entries  = s.entries;
+  RV.idx      = 0;
+  RV.revealed = new Array(s.entries.length).fill(false);
+  RV.expOpen  = false;
 
-  g('review-title').textContent = secName+' Sectional '+s.testNum+' — Review';
-  g('review-sub').textContent   = date+' · '+es.length+' questions · '+s.elapsed+' used';
-  g('rv-score').textContent     = pct+'%';
-  g('rv-correct').textContent   = correct;
-  g('rv-wrong').textContent     = wrong;
-  g('rv-skip').textContent      = skip;
-
-  const container = g('review-qs');
-  container.innerHTML = '';
-
-  if(!es.length){
-    container.innerHTML = '<div style="padding:32px;text-align:center;color:#888;font-size:14px">No question data available.</div>';
-    g('review-modal-ov').classList.add('open');
-    return;
-  }
-
-  es.forEach((e, i) => {
-    const q = e.q || {};
-    const result = e.result || 'skip';
-    const numCls = result==='correct'?'c':result==='wrong'?'w':'s';
-    const preview = (q.question||'Question '+(i+1)).replace(/\n/g,' ').replace(/\*\*/g,'').slice(0,80)+'…';
-    const diff    = q.difficulty || 'Medium';
-    const type    = e.type || 'CR';
-    const timeStr = e.time ? (Math.floor(e.time/60)+':'+(String(e.time%60).padStart(2,'0'))) : '—';
-
-    const card = document.createElement('div');
-    card.className = 'rq-card';
-
-    // Header row
-    const hdr = document.createElement('div');
-    hdr.className = 'rq-header';
-    hdr.innerHTML = `
-      <div class="rq-num ${numCls}">${i+1}</div>
-      <div class="rq-preview">${preview}</div>
-      <div class="rq-meta">
-        <span class="rq-type-tag">${type}</span>
-        <span class="rq-diff-tag ${diff}">${diff}</span>
-        <span class="rq-time">${timeStr}</span>
-        <button class="rq-toggle" id="rq-btn-${i}">Show Explanation</button>
-      </div>`;
-
-    // Body (hidden by default)
-    const body = document.createElement('div');
-    body.className = 'rq-body';
-    body.id = 'rq-body-'+i;
-
-    // Full question
-    const qDiv = document.createElement('div');
-    qDiv.className = 'rq-question';
-    qDiv.innerHTML = (q.question||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-    body.appendChild(qDiv);
-
-    // Options
-    const optsDiv = document.createElement('div');
-    optsDiv.className = 'rq-options';
-    ['A','B','C','D','E'].forEach(l => {
-      if(!q.options||!q.options[l]) return;
-      const isCorrect = l === q.answer;
-      const isWrong   = l === e.selected && !isCorrect;
-      const cls = isCorrect ? 'ca' : isWrong ? 'ws' : 'neutral';
-      const d = document.createElement('div');
-      d.className = 'rq-opt '+cls;
-      d.innerHTML = `<span class="rq-opt-letter">${l}.</span><span>${q.options[l]}</span>`;
-      optsDiv.appendChild(d);
-    });
-    body.appendChild(optsDiv);
-
-    // Your ans / correct ans
-    const ansLine = document.createElement('div');
-    ansLine.className = 'rq-ans-line';
-    const yourColor = result==='correct'?'#15803D':result==='wrong'?'#DC2626':'#9CA3AF';
-    ansLine.innerHTML = `
-      <span>Your answer: <strong style="color:${yourColor}">${e.selected||'Skipped'}</strong></span>
-      <span>Correct answer: <strong style="color:#15803D">${q.answer||'—'}</strong></span>
-      <span>Time spent: <strong>${timeStr}</strong></span>`;
-    body.appendChild(ansLine);
-
-    // Explanation
-    if(q.explanation){
-      const expDiv = document.createElement('div');
-      expDiv.className = 'rq-explanation';
-      expDiv.innerHTML = '<strong>Explanation: </strong>'+q.explanation.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      body.appendChild(expDiv);
-    } else {
-      const noExp = document.createElement('div');
-      noExp.style.cssText = 'font-size:12px;color:#9CA3AF;padding:8px 0;font-family:Inter,sans-serif';
-      noExp.textContent = 'No explanation available for this question.';
-      body.appendChild(noExp);
-    }
-
-    card.appendChild(hdr);
-    card.appendChild(body);
-
-    // Toggle
-    let open = false;
-    hdr.onclick = () => {
-      open = !open;
-      body.classList.toggle('open', open);
-      const btn = document.getElementById('rq-btn-'+i);
-      if(btn) btn.textContent = open ? 'Hide Explanation' : 'Show Explanation';
-    };
-
-    container.appendChild(card);
+  // Build nav dots
+  const dotsEl = document.getElementById('rv-nav-dots');
+  dotsEl.innerHTML = '';
+  s.entries.forEach((e,i) => {
+    const dot = document.createElement('button');
+    dot.className = 'rv-dot '+(e.result==='correct'?'c':e.result==='wrong'?'w':'s');
+    dot.textContent = i+1;
+    dot.id = 'rv-dot-'+i;
+    dot.onclick = () => rvGoTo(i);
+    dotsEl.appendChild(dot);
   });
 
-  g('review-modal-ov').classList.add('open');
+  document.getElementById('rv-screen').classList.add('open');
   document.body.style.overflow = 'hidden';
+  rvRender();
+}
+
+function rvRender(){
+  const e   = RV.entries[RV.idx];
+  const q   = e.q || {};
+  const idx = RV.idx;
+  const total = RV.entries.length;
+
+  // Breadcrumbs
+  document.getElementById('rv-crumb-section').textContent =
+    RV.session.section==='V'?'Verbal Reasoning':RV.session.section==='Q'?'Quantitative':'Data Insights';
+  document.getElementById('rv-crumb-type').textContent = e.type==='RC'?'Reading Comprehension':'Critical Reasoning';
+  document.getElementById('rv-crumb-qtype').textContent = (q.topic||'').replace(/^(CR|RC)\s*[—\-–]?\s*/i,'').slice(0,25)||'';
+  document.getElementById('rv-crumb-qid').textContent = 'Q'+(idx+1);
+
+  // Nav dot highlight
+  document.querySelectorAll('.rv-dot').forEach((d,i) => d.classList.toggle('cur', i===idx));
+
+  // Position
+  document.getElementById('rv-pos').textContent = (idx+1)+' of '+total;
+
+  // Next button label
+  const nextBtn = document.getElementById('rv-next-btn');
+  nextBtn.innerHTML = idx===total-1
+    ? 'Close Review <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>'
+    : 'Next <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/></svg>';
+
+  // Reset exp button
+  RV.expOpen = false;
+  const expBtn = document.getElementById('rv-exp-btn');
+  expBtn.classList.remove('active');
+  expBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> Show Explanation';
+
+  // Build body
+  const body = document.getElementById('rv-body');
+  body.innerHTML = '';
+
+  // Question text
+  const qDiv = document.createElement('div');
+  qDiv.className = 'rv-qtext';
+  qDiv.innerHTML = safeHtml(q.question||'');
+  body.appendChild(qDiv);
+
+  // Options — show neutrally first, no highlighting
+  const optsDiv = document.createElement('div');
+  optsDiv.className = 'rv-opts';
+  optsDiv.id = 'rv-opts-'+idx;
+  const revealed = RV.revealed[idx];
+
+  ['A','B','C','D','E'].forEach(l => {
+    if(!q.options||!q.options[l]) return;
+    const opt = document.createElement('div');
+    const isSelected = l === e.selected;
+    const isCorrect  = l === q.answer;
+    const isWrong    = isSelected && !isCorrect;
+
+    if(revealed){
+      opt.className = 'rv-opt rv-opt-locked '+(isCorrect?'is-correct':isWrong?'is-wrong':'is-neutral');
+      opt.innerHTML = `<div class="rv-opt-circle">${isCorrect?'✓':isWrong?'✗':''}</div><span>${safeHtml(q.options[l])}</span>`;
+    } else {
+      // Not revealed — show selected state only (no correct/wrong)
+      opt.className = 'rv-opt'+(isSelected?' was-selected':'');
+      opt.innerHTML = `<div class="rv-opt-circle"></div><span>${safeHtml(q.options[l])}</span>`;
+      opt.dataset.letter = l;
+      opt.onclick = () => rvRevealAnswers(idx, q, e);
+    }
+    optsDiv.appendChild(opt);
+  });
+  body.appendChild(optsDiv);
+
+  // Explanation panel (hidden until Show Explanation clicked)
+  const expWrap = document.createElement('div');
+  expWrap.className = 'rv-exp-wrap';
+  expWrap.id = 'rv-exp-'+idx;
+
+  const yourColor = e.result==='correct'?'#2e7d32':e.result==='wrong'?'#c62828':'#9e9e9e';
+  const ansLine = document.createElement('div');
+  ansLine.className = 'rv-your-ans';
+  ansLine.innerHTML = `Your answer: <strong style="color:${yourColor}">${e.selected||'Skipped'}</strong> &nbsp;·&nbsp; Correct answer: <strong style="color:#2e7d32">${q.answer||'—'}</strong> &nbsp;·&nbsp; Time: <strong>${e.time?Math.floor(e.time/60)+':'+String(e.time%60).padStart(2,'0'):'—'}</strong>`;
+  expWrap.appendChild(ansLine);
+
+  const expBox = document.createElement('div');
+  expBox.className = 'rv-exp-box';
+  expBox.innerHTML = q.explanation
+    ? safeHtml(q.explanation)
+    : '<em style="color:#9e9e9e">No explanation available for this question.</em>';
+  expWrap.appendChild(expBox);
+  body.appendChild(expWrap);
+
+  body.scrollTop = 0;
+}
+
+function rvRevealAnswers(idx, q, e){
+  RV.revealed[idx] = true;
+  const optsDiv = document.getElementById('rv-opts-'+idx);
+  if(!optsDiv) return;
+  optsDiv.querySelectorAll('.rv-opt').forEach(opt => {
+    const l = opt.dataset.letter;
+    if(!l) return;
+    const isCorrect = l === q.answer;
+    const isWrong   = l === e.selected && !isCorrect;
+    opt.className = 'rv-opt rv-opt-locked '+(isCorrect?'is-correct':isWrong?'is-wrong':'is-neutral');
+    opt.onclick = null;
+    const circle = opt.querySelector('.rv-opt-circle');
+    if(circle) circle.textContent = isCorrect?'✓':isWrong?'✗':'';
+  });
+}
+
+function rvToggleExp(){
+  RV.expOpen = !RV.expOpen;
+  const panel = document.getElementById('rv-exp-'+RV.idx);
+  if(panel) panel.classList.toggle('show', RV.expOpen);
+  const btn = document.getElementById('rv-exp-btn');
+  btn.classList.toggle('active', RV.expOpen);
+  btn.innerHTML = RV.expOpen
+    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> Hide Explanation'
+    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> Show Explanation';
+}
+
+function rvToggleGuess(){
+  // Visual only in review mode
+  const btn = document.getElementById('rv-guess-btn');
+  btn.classList.toggle('active');
+}
+
+function rvGoTo(i){
+  RV.idx = i;
+  RV.expOpen = false;
+  rvRender();
+}
+
+function rvNext(){
+  if(RV.idx >= RV.entries.length-1){ closeReview(); return; }
+  RV.idx++;
+  RV.expOpen = false;
+  rvRender();
 }
 
 function closeReview(){
-  g('review-modal-ov').classList.remove('open');
+  document.getElementById('rv-screen').classList.remove('open');
   document.body.style.overflow = '';
 }
+
+function safeHtml(text){
+  if(!text) return '';
+  return String(text)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\n/g,'<br>');
+}
+
+
 function viewScoreReport(id){
   const u = currentUser?.id || 'guest';
   window.location.href = 'score-report.html?id='+id+'&u='+u;
