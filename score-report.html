@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Score Report — Sasta GMAT Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0F172A;--teal:#14B8A6;--green:#22C55E;--red:#EF4444;--amber:#F59E0B;--border:#E5E7EB;--bg:#F1F5F9;--white:#fff;--text:#111827;--muted:#6B7280}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* TOPBAR */
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 32px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.topbar-left a{color:var(--navy);text-decoration:none;font-weight:500;cursor:pointer}
+.topbar-left a:hover{text-decoration:underline}
+.topbar-sep{color:#ddd;font-size:16px}
+.topbar-title{font-size:14px;font-weight:700;color:var(--navy)}
+.topbar-right{display:flex;gap:8px}
+.btn{padding:7px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;border:none;transition:all .15s}
+.btn-outline{background:var(--white);color:var(--navy);border:1.5px solid var(--navy)}
+.btn-outline:hover{background:#f8f8f8}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy:hover{background:#1e293b}
+
+/* LAYOUT */
+.page{max-width:1060px;margin:0 auto;padding:28px 24px 80px}
+
+/* SCORE HERO */
+.hero{background:linear-gradient(135deg,#0d1b4b 0%,#1565C0 55%,#1976D2 100%);border-radius:16px;padding:36px 40px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;margin-bottom:24px;box-shadow:0 8px 32px rgba(21,101,192,.3)}
+.hero-left .hero-label{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px}
+.hero-score{display:flex;align-items:baseline;gap:6px;line-height:1}
+.hero-score-num{font-size:80px;font-weight:900;letter-spacing:-3px}
+.hero-score-denom{font-size:30px;font-weight:400;color:rgba(255,255,255,.4)}
+.hero-badges{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600}
+.badge.pct-badge{background:rgba(255,255,255,.22)}
+.hero-right{display:flex;gap:16px;flex-wrap:wrap}
+.hero-meta{background:rgba(255,255,255,.12);border-radius:10px;padding:14px 20px;text-align:center;min-width:85px;border:1px solid rgba(255,255,255,.1)}
+.hero-meta-val{font-size:24px;font-weight:800;display:block;line-height:1}
+.hero-meta-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.55);margin-top:5px;display:block}
+
+/* SECTION TITLE */
+.sec-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:14px;margin-top:28px}
+
+/* 3-COL STATS */
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:0}
+@media(max-width:700px){.stats3{grid-template-columns:1fr}}
+.stat-card{background:var(--white);border-radius:12px;padding:22px 24px;border:1px solid var(--border)}
+.stat-card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:18px}
+
+/* DONUT */
+.donut-wrap{display:flex;align-items:center;gap:18px}
+.donut-legend{display:flex;flex-direction:column;gap:10px}
+.leg-item{display:flex;align-items:center;gap:8px;font-size:13px}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.leg-count{font-size:16px;font-weight:800;color:var(--navy)}
+.leg-pct{font-size:11px;color:var(--muted);margin-left:2px}
+
+/* TIME */
+.time-center{text-align:center}
+.time-big{font-size:38px;font-weight:800;font-family:'Inter',monospace;color:var(--navy);letter-spacing:1px}
+.time-slash{color:var(--border);margin:0 8px;font-size:28px;font-weight:300}
+.time-total{font-size:22px;font-weight:400;color:#ccc}
+.time-sub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:6px}
+.avg-line{margin-top:18px;font-size:13px;color:var(--muted)}
+.avg-line strong{color:var(--navy)}
+
+/* ACTIVITY */
+.activity{display:flex;flex-direction:column;gap:0}
+.act-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f5f5f5;font-size:13px;color:#444}
+.act-item:last-child{border-bottom:none}
+.act-val{font-size:16px;font-weight:800;color:var(--navy)}
+
+/* DIFFICULTY CARDS */
+.diff3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:700px){.diff3{grid-template-columns:1fr}}
+.diff-card{background:var(--white);border-radius:12px;padding:22px 24px;border:1px solid var(--border)}
+.diff-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:16px}
+.diff-donut-row{display:flex;align-items:center;gap:14px}
+.diff-stat-c{font-size:13px;color:#15803D;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.diff-stat-w{font-size:13px;color:#DC2626;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.diff-icon{width:18px;height:18px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.diff-avgtime{font-size:11px;color:var(--muted);margin-top:10px}
+.diff-avgtime strong{color:var(--navy)}
+
+/* QTYPE SECTION */
+.qtype-card{background:var(--white);border-radius:12px;padding:22px 24px;border:1px solid var(--border);margin-bottom:24px}
+.qtype-row{margin-bottom:18px}
+.qtype-row:last-child{margin-bottom:0}
+.qtype-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.qtype-name{font-size:13px;font-weight:600;color:#333}
+.qtype-pcts{font-size:12px;font-weight:700}
+.qtype-c{color:#15803D}
+.qtype-w{color:#DC2626;margin-left:12px}
+.bar-track{height:10px;background:#F3F4F6;border-radius:5px;overflow:hidden;display:flex}
+.bar-c{height:100%;background:#15803D;transition:width .8s ease}
+.bar-w{height:100%;background:#DC2626;transition:width .8s ease}
+
+/* ANS NUMBER TILES */
+.ans-tiles{display:flex;flex-wrap:wrap;gap:6px;background:var(--white);border-radius:12px;padding:20px 24px;border:1px solid var(--border);margin-bottom:24px}
+.ans-tile{width:34px;height:34px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:transform .1s}
+.ans-tile:hover{transform:scale(1.1)}
+.ans-tile.c{background:#15803D;color:#fff}
+.ans-tile.w{background:#DC2626;color:#fff}
+.ans-tile.s{background:#9CA3AF;color:#fff}
+
+/* ANSWERS TABLE */
+.tbl-card{background:var(--white);border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:24px}
+.tbl-hdr{padding:18px 24px;border-bottom:1px solid #f5f5f5}
+.tbl-hdr-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px}
+.filters{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.filter-grp{display:flex;align-items:center;gap:6px}
+.filter-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.filter-sel{border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--text);cursor:pointer;background:var(--white);font-family:'Inter',sans-serif}
+table.atbl{width:100%;border-collapse:collapse;font-size:13px}
+table.atbl th{padding:10px 16px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);background:#FAFAFA;border-bottom:1px solid var(--border)}
+table.atbl td{padding:13px 16px;border-bottom:1px solid #F9FAFB;vertical-align:middle}
+table.atbl tr.ar-c{border-left:3px solid #15803D}
+table.atbl tr.ar-w{border-left:3px solid #DC2626}
+table.atbl tr.ar-s{border-left:3px solid #9CA3AF}
+table.atbl tr:hover td{background:#FAFAFA;cursor:pointer}
+.type-pill{background:#EFF6FF;color:#1D4ED8;font-size:10px;font-weight:700;padding:3px 9px;border-radius:4px;white-space:nowrap}
+.dpill{font-size:10px;font-weight:700;padding:3px 9px;border-radius:4px}
+.dpill.Easy{background:#F0FDF4;color:#15803D}
+.dpill.Medium{background:#FFFBEB;color:#B45309}
+.dpill.Hard{background:#FEF2F2;color:#B91C1C}
+.r-icon{font-size:18px;line-height:1}
+
+/* EXPAND PANEL */
+.exp-row td{padding:0!important}
+.exp-panel{display:none;padding:20px 24px;background:#FAFAFA;border-top:1px solid #F3F4F6}
+.exp-panel.open{display:block}
+.exp-q{font-size:14px;line-height:1.8;color:#222;margin-bottom:16px;font-family:'Times New Roman',Georgia,serif;white-space:pre-wrap}
+.exp-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+@media(max-width:600px){.exp-opts{grid-template-columns:1fr}}
+.exp-opt{font-size:12px;padding:8px 12px;border-radius:6px;line-height:1.5;font-family:'Inter',sans-serif}
+.exp-opt.ca{background:#F0FDF4;color:#15803D;font-weight:700;border-left:3px solid #15803D}
+.exp-opt.ws{background:#FEF2F2;color:#B91C1C;text-decoration:line-through;border-left:3px solid #DC2626}
+.exp-opt.neu{background:#F9FAFB;color:#555}
+.ans-meta{display:flex;gap:20px;margin-bottom:12px;font-size:12px;color:var(--muted);font-family:'Inter',sans-serif}
+.ans-meta strong{color:var(--navy)}
+.explanation{font-size:13px;line-height:1.75;color:#374151;padding:14px 16px;background:var(--white);border-radius:8px;border-left:4px solid var(--navy);font-family:'Inter',sans-serif}
+.explanation strong{color:var(--navy)}
+
+/* NO DATA */
+.no-data{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
+
+/* LOADING */
+#loader{position:fixed;inset:0;background:var(--white);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:999}
+.spin{width:36px;height:36px;border:4px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div id="loader"><div class="spin"></div><span style="font-size:13px;color:var(--muted)">Loading report...</span></div>
+
+<div id="app" style="display:none">
+  <div class="topbar">
+    <div class="topbar-left">
+      <a onclick="goBack()">← Back to Tests List</a>
+      <span class="topbar-sep">/</span>
+      <span id="topbar-title" style="color:var(--navy);font-weight:600">—</span>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-outline" onclick="goBack()">Dashboard</button>
+      <button class="btn btn-navy" onclick="window.print()">⎙ Print</button>
+    </div>
+  </div>
+
+  <div class="page">
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-left">
+        <div class="hero-label">Your Verbal Score</div>
+        <div class="hero-score">
+          <span class="hero-score-num" id="h-score">—</span>
+          <span class="hero-score-denom"> / 90</span>
+        </div>
+        <div class="hero-badges">
+          <span class="badge pct-badge" id="h-pct">—</span>
+          <span class="badge" id="h-date">—</span>
+          <span class="badge" id="h-meta">—</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-meta"><span class="hero-meta-val" id="h-time">—</span><span class="hero-meta-lbl">Time Used</span></div>
+        <div class="hero-meta"><span class="hero-meta-val" id="h-correct">—</span><span class="hero-meta-lbl">Correct</span></div>
+        <div class="hero-meta"><span class="hero-meta-val" id="h-wrong">—</span><span class="hero-meta-lbl">Incorrect</span></div>
+        <div class="hero-meta"><span class="hero-meta-val" id="h-acc">—</span><span class="hero-meta-lbl">Accuracy</span></div>
+      </div>
+    </div>
+
+    <!-- STATS ROW -->
+    <div class="stats3">
+      <!-- Donut -->
+      <div class="stat-card">
+        <div class="stat-card-title">Overall Result</div>
+        <div class="donut-wrap">
+          <svg id="donut-svg" width="96" height="96" viewBox="0 0 96 96" style="flex-shrink:0">
+            <circle cx="48" cy="48" r="38" fill="none" stroke="#F3F4F6" stroke-width="11"/>
+            <circle id="arc-c" cx="48" cy="48" r="38" fill="none" stroke="#15803D" stroke-width="11"
+              stroke-dasharray="0 239" transform="rotate(-90 48 48)" style="transition:stroke-dasharray 1s ease;stroke-linecap:round"/>
+            <circle id="arc-w" cx="48" cy="48" r="38" fill="none" stroke="#DC2626" stroke-width="11"
+              stroke-dasharray="0 239" transform="rotate(-90 48 48)" style="transition:stroke-dasharray 1s ease;stroke-linecap:round"/>
+          </svg>
+          <div class="donut-legend">
+            <div class="leg-item"><span class="leg-dot" style="background:#15803D"></span><span>Correct</span><span class="leg-count" id="leg-c">—</span><span class="leg-pct" id="leg-cp"></span></div>
+            <div class="leg-item"><span class="leg-dot" style="background:#DC2626"></span><span>Incorrect</span><span class="leg-count" id="leg-w">—</span><span class="leg-pct" id="leg-wp"></span></div>
+            <div class="leg-item"><span class="leg-dot" style="background:#9CA3AF"></span><span>Skipped</span><span class="leg-count" id="leg-s">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time -->
+      <div class="stat-card">
+        <div class="stat-card-title">Test Time</div>
+        <div class="time-center">
+          <div><span class="time-big" id="t-elapsed">—</span><span class="time-slash">|</span><span class="time-total">45:00</span></div>
+          <div class="time-sub">Used / Allotted</div>
+          <div class="avg-line">Avg time/question: <strong id="t-avg">—</strong></div>
+        </div>
+      </div>
+
+      <!-- Activity -->
+      <div class="stat-card">
+        <div class="stat-card-title">Test Activity</div>
+        <div class="activity">
+          <div class="act-item"><span>Marked as Guessed</span><span class="act-val" id="a-guess">0</span></div>
+          <div class="act-item"><span>Skipped</span><span class="act-val" id="a-skip">0</span></div>
+          <div class="act-item"><span>Answers Edited</span><span class="act-val" id="a-edit">0</span></div>
+          <div class="act-item"><span>CR Questions</span><span class="act-val" id="a-cr">—</span></div>
+          <div class="act-item"><span>RC Questions</span><span class="act-val" id="a-rc">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIFFICULTY -->
+    <div class="sec-title">Results by difficulty</div>
+    <div class="diff3" id="diff3"></div>
+
+    <!-- QTYPE -->
+    <div class="sec-title">Results by question type</div>
+    <div class="qtype-card" id="qtype-card"></div>
+
+    <!-- ANS TILES -->
+    <div class="sec-title">Answers</div>
+    <div class="ans-tiles" id="ans-tiles"></div>
+
+    <!-- TABLE -->
+    <div class="tbl-card">
+      <div class="tbl-hdr">
+        <div class="tbl-hdr-title">Verbal</div>
+        <div class="filters">
+          <div class="filter-grp"><span class="filter-lbl">Type</span>
+            <select class="filter-sel" id="f-type" onchange="applyFilters()">
+              <option value="">-- All --</option><option>CR</option><option>RC</option>
+            </select></div>
+          <div class="filter-grp"><span class="filter-lbl">Difficulty</span>
+            <select class="filter-sel" id="f-diff" onchange="applyFilters()">
+              <option value="">-- All --</option><option>Easy</option><option>Medium</option><option>Hard</option>
+            </select></div>
+          <div class="filter-grp"><span class="filter-lbl">Answer</span>
+            <select class="filter-sel" id="f-ans" onchange="applyFilters()">
+              <option value="">-- All --</option><option value="correct">Correct ✓</option><option value="wrong">Incorrect ✗</option><option value="skip">Skipped</option>
+            </select></div>
+        </div>
+      </div>
+      <table class="atbl">
+        <thead><tr>
+          <th style="width:40px">Nº</th>
+          <th>Type</th>
+          <th>Answer</th>
+          <th>Difficulty</th>
+          <th style="width:70px">Time</th>
+          <th style="width:60px">Guessed</th>
+        </tr></thead>
+        <tbody id="ans-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const g = id => document.getElementById(id);
+let SESSION = null;
+let MARKED_GUESS = new Set();
+
+// ── Load session from URL param or localStorage ──
+function loadSession(){
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const userId = params.get('u') || 'guest';
+  const key = 'gmat_sessions_' + userId;
+  const sessions = JSON.parse(localStorage.getItem(key) || '[]');
+  if(id){
+    return sessions.find(s => String(s.id) === String(id)) || null;
+  }
+  return sessions[0] || null; // most recent
+}
+
+// ── Score calculation ──
+function calcScore(correct, total){
+  if(!total) return 60;
+  const p = correct / total;
+  return Math.min(90, Math.max(60, Math.round(60 + p*p*30 + p*10*(1-p*0.3))));
+}
+function calcPct(score){
+  const map = {60:1,62:3,64:6,66:10,68:15,70:21,72:28,74:36,76:45,78:54,80:63,82:71,84:78,86:85,88:91,90:99};
+  const keys = Object.keys(map).map(Number).sort((a,b)=>a-b);
+  for(let i=keys.length-1;i>=0;i--) if(score>=keys[i]) return map[keys[i]];
+  return 1;
+}
+
+// ── Donut ──
+function animateDonut(cPct, wPct){
+  const circ = 2 * Math.PI * 38;
+  const cLen = circ * cPct;
+  const wLen = circ * wPct;
+  setTimeout(()=>{
+    g('arc-c').setAttribute('stroke-dasharray', cLen.toFixed(1)+' '+(circ-cLen).toFixed(1));
+    const cDeg = (cPct * 360) - 90;
+    g('arc-w').setAttribute('stroke-dasharray', wLen.toFixed(1)+' '+(circ-wLen).toFixed(1));
+    g('arc-w').setAttribute('transform', 'rotate('+cDeg.toFixed(1)+' 48 48)');
+  }, 100);
+}
+
+function makeMiniDonut(cPct, w=68, h=68, r=26, sw=8){
+  const circ = 2*Math.PI*r;
+  const cLen = circ*cPct;
+  const wLen = circ*(1-cPct);
+  const cx=w/2, cy=h/2;
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#F3F4F6" stroke-width="${sw}"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#15803D" stroke-width="${sw}"
+      stroke-dasharray="${cLen.toFixed(1)} ${(circ-cLen).toFixed(1)}"
+      transform="rotate(-90 ${cx} ${cy})" stroke-linecap="round"/>
+    ${cPct<1?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#DC2626" stroke-width="${sw}"
+      stroke-dasharray="${wLen.toFixed(1)} ${(circ-wLen).toFixed(1)}"
+      transform="rotate(${(cPct*360-90).toFixed(1)} ${cx} ${cy})" stroke-linecap="round"/>`:''}
+  </svg>`;
+}
+
+function fmtTime(secs){
+  return Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0');
+}
+
+// ── Main render ──
+function render(){
+  const s = SESSION;
+  if(!s){ g('loader').innerHTML='<div class="no-data">Session not found. <a href="dashboard.html">Back to dashboard</a></div>'; return; }
+
+  const es = s.entries || [];
+  const correct = es.filter(e=>e.result==='correct').length;
+  const wrong   = es.filter(e=>e.result==='wrong').length;
+  const skip    = es.filter(e=>e.result==='skip').length;
+  const total   = es.length;
+  const pct     = total ? Math.round(correct/total*100) : 0;
+  const score   = calcScore(correct, total);
+  const percentile = calcPct(score);
+  const elapsed = s.elapsed || '—';
+  const avgT    = s.avgTime || 0;
+  const crEs    = es.filter(e=>e.type==='CR');
+  const rcEs    = es.filter(e=>e.type==='RC');
+  const edited  = es.filter(e=>e.edited).length;
+
+  // Topbar
+  const sectionName = s.section==='V'?'Verbal':s.section==='Q'?'Quantitative':'Data Insights';
+  g('topbar-title').textContent = sectionName+' Sectional '+s.testNum;
+
+  // Hero
+  g('h-score').textContent = score;
+  g('h-pct').textContent = percentile+'th percentile';
+  g('h-date').textContent = new Date(s.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  g('h-meta').textContent = elapsed+' used · '+total+'Q';
+  g('h-time').textContent = elapsed;
+  g('h-correct').textContent = correct;
+  g('h-wrong').textContent = wrong;
+  g('h-acc').textContent = pct+'%';
+
+  // Donut
+  animateDonut(total?correct/total:0, total?wrong/total:0);
+  g('leg-c').textContent = correct; g('leg-cp').textContent = pct+'%';
+  g('leg-w').textContent = wrong;   g('leg-wp').textContent = total?Math.round(wrong/total*100)+'%':'';
+  g('leg-s').textContent = skip;
+
+  // Time
+  g('t-elapsed').textContent = elapsed;
+  g('t-avg').textContent = fmtTime(avgT);
+
+  // Activity
+  g('a-guess').textContent = s.markedGuess || 0;
+  g('a-skip').textContent = skip;
+  g('a-edit').textContent = edited;
+  g('a-cr').textContent = crEs.length;
+  g('a-rc').textContent = rcEs.length;
+
+  // Difficulty
+  const diff3 = g('diff3'); diff3.innerHTML='';
+  ['Easy','Medium','Hard'].forEach(diff=>{
+    const dqs = es.filter(e=>e.q?.difficulty===diff);
+    const dc = dqs.filter(e=>e.result==='correct').length;
+    const dw = dqs.filter(e=>e.result==='wrong').length;
+    const dpct = dqs.length ? dc/dqs.length : 0;
+    const avgDT = dqs.length ? Math.round(dqs.reduce((s,e)=>s+(e.time||0),0)/dqs.length) : 0;
+    diff3.innerHTML += `<div class="diff-card">
+      <div class="diff-label">${diff}</div>
+      <div class="diff-donut-row">
+        ${dqs.length ? makeMiniDonut(dpct) : '<div style="width:68px;height:68px;background:#F9FAFB;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:#9CA3AF">N/A</div>'}
+        <div>
+          <div class="diff-stat-c"><span class="diff-icon" style="background:#15803D">✓</span>${dc} Correct</div>
+          <div class="diff-stat-w"><span class="diff-icon" style="background:#DC2626">✗</span>${dw} Incorrect</div>
+          <div class="diff-avgtime">Avg Time: <strong>${fmtTime(avgDT)}</strong></div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  // Q-type bars
+  const qt = g('qtype-card'); qt.innerHTML='';
+  [{label:'Verbal - Critical Reasoning', qs:crEs},{label:'Verbal - Reading Comprehension', qs:rcEs}].forEach(({label,qs})=>{
+    if(!qs.length) return;
+    const qc=qs.filter(e=>e.result==='correct').length;
+    const qw=qs.filter(e=>e.result==='wrong').length;
+    const cp=Math.round(qc/qs.length*100), wp=Math.round(qw/qs.length*100);
+    qt.innerHTML+=`<div class="qtype-row">
+      <div class="qtype-hdr"><span class="qtype-name">${label}</span>
+        <span class="qtype-pcts"><span class="qtype-c">✓ ${cp}%</span><span class="qtype-w">✗ ${wp}%</span></span></div>
+      <div class="bar-track"><div class="bar-c" style="width:${cp}%"></div><div class="bar-w" style="width:${wp}%"></div></div>
+    </div>`;
+  });
+
+  // Tiles
+  const tiles = g('ans-tiles'); tiles.innerHTML='';
+  es.forEach((e,i)=>{
+    const btn=document.createElement('button');
+    btn.className='ans-tile '+(e.result==='correct'?'c':e.result==='wrong'?'w':'s');
+    btn.textContent=i+1;
+    btn.onclick=()=>{ const row=g('ar-'+i); if(row){row.scrollIntoView({behavior:'smooth',block:'center'}); if(!row._open) row.click();} };
+    tiles.appendChild(btn);
+  });
+
+  // Table
+  window._entries = es;
+  renderTable(es);
+
+  // Show
+  g('loader').style.display='none';
+  g('app').style.display='block';
+}
+
+function renderTable(entries){
+  const tbody = g('ans-tbody'); tbody.innerHTML='';
+  entries.forEach(e=>{
+    const i = window._entries.indexOf(e);
+    const icon = e.result==='correct'?'<span class="r-icon" style="color:#15803D">✓</span>':e.result==='wrong'?'<span class="r-icon" style="color:#DC2626">✗</span>':'<span class="r-icon" style="color:#9CA3AF">—</span>';
+    const guessed = (SESSION.markedGuessArr||[]).includes(i) ? '★' : '—';
+    const tr=document.createElement('tr');
+    tr.className='ar-'+(e.result==='correct'?'c':e.result==='wrong'?'w':'s');
+    tr.id='ar-'+i;
+    const typeTopic = (e.q?.topic||e.type||'').replace(/^(CR|RC)\s*[—\-–]?\s*/i,'').slice(0,22);
+    tr.innerHTML=`<td style="font-weight:700;color:var(--navy);text-align:center">${i+1}</td>
+      <td><span class="type-pill">${e.type} / ${typeTopic||e.type}</span></td>
+      <td style="text-align:center">${icon}</td>
+      <td><span class="dpill ${e.q?.difficulty||'Medium'}">${e.q?.difficulty||'Medium'}</span></td>
+      <td style="font-family:monospace;color:var(--muted)">${fmtTime(e.time||0)}</td>
+      <td style="text-align:center;color:var(--amber)">${guessed}</td>`;
+
+    // Exp row
+    const expTr=document.createElement('tr'); expTr.className='exp-row';
+    const expTd=document.createElement('td'); expTd.colSpan=6; expTd.style.padding='0';
+    const expDiv=document.createElement('div'); expDiv.className='exp-panel';
+
+    // Question text
+    const qd=document.createElement('div'); qd.className='exp-q';
+    qd.innerHTML=(e.q?.question||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    expDiv.appendChild(qd);
+
+    // Options
+    const od=document.createElement('div'); od.className='exp-opts';
+    ['A','B','C','D','E'].forEach(l=>{
+      if(!e.q?.options?.[l]) return;
+      const d=document.createElement('div');
+      const isCa=l===e.q.answer, isWs=l===e.selected&&!isCa;
+      d.className='exp-opt '+(isCa?'ca':isWs?'ws':'neu');
+      d.innerHTML='<strong>'+l+'.</strong> '+e.q.options[l];
+      od.appendChild(d);
+    });
+    expDiv.appendChild(od);
+
+    // Meta
+    const md=document.createElement('div'); md.className='ans-meta';
+    md.innerHTML=`<span>Your answer: <strong style="color:${e.result==='correct'?'#15803D':'#DC2626'}">${e.selected||'Skipped'}</strong></span>
+      <span>Correct: <strong style="color:#15803D">${e.q?.answer||'—'}</strong></span>
+      <span>Time: <strong>${fmtTime(e.time||0)}</strong></span>`;
+    expDiv.appendChild(md);
+
+    // Explanation
+    if(e.q?.explanation){
+      const exd=document.createElement('div'); exd.className='explanation';
+      exd.innerHTML='<strong>Explanation: </strong>'+e.q.explanation;
+      expDiv.appendChild(exd);
+    }
+
+    expTd.appendChild(expDiv); expTr.appendChild(expTd);
+    let open=false;
+    tr._open=false;
+    tr.onclick=()=>{
+      open=!open; tr._open=open;
+      expTr.style.display=open?'':'none';
+      expDiv.classList.toggle('open',open);
+    };
+    tbody.appendChild(tr); tbody.appendChild(expTr);
+  });
+}
+
+function applyFilters(){
+  const type=g('f-type').value, diff=g('f-diff').value, ans=g('f-ans').value;
+  let f=window._entries||[];
+  if(type) f=f.filter(e=>e.type===type);
+  if(diff) f=f.filter(e=>e.q?.difficulty===diff);
+  if(ans)  f=f.filter(e=>e.result===ans);
+  renderTable(f);
+}
+
+function goBack(){ window.location.href='dashboard.html'; }
+
+// ── Init ──
+SESSION = loadSession();
+render();
+</script>
+</body>
+</html>

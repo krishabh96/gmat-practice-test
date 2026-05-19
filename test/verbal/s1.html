@@ -53,9 +53,9 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 
 /* ── CR LAYOUT (single panel) ── */
 .cr-body{flex:1;overflow-y:auto;padding:32px 48px;max-width:1100px;margin:0 auto;width:100%}
-.cr-passage{font-size:15px;line-height:1.9;color:#111;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid #ddd}
+.cr-passage{font-size:15px;line-height:1.9;color:#111;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid #ddd}
 .cr-passage b,.cr-passage strong{font-weight:700}
-.cr-question{font-size:15px;line-height:1.7;color:#111;margin-bottom:20px}
+.cr-question{font-size:15px;line-height:1.7;color:#111;margin-bottom:20px;font-style:italic}
 .cr-options{display:flex;flex-direction:column;gap:10px}
 .cr-option{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;border:1.5px solid #ccc;border-radius:2px;cursor:pointer;background:#fff;transition:all .1s}
 .cr-option:hover{border-color:#005487;background:#f0f6fb}
@@ -134,11 +134,124 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 .edit-opts{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
 
 /* ── REPORT ── */
-#screen-report .report-header{background:#005487;color:#fff;padding:22px 36px;flex-shrink:0}
-.report-header-title{font-family:Arial,sans-serif;font-size:20px;font-weight:700;margin-bottom:4px}
-.report-header-sub{font-family:Arial,sans-serif;font-size:13px;color:rgba(255,255,255,.7)}
-#screen-report .report-scroll{flex:1;overflow-y:auto;padding:24px 36px}
-.report-scorecard{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#ddd;border:1px solid #ddd;border-radius:3px;overflow:hidden;margin-bottom:24px}
+/* ── REPORT SCREEN ── */
+#screen-report{background:#f0f2f5}
+#screen-report .report-topbar{background:#fff;border-bottom:1px solid #e0e0e0;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;font-family:Arial,sans-serif}
+.report-topbar-left{font-size:13px;color:#888}
+.report-topbar-left a{color:#005487;text-decoration:none;cursor:pointer}
+.report-topbar-title{font-size:15px;font-weight:700;color:#111}
+.report-topbar-right{display:flex;gap:10px}
+.rpt-btn{padding:7px 18px;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;border:none}
+.rpt-btn-outline{background:#fff;color:#005487;border:1.5px solid #005487}
+.rpt-btn-outline:hover{background:#f0f6fb}
+.rpt-btn-solid{background:#005487;color:#fff}
+.rpt-btn-solid:hover{background:#006ba3}
+#screen-report .report-scroll{flex:1;overflow-y:auto;padding:28px 32px;max-width:1100px;margin:0 auto;width:100%}
+
+/* Score hero */
+.score-hero{background:linear-gradient(135deg,#1a237e 0%,#1565c0 60%,#1976d2 100%);border-radius:12px;padding:32px 36px;color:#fff;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
+.score-hero-left{}
+.score-hero-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:8px;font-family:Arial,sans-serif}
+.score-hero-num{font-size:72px;font-weight:900;line-height:1;font-family:Arial,sans-serif;letter-spacing:-2px}
+.score-hero-denom{font-size:28px;font-weight:400;color:rgba(255,255,255,.6)}
+.score-hero-badges{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.score-badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;font-family:Arial,sans-serif}
+.score-badge.pct{background:rgba(255,255,255,.2)}
+.score-hero-right{display:flex;gap:24px;flex-wrap:wrap}
+.score-meta-box{background:rgba(255,255,255,.12);border-radius:8px;padding:14px 20px;text-align:center;min-width:90px}
+.score-meta-val{font-size:22px;font-weight:700;font-family:Arial,sans-serif;display:block;line-height:1}
+.score-meta-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.6);margin-top:4px;font-family:Arial,sans-serif}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px}
+.stat-card{background:#fff;border-radius:8px;padding:20px 24px;border:1px solid #e8e8e8}
+.stat-card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:16px;font-family:Arial,sans-serif}
+
+/* Donut chart */
+.donut-wrap{display:flex;align-items:center;gap:20px}
+.donut-svg{flex-shrink:0}
+.donut-legend{display:flex;flex-direction:column;gap:8px}
+.donut-leg-item{display:flex;align-items:center;gap:8px;font-family:Arial,sans-serif;font-size:13px}
+.donut-leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.donut-leg-count{font-weight:700;font-size:15px}
+.donut-leg-pct{color:#888;font-size:11px}
+
+/* Time stat */
+.time-display{text-align:center;padding:8px 0}
+.time-big{font-size:36px;font-weight:700;font-family:'Courier New',monospace;color:#005487;letter-spacing:2px}
+.time-sep{color:#888;font-size:18px;margin:0 4px}
+.time-total{font-size:20px;color:#ccc;font-family:'Courier New',monospace;letter-spacing:2px}
+.time-lbl{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-top:6px;font-family:Arial,sans-serif}
+
+/* Activity stats */
+.activity-list{display:flex;flex-direction:column;gap:10px}
+.activity-item{display:flex;justify-content:space-between;align-items:center;font-family:Arial,sans-serif;font-size:13px;color:#555;padding:6px 0;border-bottom:1px solid #f5f5f5}
+.activity-item:last-child{border-bottom:none}
+.activity-val{font-weight:700;color:#111;font-size:15px}
+
+/* Difficulty section */
+.section-title{font-family:Arial,sans-serif;font-size:15px;font-weight:700;color:#111;margin-bottom:14px}
+.diff-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px}
+.diff-card-new{background:#fff;border-radius:8px;padding:20px 24px;border:1px solid #e8e8e8}
+.diff-card-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:14px;font-family:Arial,sans-serif}
+.diff-donut-wrap{display:flex;align-items:center;gap:14px}
+.diff-stats{font-family:Arial,sans-serif}
+.diff-correct{font-size:14px;color:#2e7d32;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.diff-wrong{font-size:14px;color:#c62828;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.diff-avgtime{font-size:12px;color:#888;margin-top:8px}
+.diff-avgtime strong{color:#111}
+
+/* Question type bars */
+.qtype-section{background:#fff;border-radius:8px;padding:20px 24px;border:1px solid #e8e8e8;margin-bottom:24px}
+.qtype-row{margin-bottom:16px}
+.qtype-row:last-child{margin-bottom:0}
+.qtype-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-family:Arial,sans-serif}
+.qtype-name{font-size:13px;font-weight:600;color:#333}
+.qtype-pcts{font-size:12px}
+.qtype-pct-c{color:#2e7d32;font-weight:700}
+.qtype-pct-w{color:#c62828;font-weight:700;margin-left:10px}
+.qtype-bar-track{height:10px;background:#f5f5f5;border-radius:5px;overflow:hidden;display:flex}
+.qtype-bar-c{height:100%;background:#2e7d32;border-radius:5px 0 0 5px;transition:width .8s ease}
+.qtype-bar-w{height:100%;background:#c62828;border-radius:0 5px 5px 0;transition:width .8s ease}
+
+/* Answer numbers row */
+.ans-nums{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.ans-num{width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;border:none}
+.ans-num.c{background:#2e7d32;color:#fff}
+.ans-num.w{background:#c62828;color:#fff}
+.ans-num.s{background:#bbb;color:#fff}
+
+/* Answers table */
+.ans-table-section{background:#fff;border-radius:8px;border:1px solid #e8e8e8;margin-bottom:24px;overflow:hidden}
+.ans-table-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;font-family:Arial,sans-serif}
+.ans-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.ans-filter-group{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#888;font-family:Arial,sans-serif}
+.ans-filter-select{border:1px solid #ddd;border-radius:4px;padding:4px 8px;font-size:12px;font-family:Arial,sans-serif;color:#333;cursor:pointer;background:#fff}
+.ans-tbl{width:100%;border-collapse:collapse;font-family:Arial,sans-serif;font-size:13px}
+.ans-tbl th{background:#f8f8f8;padding:10px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;border-bottom:1px solid #eee;white-space:nowrap}
+.ans-tbl td{padding:12px 14px;border-bottom:1px solid #f5f5f5;vertical-align:middle}
+.ans-tbl tr:hover td{background:#fafafa;cursor:pointer}
+.ans-tbl tr.ans-row-c{border-left:3px solid #2e7d32}
+.ans-tbl tr.ans-row-w{border-left:3px solid #c62828}
+.ans-tbl tr.ans-row-s{border-left:3px solid #bbb}
+.ans-result-icon{font-size:16px}
+.ans-type-pill{background:#e8f0f8;color:#003865;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;white-space:nowrap}
+.ans-diff-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px}
+.ans-diff-pill.Easy{background:#e8f5e8;color:#2e7d32}
+.ans-diff-pill.Medium{background:#fff8e1;color:#f57f17}
+.ans-diff-pill.Hard{background:#fce8e8;color:#c62828}
+
+/* Expandable explanation panel */
+.exp-panel-new{display:none;padding:16px 20px;background:#fafafa;border-top:1px solid #eee}
+.exp-panel-new.show{display:block}
+.exp-q-full{font-size:13px;line-height:1.7;color:#222;margin-bottom:12px;font-family:'Times New Roman',Georgia,serif;white-space:pre-wrap}
+.exp-opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.exp-opt-item{font-size:12px;padding:6px 10px;border-radius:4px;font-family:Arial,sans-serif;line-height:1.5}
+.exp-opt-item.correct-ans{background:#e8f5e8;color:#2e7d32;font-weight:700;border-left:3px solid #2e7d32}
+.exp-opt-item.wrong-sel{background:#fce8e8;color:#c62828;text-decoration:line-through;border-left:3px solid #c62828}
+.exp-opt-item.neutral{background:#f5f5f5;color:#555}
+.exp-explanation{font-size:13px;line-height:1.7;color:#444;padding:12px 14px;background:#fff;border-radius:4px;border-left:3px solid #005487;font-family:Arial,sans-serif}
+.exp-explanation strong{color:#005487}
 .score-cell{background:#fff;padding:16px 12px;text-align:center}
 .score-val{font-family:Arial,sans-serif;font-size:26px;font-weight:700;display:block;line-height:1;margin-bottom:4px}
 .score-val.blue{color:#005487}.score-val.green{color:#2e7d32}.score-val.red{color:#c62828}.score-val.amber{color:#f59e0b}.score-val.grey{color:#888}
@@ -178,9 +291,15 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 /* AUTH LOADING */
 #auth-loading{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:14px;font-family:Arial,sans-serif;font-size:13px;color:#666}
 .spinner{width:28px;height:28px;border:3px solid #e8e8e8;border-top-color:#005487;border-radius:50%;animation:spin .7s linear infinite}
+
+/* Debug error overlay */
+#debug-overlay{position:fixed;bottom:0;left:0;right:0;background:rgba(200,0,0,.9);color:#fff;font-family:monospace;font-size:12px;padding:8px 12px;z-index:9999;display:none;max-height:120px;overflow-y:auto}
 </style>
 </head>
 <body>
+
+
+<div id="debug-overlay"></div>
 
 <div id="auth-loading"><div class="spinner"></div><span>Checking session...</span></div>
 
@@ -331,29 +450,163 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 
 <!-- ══ REPORT ══ -->
 <div id="screen-report" class="screen">
-  <div class="gmat-topbar">
-    <div class="gmat-topbar-left">Verbal Reasoning — Results</div>
-    <div class="gmat-topbar-right"><button class="help-btn" onclick="goBack()">✕</button></div>
-  </div>
-  <div class="report-header">
-    <div class="report-header-title">Performance Report</div>
-    <div class="report-header-sub" id="report-sub"></div>
+  <div class="report-topbar">
+    <div class="report-topbar-left">
+      <a onclick="goBack()">← Back to Tests List</a>
+      <span style="margin:0 6px;color:#ccc">/</span>
+      <span id="report-topbar-title" style="color:#111;font-weight:600">Verbal Sectional 1</span>
+    </div>
+    <div class="report-topbar-right">
+      <button class="rpt-btn rpt-btn-outline" onclick="goBack()">← Dashboard</button>
+      <button class="rpt-btn rpt-btn-solid" onclick="location.reload()">Retake Test</button>
+    </div>
   </div>
   <div class="report-scroll">
-    <div class="report-scorecard" id="report-scorecard"></div>
-    <div class="rep-sec-title">Adaptive Path</div>
-    <div class="adaptive-trail" id="adaptive-trail"></div>
-    <div class="rep-sec-title">Accuracy by Difficulty</div>
-    <div class="diff-bars" id="diff-bars"></div>
-    <div class="rep-sec-title">Question-by-Question Review</div>
-    <table class="review-table">
-      <thead><tr><th>#</th><th>Question</th><th>Type</th><th>Result</th><th>Difficulty</th><th>Your Ans</th><th>Correct</th><th>Time</th></tr></thead>
-      <tbody id="review-tbody"></tbody>
-    </table>
-    <div style="display:flex;gap:12px;padding-bottom:40px">
-      <button class="gmat-btn gmat-btn-blue" onclick="goBack()">← Back to Dashboard</button>
-      <button class="gmat-btn" onclick="location.reload()">Retake Test</button>
+    <!-- Score Hero -->
+    <div class="score-hero" id="score-hero">
+      <div class="score-hero-left">
+        <div class="score-hero-label">Your Verbal Score</div>
+        <div><span class="score-hero-num" id="rpt-score">—</span><span class="score-hero-denom"> / 90</span></div>
+        <div class="score-hero-badges">
+          <span class="score-badge pct" id="rpt-percentile">—</span>
+          <span class="score-badge" id="rpt-date">—</span>
+          <span class="score-badge" id="rpt-mode">Standard Mode</span>
+        </div>
+      </div>
+      <div class="score-hero-right">
+        <div class="score-meta-box">
+          <span class="score-meta-val" id="rpt-time-used">—</span>
+          <div class="score-meta-lbl">Time Used</div>
+        </div>
+        <div class="score-meta-box">
+          <span class="score-meta-val" id="rpt-correct">—</span>
+          <div class="score-meta-lbl">Correct</div>
+        </div>
+        <div class="score-meta-box">
+          <span class="score-meta-val" id="rpt-wrong">—</span>
+          <div class="score-meta-lbl">Incorrect</div>
+        </div>
+        <div class="score-meta-box">
+          <span class="score-meta-val" id="rpt-accuracy">—</span>
+          <div class="score-meta-lbl">Accuracy</div>
+        </div>
+      </div>
     </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <!-- Donut -->
+      <div class="stat-card">
+        <div class="stat-card-title">Overall Result</div>
+        <div class="donut-wrap">
+          <svg class="donut-svg" width="90" height="90" viewBox="0 0 90 90">
+            <circle cx="45" cy="45" r="35" fill="none" stroke="#f5f5f5" stroke-width="10"/>
+            <circle id="donut-correct-arc" cx="45" cy="45" r="35" fill="none" stroke="#2e7d32" stroke-width="10"
+              stroke-dasharray="0 220" stroke-dashoffset="55" transform="rotate(-90 45 45)" style="transition:stroke-dasharray 1s ease"/>
+            <circle id="donut-wrong-arc" cx="45" cy="45" r="35" fill="none" stroke="#c62828" stroke-width="10"
+              stroke-dasharray="0 220" stroke-dashoffset="55" transform="rotate(-90 45 45)" style="transition:stroke-dasharray 1s ease"/>
+          </svg>
+          <div class="donut-legend">
+            <div class="donut-leg-item">
+              <div class="donut-leg-dot" style="background:#2e7d32"></div>
+              <span>Correct</span>
+              <span class="donut-leg-count" id="leg-correct">—</span>
+              <span class="donut-leg-pct" id="leg-correct-pct"></span>
+            </div>
+            <div class="donut-leg-item">
+              <div class="donut-leg-dot" style="background:#c62828"></div>
+              <span>Incorrect</span>
+              <span class="donut-leg-count" id="leg-wrong">—</span>
+              <span class="donut-leg-pct" id="leg-wrong-pct"></span>
+            </div>
+            <div class="donut-leg-item">
+              <div class="donut-leg-dot" style="background:#bbb"></div>
+              <span>Skipped</span>
+              <span class="donut-leg-count" id="leg-skip">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time -->
+      <div class="stat-card">
+        <div class="stat-card-title">Test Time</div>
+        <div class="time-display">
+          <div>
+            <span class="time-big" id="rpt-elapsed-display">—</span>
+            <span class="time-sep" style="color:#ddd;font-size:24px;margin:0 8px">|</span>
+            <span class="time-total">45:00</span>
+          </div>
+          <div class="time-lbl">Used / Allotted</div>
+          <div style="margin-top:16px;font-family:Arial,sans-serif;font-size:13px;color:#888">
+            Avg time/question: <strong id="rpt-avg-time" style="color:#111">—</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity -->
+      <div class="stat-card">
+        <div class="stat-card-title">Test Activity</div>
+        <div class="activity-list">
+          <div class="activity-item"><span>Marked as Guessed</span><span class="activity-val" id="rpt-guessed">0</span></div>
+          <div class="activity-item"><span>Questions Skipped</span><span class="activity-val" id="rpt-skipped">0</span></div>
+          <div class="activity-item"><span>Answers Edited</span><span class="activity-val" id="rpt-edited">0</span></div>
+          <div class="activity-item"><span>CR Questions</span><span class="activity-val" id="rpt-cr-count">—</span></div>
+          <div class="activity-item"><span>RC Questions</span><span class="activity-val" id="rpt-rc-count">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results by Difficulty -->
+    <div class="section-title">Results by difficulty</div>
+    <div class="diff-grid" id="diff-grid"></div>
+
+    <!-- Results by Question Type -->
+    <div class="section-title">Results by question type</div>
+    <div class="qtype-section" id="qtype-section"></div>
+
+    <!-- Answers -->
+    <div class="section-title">Answers</div>
+    <div class="ans-nums" id="ans-nums"></div>
+
+    <div class="ans-table-section">
+      <div class="ans-table-header">
+        <div style="font-family:Arial,sans-serif;font-size:14px;font-weight:700;color:#111">Verbal</div>
+        <div class="ans-filters">
+          <div class="ans-filter-group">Type <select class="ans-filter-select" id="filter-type" onchange="filterAnswers()">
+            <option value="">-- All --</option>
+            <option value="CR">CR</option>
+            <option value="RC">RC</option>
+          </select></div>
+          <div class="ans-filter-group">Difficulty <select class="ans-filter-select" id="filter-diff" onchange="filterAnswers()">
+            <option value="">-- All --</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select></div>
+          <div class="ans-filter-group">Answer <select class="ans-filter-select" id="filter-ans" onchange="filterAnswers()">
+            <option value="">-- All --</option>
+            <option value="correct">Correct</option>
+            <option value="wrong">Incorrect</option>
+            <option value="skip">Skipped</option>
+          </select></div>
+        </div>
+      </div>
+      <table class="ans-tbl">
+        <thead><tr>
+          <th style="width:40px">Nº</th>
+          <th style="width:60px">ID</th>
+          <th>Type</th>
+          <th>Answer</th>
+          <th>Difficulty</th>
+          <th style="width:80px">Time</th>
+          <th style="width:60px">Guessed</th>
+        </tr></thead>
+        <tbody id="ans-tbody"></tbody>
+      </table>
+    </div>
+
+    <div style="padding-bottom:60px"></div>
   </div>
 </div>
 
@@ -428,622 +681,8 @@ const SECTION       = 'V';
 const SECTIONAL_NUM = 1;
 const TOTAL_QS      = 23;
 const SECTION_NAME  = 'Verbal Reasoning';
-
-const _sb = supabase.createClient(SUPA_URL, SUPA_KEY);
-let currentUser = null;
-
-// ── Question types ──
-const Q_TYPE = { CR:'CR', RC:'RC' };
-
-// ── State ──
-let TEST = {
-  pool:[], entries:[], idx:0,
-  secsLeft:45*60, interval:null, qStart:null, sel:null,
-  savedForLater:new Set(), markedGuess:new Set(),
-  isPaused:false, editEditsLeft:3, editingIdx:-1, editSelLetter:null
-};
-
-// ── Auth ──
-async function initAuth(){
-  const{data:{session}}=await _sb.auth.getSession();
-  if(!session){window.location.href='../../index.html';return;}
-  currentUser=session.user;
-  g('auth-loading').style.display='none';
-  showScreen('instruction');
-}
-
-// ── Load pool from Supabase ──
-async function loadPool(){
-  const{data,error}=await _sb.from('questions').select('*')
-    .eq('section',SECTION).eq('sectional',SECTIONAL_NUM);
-  if(error){console.error(error);return[];}
-  return(data||[]).map(q=>({
-    ...q,
-    options:typeof q.options==='string'?JSON.parse(q.options):q.options
-  }));
-}
-
-// ── Detect question type ──
-function detectType(q){
-  const t=(q.topic||'').toLowerCase();
-  if(t.includes('rc')||t.includes('reading')||q.passage) return Q_TYPE.RC;
-  return Q_TYPE.CR;
-}
-
-// ── Queue Builder ──
-// Builds the full 23-question queue upfront:
-// - RC passages appear as a consecutive block (3-4 Qs)
-// - CR questions fill the gaps adaptively
-// - Passages are distributed evenly across the test (not all at start/end)
-//
-// Real GMAT pattern for 23 Verbal Qs:
-// Q1-6: CR block | Q7-10: RC passage 1 | Q11-16: CR block | Q17-20: RC passage 2 | Q21-23: CR block
-// (adjusted based on how many passages are in the pool)
-
-function buildQueue(pool) {
-  // Separate CR and RC questions
-  const crQs = shuffle(pool.filter(q => detectType(q) === Q_TYPE.CR));
-  const rcQs  = pool.filter(q => detectType(q) === Q_TYPE.RC);
-
-  // Group RC questions by passage
-  const passageGroups = {};
-  rcQs.forEach(q => {
-    const key = q.passage
-      ? q.passage.slice(0, 100)   // use first 100 chars as passage key
-      : (q.id || 'ungrouped');
-    if(!passageGroups[key]) passageGroups[key] = [];
-    passageGroups[key].push(q);
-  });
-
-  // Convert to array of passage blocks, shuffle passage order
-  const passages = shuffle(Object.values(passageGroups));
-
-  // If no RC questions, just return shuffled CR
-  if(!passages.length) {
-    return buildAdaptiveList(crQs, TOTAL_QS);
-  }
-
-  // Distribute passages evenly across the 23-question test
-  // E.g. with 4 passages of 4 Qs each = 16 RC, 7 CR
-  // Pattern: [CR block] [RC passage] [CR block] [RC passage] ... [CR block]
-  const numPassages = passages.length;
-  const totalRCQs   = passages.reduce((s, p) => s + p.length, 0);
-  const totalCRQs   = Math.min(crQs.length, TOTAL_QS - totalRCQs);
-  const totalQs     = Math.min(TOTAL_QS, totalCRQs + totalRCQs);
-
-  // CR slots: split into (numPassages + 1) segments between passages
-  // e.g. 4 passages → 5 CR segments
-  const crPerSegment = Math.floor(totalCRQs / (numPassages + 1));
-  const crExtra      = totalCRQs % (numPassages + 1); // extra CRs go to first segment
-
-  // Build CR pool with adaptive difficulty tracking
-  const crPool = { Easy: [], Medium: [], Hard: [] };
-  crQs.forEach(q => crPool[q.difficulty] && crPool[q.difficulty].push(q));
-  let crDiff  = 'Medium', crLast2 = [];
-  const usedIds = new Set();
-
-  function nextCR() {
-    const order = crDiff === 'Hard'   ? ['Hard','Medium','Easy']
-                : crDiff === 'Easy'   ? ['Easy','Medium','Hard']
-                : ['Medium','Hard','Easy'];
-    for(const d of order) {
-      const avail = crPool[d].filter(q => !usedIds.has(q.id));
-      if(avail.length) { usedIds.add(avail[0].id); return avail[0]; }
-    }
-    return null;
-  }
-
-  function updateDiff(result) {
-    if(result === 'skip') return;
-    crLast2.push(result);
-    if(crLast2.length > 2) crLast2.shift();
-    if(crLast2.length === 2 && crLast2.every(r => r === 'correct')) {
-      if(crDiff === 'Easy')   crDiff = 'Medium';
-      else if(crDiff === 'Medium') crDiff = 'Hard';
-    } else if(crLast2.length === 2 && crLast2.every(r => r === 'wrong')) {
-      if(crDiff === 'Hard')   crDiff = 'Medium';
-      else if(crDiff === 'Medium') crDiff = 'Easy';
-    }
-  }
-
-  // Assemble final queue
-  const queue = [];
-
-  passages.forEach((passageBlock, pi) => {
-    // CR segment before this passage
-    const segSize = crPerSegment + (pi === 0 ? crExtra : 0);
-    for(let i = 0; i < segSize && queue.length < totalQs; i++) {
-      const q = nextCR();
-      if(q) queue.push({ q, type: Q_TYPE.CR, updateDiff });
-    }
-    // RC passage block (all questions from this passage together)
-    for(const rcQ of passageBlock) {
-      if(queue.length < totalQs) queue.push({ q: rcQ, type: Q_TYPE.RC, updateDiff: ()=>{} });
-    }
-  });
-
-  // Final CR segment after all passages
-  while(queue.length < totalQs) {
-    const q = nextCR();
-    if(!q) break;
-    queue.push({ q, type: Q_TYPE.CR, updateDiff });
-  }
-
-  return queue;
-}
-
-function buildAdaptiveList(crQs, total) {
-  // Pure CR test (no RC questions in pool)
-  const pool = { Easy:[], Medium:[], Hard:[] };
-  crQs.forEach(q => pool[q.difficulty] && pool[q.difficulty].push(q));
-  const used = new Set();
-  let diff = 'Medium', last2 = [];
-  const queue = [];
-  for(let i = 0; i < total; i++) {
-    const order = diff==='Hard'?['Hard','Medium','Easy']:diff==='Easy'?['Easy','Medium','Hard']:['Medium','Hard','Easy'];
-    let picked = null;
-    for(const d of order) {
-      const a = pool[d].filter(q=>!used.has(q.id));
-      if(a.length){ used.add(a[0].id); picked=a[0]; break; }
-    }
-    if(!picked) break;
-    queue.push({ q:picked, type:Q_TYPE.CR,
-      updateDiff:(r)=>{
-        if(r==='skip') return;
-        last2.push(r); if(last2.length>2) last2.shift();
-        if(last2.length===2&&last2.every(x=>x==='correct')){ if(diff==='Easy')diff='Medium'; else if(diff==='Medium')diff='Hard'; }
-        if(last2.length===2&&last2.every(x=>x==='wrong')){ if(diff==='Hard')diff='Medium'; else if(diff==='Medium')diff='Easy'; }
-      }
-    });
-  }
-  return queue;
-}
-
-// ── Start test ──
-async function startTest(){
-  showScreen('loading');
-  g('loading-msg').textContent='Fetching question pool from Supabase...';
-  const pool = await loadPool();
-  if(!pool.length){
-    showScreen('instruction');
-    alert('No questions found for Verbal Sectional '+SECTIONAL_NUM+'. Please add questions via Admin panel.');
-    return;
-  }
-
-  // Build the ordered queue (RC passages grouped, CR adaptive)
-  const queue = buildQueue(pool);
-  if(!queue.length){ showScreen('instruction'); alert('Could not build question queue.'); return; }
-
-  console.log('✅ Queue built:', queue.length, 'questions');
-  console.log('   CR:', queue.filter(e=>e.type===Q_TYPE.CR).length,
-              '| RC:', queue.filter(e=>e.type===Q_TYPE.RC).length);
-  queue.forEach((e,i) => console.log(`  Q${i+1} [${e.type}] ${(e.q.topic||'').slice(0,30)} diff:${e.q.difficulty}`));
-
-  TEST.queue   = queue;    // full pre-built queue
-  TEST.entries = [];
-  TEST.idx     = 0;
-  TEST.secsLeft = 45*60; TEST.sel = null;
-  TEST.savedForLater = new Set(); TEST.markedGuess = new Set();
-  TEST.isPaused = false; TEST.editEditsLeft = 3;
-  clearInterval(TEST.interval);
-
-  // Load first question from queue
-  const first = queue[0];
-  TEST.entries.push({ q:first.q, selected:null, result:null, time:0, edited:false, type:first.type });
-
-  renderQuestion();
-  startTimer();
-}
-
-
-// ── Render question ──
-function renderQuestion(){
-  const e=TEST.entries[TEST.idx],q=e.q;
-  const type=e.type;
-  TEST.sel=e.selected||null;
-  TEST.qStart=Date.now();
-
-  const posLabel='Question '+(TEST.idx+1)+' of '+TOTAL_QS;
-  const pct=TEST.idx/TOTAL_QS*100;
-
-  if(type===Q_TYPE.CR){
-    showScreen('test-cr');
-    g('cr-timer').textContent=formatTime(TEST.secsLeft);
-    g('cr-progress').style.width=pct+'%';
-    g('cr-pos-label').textContent=posLabel;
-
-    // Passage (argument) — supports **bold** markdown
-    g('cr-passage').innerHTML=formatText(q.question);
-
-    // Question stem (stored in topic or a sub-field)
-    const stem=q.question_stem||q.stem||getQuestionStem(q);
-    g('cr-question').innerHTML=formatText(stem);
-
-    // Options
-    renderOptions('cr-options','cr-option');
-    g('cr-mark-guess').checked=TEST.markedGuess.has(TEST.idx);
-    g('cr-next-btn').disabled=!TEST.sel;
-
-  } else {
-    showScreen('test-rc');
-    g('rc-timer').textContent=formatTime(TEST.secsLeft);
-    g('rc-progress').style.width=pct+'%';
-    g('rc-pos-label').textContent=posLabel;
-    g('rc-q-num').textContent=TEST.idx+1;
-    g('rc-q-header').innerHTML='Question <span class="rc-q-badge">'+(TEST.idx+1)+'</span> of '+TOTAL_QS;
-
-    // Passage on left
-    const passageText=q.passage||q.question;
-    g('rc-passage-text').innerHTML=formatPassage(passageText);
-
-    // Question on right (with highlight support)
-    g('rc-question').innerHTML=formatHighlightQuestion(q);
-
-    // Options
-    renderOptions('rc-options','rc-option');
-    g('rc-mark-guess').checked=TEST.markedGuess.has(TEST.idx);
-    g('rc-next-btn').disabled=!TEST.sel;
-  }
-}
-
-// ── Format helpers ──
-function formatText(text){
-  if(!text) return '';
-  // **bold** → <strong>bold</strong>
-  return text
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\n/g,'<br>');
-}
-
-function formatPassage(text){
-  if(!text) return '';
-  const paragraphs=text.split(/\n\n+/);
-  return paragraphs.map(p=>'<p>'+formatText(p.trim())+'</p>').join('');
-}
-
-function formatHighlightQuestion(q){
-  let text=q.question_stem||getQuestionStem(q)||'';
-  // Handle "ideally" (click to highlight) style questions
-  // Pattern: word/phrase followed by (click to highlight)
-  text=text.replace(/"([^"]+)"\s*\(click to highlight\)/gi,(m,word)=>{
-    return `<span class="rc-highlight" onclick="toggleHighlight(this)" data-word="${word}">"${word}" (click to highlight)</span>`;
-  });
-  // Also handle plain **bold** in question text
-  return formatText(text).replace(/\*\*(.+?)\*\*/g,'<strong style="color:#005487">$1</strong>');
-}
-
-function toggleHighlight(el){
-  el.classList.toggle('highlighted');
-}
-
-function getQuestionStem(q){
-  // If question has a passage, the stem is a separate field
-  // Otherwise the whole question IS the stem (CR)
-  return q.stem || q.question_stem || q.question || '';
-}
-
-function renderOptions(containerId, optClass){
-  const e=TEST.entries[TEST.idx],q=e.q;
-  const container=g(containerId);
-  container.innerHTML='';
-  ['A','B','C','D','E'].forEach(l=>{
-    if(!q.options||!q.options[l])return;
-    const row=document.createElement('div');
-    row.className=optClass+(TEST.sel===l?' confirmed':'');
-    row.dataset.l=l;
-    const circle=document.createElement('div');circle.className='opt-circle';
-    const text=document.createElement('span');text.className='opt-text';
-    // Support **bold** in options (for boldface CR)
-    text.innerHTML=formatText(q.options[l]);
-    row.appendChild(circle);row.appendChild(text);
-    if(TEST.sel!==l){
-      row.addEventListener('click',()=>pickOption(l,containerId,optClass));
-    }
-    container.appendChild(row);
-  });
-}
-
-function pickOption(l,containerId,optClass){
-  TEST.sel=l;
-  document.querySelectorAll('.'+optClass).forEach(r=>{
-    r.classList.toggle('selected',r.dataset.l===l);
-    r.classList.remove('confirmed');
-  });
-  const e=TEST.entries[TEST.idx];
-  const type=e.type;
-  if(type===Q_TYPE.CR) g('cr-next-btn').disabled=false;
-  else g('rc-next-btn').disabled=false;
-}
-
-// ── Navigation ──
-function confirmNext(){
-  if(!TEST.sel){
-    g('skip-dialog').classList.add('show');
-    return;
-  }
-  g('confirm-dialog').classList.add('show');
-}
-function closeConfirm(){g('confirm-dialog').classList.remove('show');}
-function confirmYes(){closeConfirm();advance(false);}
-function closeSkip(){g('skip-dialog').classList.remove('show');}
-function confirmSkip(){closeSkip();advance(true);}
-
-function advance(skip = false) {
-  const e = TEST.entries[TEST.idx];
-  e.time = Math.round((Date.now() - TEST.qStart) / 1000);
-
-  const mg = g('cr-mark-guess').checked || g('rc-mark-guess').checked;
-  if(mg) TEST.markedGuess.add(TEST.idx);
-  else TEST.markedGuess.delete(TEST.idx);
-
-  if(skip) {
-    e.selected = null; e.result = 'skip';
-    // still call updateDiff for the queue slot
-    TEST.queue[TEST.idx]?.updateDiff('skip');
-  } else {
-    e.selected = TEST.sel;
-    e.result = TEST.sel === e.q.answer ? 'correct' : 'wrong';
-    // update adaptive difficulty for next CR question
-    TEST.queue[TEST.idx]?.updateDiff(e.result);
-  }
-
-  TEST.idx++;
-  if(TEST.idx >= TEST.queue.length || TEST.idx >= TOTAL_QS) { endTest(); return; }
-
-  // Get next question from pre-built queue
-  const next = TEST.queue[TEST.idx];
-  if(!next) { endTest(); return; }
-
-  TEST.entries.push({ q: next.q, selected: null, result: null, time: 0, edited: false, type: next.type });
-  TEST.sel = null;
-  renderQuestion();
-}
-
-// ── Timer ──
-function startTimer(){
-  updateTimerDisplay();
-  TEST.interval=setInterval(()=>{
-    if(TEST.isPaused)return;
-    TEST.secsLeft--;
-    updateTimerDisplay();
-    if(TEST.secsLeft<=300){
-      ['cr-timer','rc-timer','edit-timer'].forEach(id=>g(id)&&g(id).classList.add('urgent'));
-    }
-    if(TEST.secsLeft<=0){clearInterval(TEST.interval);endTest();}
-  },1000);
-}
-
-function updateTimerDisplay(){
-  const str=formatTime(TEST.secsLeft);
-  ['cr-timer','rc-timer','edit-timer','pause-timer-display'].forEach(id=>{const el=g(id);if(el)el.textContent=str;});
-}
-
-function formatTime(secs){
-  const m=Math.floor(secs/60),s=secs%60;
-  return m+':'+String(s).padStart(2,'0');
-}
-
-function togglePause(){
-  TEST.isPaused=!TEST.isPaused;
-  if(TEST.isPaused) g('pause-overlay').classList.add('show');
-  else g('pause-overlay').classList.remove('show');
-}
-
-// ── Misc controls ──
-function toggleSaveForLater(){
-  if(TEST.savedForLater.has(TEST.idx)) TEST.savedForLater.delete(TEST.idx);
-  else TEST.savedForLater.add(TEST.idx);
-}
-
-function toggleFullscreen(){
-  if(!document.fullscreenElement) document.documentElement.requestFullscreen();
-  else document.exitFullscreen();
-}
-
-// ── End test ──
-function endTest(){
-  clearInterval(TEST.interval);
-  if(TEST.secsLeft>30) showEditScreen();
-  else submitFinal();
-}
-
-// ── Edit answers ──
-function showEditScreen(){
-  showScreen('edit');
-  updateEditCounter();
-  renderEditTable();
-  g('edit-q-panel').classList.remove('show');
-}
-
-function updateEditCounter(){
-  g('edit-counter').textContent='Edits remaining: '+TEST.editEditsLeft;
-}
-
-function renderEditTable(){
-  const tbody=g('edit-tbody');tbody.innerHTML='';
-  TEST.entries.forEach((e,i)=>{
-    const mk=TEST.markedGuess.has(i);
-    const sv=TEST.savedForLater.has(i);
-    const statusText=e.edited?'Edited':mk?'Marked Guess':sv?'Saved for Later':e.result==='skip'?'Skipped':'Answered';
-    const statusClass=e.edited?'editing':mk?'marked':e.result==='skip'?'skipped':'answered';
-    const short=(e.q.question||'').replace(/\n/g,' ').replace(/\*\*/g,'').slice(0,55)+'…';
-    const tr=document.createElement('tr');
-    if(TEST.editingIdx===i)tr.classList.add('sel-edit');
-    tr.innerHTML=`
-      <td class="edit-row-num">${i+1}</td>
-      <td style="font-size:12px">${short}</td>
-      <td><span class="type-pill">${e.type}</span></td>
-      <td><strong>${e.selected||'—'}</strong></td>
-      <td><span class="edit-status ${statusClass}">${statusText}</span></td>
-      <td><span class="dpill ${e.q.difficulty}">${e.q.difficulty}</span></td>`;
-    tr.addEventListener('click',()=>openEditQ(i));
-    tbody.appendChild(tr);
-  });
-}
-
-function openEditQ(idx){
-  if(TEST.editEditsLeft<=0&&TEST.editingIdx!==idx){alert('No edits remaining.');return;}
-  TEST.editingIdx=idx;
-  TEST.editSelLetter=TEST.entries[idx].selected;
-  const e=TEST.entries[idx];
-  g('edit-q-text').innerHTML=formatText((e.q.question||'').slice(0,300)+(e.q.question.length>300?'…':''));
-  const opts=g('edit-opts');opts.innerHTML='';
-  ['A','B','C','D','E'].forEach(l=>{
-    if(!e.q.options||!e.q.options[l])return;
-    const row=document.createElement('div');
-    row.className='cr-option'+(TEST.editSelLetter===l?' confirmed':'');
-    row.dataset.l=l;
-    row.innerHTML=`<div class="opt-circle"></div><span class="opt-text">${formatText(e.q.options[l])}</span>`;
-    row.addEventListener('click',()=>{
-      TEST.editSelLetter=l;
-      opts.querySelectorAll('.cr-option').forEach(r=>{
-        r.classList.toggle('selected',r.dataset.l===l);r.classList.remove('confirmed');
-      });
-    });
-    opts.appendChild(row);
-  });
-  g('edit-q-panel').classList.add('show');
-  g('edit-q-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
-  renderEditTable();
-}
-
-function saveEdit(){
-  if(TEST.editingIdx<0)return;
-  const e=TEST.entries[TEST.editingIdx];
-  if(TEST.editSelLetter===e.selected){cancelEdit();return;}
-  e.selected=TEST.editSelLetter;
-  e.result=TEST.editSelLetter===e.q.answer?'correct':'wrong';
-  if(!e.edited){TEST.editEditsLeft--;e.edited=true;}
-  TEST.editingIdx=-1;TEST.editSelLetter=null;
-  updateEditCounter();renderEditTable();
-  g('edit-q-panel').classList.remove('show');
-}
-
-function cancelEdit(){
-  TEST.editingIdx=-1;TEST.editSelLetter=null;
-  renderEditTable();g('edit-q-panel').classList.remove('show');
-}
-
-// ── Submit & Report ──
-function submitFinal(){
-  clearInterval(TEST.interval);
-  saveSession();
-  renderReport();
-  showScreen('report');
-}
-
-function saveSession(){
-  const es=TEST.entries;
-  const correct=es.filter(e=>e.result==='correct').length;
-  const total=es.length;
-  const elapsed=45*60-TEST.secsLeft;
-  const em=Math.floor(elapsed/60),esec=elapsed%60;
-  const sessKey='gmat_sessions_'+(currentUser?.id||'guest');
-  const sessions=JSON.parse(localStorage.getItem(sessKey)||'[]');
-  sessions.unshift({
-    id:Date.now(),date:new Date().toISOString(),
-    section:SECTION,testNum:SECTIONAL_NUM,
-    entries:es.map(e=>({
-      result:e.result,selected:e.selected,time:e.time,edited:e.edited,type:e.type,
-      q:{question:e.q.question,answer:e.q.answer,difficulty:e.q.difficulty,
-         topic:e.q.topic,options:e.q.options,explanation:e.q.explanation}
-    })),
-    correct,total,
-    pct:total?Math.round(correct/total*100):0,
-    avgTime:total?Math.round(es.reduce((s,e)=>s+e.time,0)/total):0,
-    elapsed:em+'m '+esec+'s'
-  });
-  localStorage.setItem(sessKey,JSON.stringify(sessions.slice(0,50)));
-}
-
-function renderReport(){
-  const es=TEST.entries;
-  const correct=es.filter(e=>e.result==='correct').length;
-  const wrong=es.filter(e=>e.result==='wrong').length;
-  const skip=es.filter(e=>e.result==='skip').length;
-  const total=es.length;
-  const pct=total?Math.round(correct/total*100):0;
-  const avgT=total?Math.round(es.reduce((s,e)=>s+e.time,0)/total):0;
-  const elapsed=45*60-TEST.secsLeft;
-  const em=Math.floor(elapsed/60),esec=elapsed%60;
-  g('report-sub').textContent=SECTION_NAME+' Sectional '+SECTIONAL_NUM+' · '+total+' questions · '+em+'m '+esec+'s';
-  g('report-scorecard').innerHTML=`
-    <div class="score-cell"><span class="score-val blue">${pct}%</span><span class="score-lbl">Accuracy</span></div>
-    <div class="score-cell"><span class="score-val green">${correct}</span><span class="score-lbl">Correct</span></div>
-    <div class="score-cell"><span class="score-val red">${wrong}</span><span class="score-lbl">Wrong</span></div>
-    <div class="score-cell"><span class="score-val grey">${skip}</span><span class="score-lbl">Skipped</span></div>
-    <div class="score-cell"><span class="score-val amber">${avgT}s</span><span class="score-lbl">Avg/Q</span></div>`;
-
-  const trail=g('adaptive-trail');trail.innerHTML='';
-  es.forEach((e,i)=>{
-    const d0=e.q.difficulty[0];
-    const cls=e.result==='skip'?'sk':e.result==='correct'?'c'+d0:'w'+d0;
-    const mk=TEST.markedGuess.has(i)?'mk':'';
-    const dot=document.createElement('div');
-    dot.className=`trail-dot ${cls} ${mk}`;
-    dot.textContent=e.type;dot.title='Q'+(i+1)+': '+e.type+' · '+e.q.difficulty+' · '+e.result;
-    dot.addEventListener('click',()=>{const row=g('rrow-'+i);if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.click();}});
-    trail.appendChild(dot);
-  });
-
-  const diffWrap=g('diff-bars');diffWrap.innerHTML='';
-  ['Easy','Medium','Hard'].forEach(diff=>{
-    const dqs=es.filter(e=>e.q.difficulty===diff);
-    const dc=dqs.filter(e=>e.result==='correct').length;
-    const dpct=dqs.length?Math.round(dc/dqs.length*100):0;
-    const col=dpct>=70?'#2e7d32':dpct>=50?'#f57f17':'#c62828';
-    diffWrap.innerHTML+=`<div class="diff-card"><div class="diff-card-title">${diff}</div><div class="diff-pct" style="color:${col}">${dqs.length?dpct+'%':'—'}</div><div class="diff-bar-wrap"><div class="diff-bar" style="width:${dpct}%;background:${col}"></div></div><div class="diff-attempted">${dc}/${dqs.length} correct</div></div>`;
-  });
-
-  const tbody=g('review-tbody');tbody.innerHTML='';
-  es.forEach((e,i)=>{
-    const cls=e.result==='correct'?'row-c':e.result==='wrong'?'row-w':'row-s';
-    const pill=e.result==='correct'?'<span class="rpill C">✓ Correct</span>':e.result==='wrong'?'<span class="rpill W">✗ Wrong</span>':'<span class="rpill S">— Skipped</span>';
-    const editB=e.edited?' <span style="font-size:10px;color:#005487;font-weight:700">[Edited]</span>':'';
-    const short=(e.q.question||'').replace(/\n/g,' ').replace(/\*\*/g,'').slice(0,50)+'…';
-    const tr=document.createElement('tr');tr.className=cls;tr.id='rrow-'+i;
-    tr.innerHTML=`<td style="font-weight:700;color:#005487">${i+1}</td><td style="font-size:12px">${short}${editB}</td><td><span class="type-pill">${e.type}</span></td><td>${pill}</td><td><span class="dpill ${e.q.difficulty}">${e.q.difficulty}</span></td><td style="font-weight:700;color:#005487">${e.selected||'—'}</td><td style="font-weight:700;color:#2e7d32">${e.q.answer}</td><td style="color:#888;font-family:Arial">${e.time}s</td>`;
-    const expTr=document.createElement('tr');expTr.style.display='none';
-    const expTd=document.createElement('td');expTd.colSpan=8;expTd.style.padding='0';
-    const expDiv=document.createElement('div');expDiv.className='exp-panel';
-    const expQ=document.createElement('div');expQ.className='exp-q';expQ.innerHTML=formatText(e.q.question||'');
-    const expOpts=document.createElement('div');
-    ['A','B','C','D','E'].forEach(l=>{
-      if(!e.q.options||!e.q.options[l])return;
-      const d=document.createElement('div');
-      d.className='exp-opt'+(l===e.q.answer?' ca':l===e.selected&&l!==e.q.answer?' wa':'');
-      d.innerHTML=l+'. '+formatText(e.q.options[l]);
-      expOpts.appendChild(d);
-    });
-    const expText=document.createElement('div');expText.className='exp-text';
-    expText.textContent=e.q.explanation?'Explanation: '+e.q.explanation:'The correct answer is '+e.q.answer+'.';
-    expDiv.appendChild(expQ);expDiv.appendChild(expOpts);expDiv.appendChild(expText);
-    expTd.appendChild(expDiv);expTr.appendChild(expTd);
-    let open=false;
-    tr.addEventListener('click',()=>{open=!open;expTr.style.display=open?'':'none';expDiv.classList.toggle('show',open);});
-    tbody.appendChild(tr);tbody.appendChild(expTr);
-  });
-}
-
-function showHelp(){g('help-dialog').classList.add('show');}
-function closeHelp(){g('help-dialog').classList.remove('show');}
-function goBack(){window.location.href='../../dashboard.html';}
-
-const g=id=>document.getElementById(id);
-function showScreen(name){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  g('screen-'+name).classList.add('active');
-  window.scrollTo(0,0);
-}
-function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
-
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeConfirm();closeHelp();closeSkip();if(TEST.isPaused)togglePause();}
-  if(e.key==='Enter'&&g('confirm-dialog').classList.contains('show'))confirmYes();
-});
-
-initAuth();
 </script>
+<script src="./verbal-core.js"></script>
+<script>initAuth();</script>
 </body>
 </html>

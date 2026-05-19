@@ -636,6 +636,8 @@ function renderParsedList(qs,listId,countId){
     // Show explanation preview — key fix
     const explHtml=q.explanation?
       `<div class="pq-expl">📝 <strong>Explanation:</strong>\n${q.explanation.slice(0,300)}${q.explanation.length>300?'…':''}</div>`:'';
+    const passageHtml=q.passage?
+      `<div class="pq-expl" style="border-left-color:#005487;background:#f0f6fb">📖 <strong>Passage (${q.passage.length} chars):</strong> ${q.passage.slice(0,150)}…</div>`:'<div style="font-size:10px;color:#bbb;margin-top:4px">No passage (CR/Q/DI)</div>';
     const secNum=q.sectional?`<span style="font-size:10px;color:var(--teal-d);padding:2px 6px;background:var(--teal-l);border-radius:4px">S${String(q.sectional).padStart(2,'0')}</span>`:'';
     const typePill=q.topic?`<span style="font-size:10px;background:#e8f0f8;color:#003865;padding:2px 7px;border-radius:4px;font-weight:600">${q.topic}</span>`:'';
     item.innerHTML=`
@@ -644,6 +646,7 @@ function renderParsedList(qs,listId,countId){
         <div class="pq-q">${(q.question||'').slice(0,200)}${(q.question||'').length>200?'…':''}</div>
         <div class="pq-opts">${optHtml}</div>
         ${explHtml}
+        ${passageHtml}
         <div class="pq-tags" style="margin-top:5px">
           <span class="dpill ${q.difficulty}">${q.difficulty}</span>
           <span class="spill spill-${q.section}">${q.section}</span>
@@ -728,7 +731,8 @@ async function saveManual(){
   ['C','D','E'].forEach(l=>{if(!q.options[l])delete q.options[l];});
 
   // Add passage for RC
-  if(isRC) q.passage=g('f-q-rc').value;
+  if(isRC) q.passage = g('f-passage').value.trim() || null;
+  else q.passage = null;
 
   const btn=g('save-btn');
   btn.disabled=true;btn.textContent='Saving...';
