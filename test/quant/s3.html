@@ -149,6 +149,33 @@ body{font-family:'Times New Roman',Georgia,serif;background:#fff;color:#000;min-
 #auth-loading{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:14px;font-family:Arial,sans-serif;font-size:13px;color:#666}
 .spinner{width:28px;height:28px;border:3px solid #e8e8e8;border-top-color:#005487;border-radius:50%;animation:spin .7s linear infinite}
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="initMathRender()"></script>
+<script>
+function initMathRender(){
+  // Auto-render KaTeX on the whole page
+  renderMathInElement(document.body, {
+    delimiters:[
+      {left:'$$',right:'$$',display:true},
+      {left:'$',right:'$',display:false},
+      {left:'\\(',right:'\\)',display:false},
+      {left:'\\[',right:'\\]',display:true},
+    ],
+    throwOnError:false,
+    output:'html'
+  });
+}
+// Re-render after each question loads
+function renderCurrentQuestion(){
+  if(typeof renderMathInElement==='undefined') return;
+  const body = document.getElementById('cr-body') || document.getElementById('rc-body') || document.body;
+  renderMathInElement(body, {
+    delimiters:[{left:'$',right:'$',display:false},{left:'$$',right:'$$',display:true}],
+    throwOnError:false, output:'html'
+  });
+}
+</script>
 </head>
 <body>
 

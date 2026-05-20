@@ -58,11 +58,14 @@
 
   <div class="filter-bar">
     <input class="search-input" id="search" placeholder="🔍 Search questions..." oninput="applyFilters()">
-    <select class="filter-sel" id="f-sec" onchange="applyFilters()">
+    <select class="filter-sel" id="f-sec" onchange="updateBankTypeFilter();applyFilters()">
       <option value="">All Sections</option><option value="Q">Quantitative</option><option value="V">Verbal</option><option value="D">Data Insights</option>
     </select>
     <select class="filter-sel" id="f-diff" onchange="applyFilters()">
       <option value="">All Difficulties</option><option value="Easy">Easy</option><option value="Medium">Medium</option><option value="Hard">Hard</option>
+    </select>
+    <select class="filter-sel" id="f-type" onchange="applyFilters()" style="max-width:240px">
+      <option value="">All Types</option>
     </select>
     <select class="filter-sel" id="f-pool" onchange="applyFilters()">
       <option value="__all__">All Pools</option>
@@ -94,6 +97,46 @@ document.getElementById('topbar-wrap').innerHTML = renderTopbar('bank');
 
 let allQs = [], filteredQs = [], selectedIds = new Set();
 
+// Populate type filter based on selected section
+function updateBankTypeFilter(){
+  const sec = g('f-sec').value;
+  const sel = g('f-type');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">All Types</option>';
+
+  // Use SECTION_TYPES from admin-shared.js if available
+  const types = (typeof SECTION_TYPES !== 'undefined' && SECTION_TYPES[sec])
+    ? SECTION_TYPES[sec]
+    : (typeof ALL_TYPES_FLAT !== 'undefined'
+        ? ALL_TYPES_FLAT
+            .filter(t => sec === 'Q' ? t.startsWith('PS') || t.startsWith('DS') && !sec
+                       : sec === 'V' ? t.startsWith('CR') || t.startsWith('RC')
+                       : sec === 'D' ? t.startsWith('DS') || t.startsWith('MSR') || t.startsWith('TPA') || t.startsWith('GI') || t.startsWith('TABLE')
+                       : true)
+            .map(t => ({value:t, label:t}))
+        : []);
+
+  // Group by prefix
+  const grouped = {};
+  types.forEach(t => {
+    const prefix = t.value.split('-')[0];
+    if(!grouped[prefix]) grouped[prefix] = [];
+    grouped[prefix].push(t);
+  });
+
+  Object.entries(grouped).forEach(([group, items]) => {
+    const og = document.createElement('optgroup');
+    og.label = group;
+    items.forEach(t => {
+      const o = document.createElement('option');
+      o.value = t.value;
+      o.textContent = t.label || t.value;
+      og.appendChild(o);
+    });
+    sel.appendChild(og);
+  });
+}
+
 async function loadBank(){
   g('bank-body').innerHTML = '<div class="page-loading"><div class="spinner"></div> Loading from Supabase...</div>';
   try {
@@ -108,12 +151,14 @@ async function loadBank(){
 function applyFilters(){
   const sec  = g('f-sec').value;
   const diff = g('f-diff').value;
+  const type = g('f-type').value;
   const pool = g('f-pool').value;
   const search = g('search').value.toLowerCase().trim();
 
   filteredQs = allQs.filter(q => {
     if(sec  && q.section !== sec) return false;
     if(diff && q.difficulty !== diff) return false;
+    if(type && !(q.topic||'').startsWith(type)) return false;
     if(pool === '__untagged__' && q.sectional) return false;
     if(pool !== '__all__' && pool !== '__untagged__' && String(q.sectional) !== pool) return false;
     if(search && !q.question.toLowerCase().includes(search) && !(q.topic||'').toLowerCase().includes(search)) return false;
@@ -231,7 +276,7 @@ async function clearAll(){
   showToast('All questions deleted','info');
 }
 
-loadBank();
+updateBankTypeFilter(); loadBank();
 </script>
 </body>
 </html>

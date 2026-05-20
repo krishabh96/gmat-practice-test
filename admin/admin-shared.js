@@ -43,7 +43,42 @@ function getDb(){
 
 // ── DB: Supabase-backed question store ──
 // All methods are async — await them in calling code
-const DB = {
+
+// ── All question types flat list (for bank filters) ──
+const ALL_TYPES_FLAT = [
+  // Quant PS
+  'PS',
+  'PS-Algebra','PS-Algebra-Inequalities','PS-Algebra-Functions','PS-Algebra-Exponents',
+  'PS-Algebra-Roots','PS-Algebra-Sequences','PS-Algebra-AbsoluteValue','PS-Algebra-MinMax',
+  'PS-Arithmetic','PS-Arith-Fractions','PS-Arith-Percents',
+  'PS-NumberTheory','PS-NT-Divisibility','PS-NT-NumberProperties','PS-NT-Remainders','PS-NT-MustCouldBeTrue',
+  'PS-WordProblem','PS-WP-DistanceRate','PS-WP-WorkRate','PS-WP-Mixtures','PS-WP-OverlappingSets','PS-WP-CoordinateGeometry',
+  'PS-Stats','PS-Stats-StatisticsSets','PS-Stats-Probability','PS-Stats-Combinations',
+  // Verbal CR
+  'CR',
+  'CR-Assumption','CR-Strengthen','CR-Weaken','CR-Inference',
+  'CR-Evaluate','CR-Flaw','CR-Boldface','CR-Paradox','CR-MustBeTrue','CR-Complete',
+  // Verbal RC
+  'RC',
+  'RC-ShortPassage','RC-LongPassage',
+  'RC-MainPurpose','RC-Detail','RC-Inference','RC-Function',
+  'RC-Strengthen','RC-Weaken','RC-Tone','RC-Vocab','RC-Except','RC-Apply',
+  // DI DS
+  'DS',
+  'DS-Algebra','DS-Algebra-Inequalities','DS-Algebra-Exponents',
+  'DS-Arith-Fractions','DS-Arith-Percents',
+  'DS-NT-Divisibility','DS-NT-NumberProperties','DS-NT-Remainders',
+  'DS-WordProblem','DS-WP-DistanceRate','DS-WP-WorkRate','DS-WP-OverlappingSets',
+  'DS-Stats-Probability','DS-Stats-Combinations','DS-Stats-StatisticsSets',
+  // DI MSR
+  'MSR','MSR-Inference','MSR-Calc','MSR-Evaluate',
+  // DI TPA
+  'TPA','TPA-Math','TPA-Verbal',
+  // DI GI
+  'GI','GI-BarChart','GI-LineGraph','GI-ScatterPlot','GI-Mixed',
+  // DI Table
+  'TABLE','TABLE-Sort','TABLE-Calc',
+];const DB = {
 
   // ── READ ──
   async getQs(filters = {}) {
@@ -639,13 +674,15 @@ function parseDocText(rawText, defaultSection, defaultDifficulty){
     const content = block.slice(0, contentEnd);
 
     // ── Extract options ──
-    // KEY FIX: options have blank lines between them (one option per paragraph in docx)
-    // Scan ALL lines — blank lines between options are fine
+    // Roman numeral lines (I. II. III.) are part of the QUESTION, not options — skip them
+    const isRomanLine = (s) => /^(I{1,3}|IV|VI{0,3}|IX|XI{0,3})\s*[.)]\s+\S/.test(s.trim());
+
     const options = {}, optIdxs = [];
     content.forEach((l, j) => {
       const s = l.trim().replace(/\*\*/g,'');
-      const ltr = s.match(/^[\(\[]?([A-E])[\)\].]\s+(.+)/);
-      if(ltr && !detectAnswer(s)){ options[ltr[1]] = ltr[2].trim(); optIdxs.push(j); return; }
+      if(isRomanLine(s)) return; // Roman numeral statements belong in question text
+      const ltr = s.match(/^[\(\[]?([A-E])[\)\].\s]\s*(.+)/);
+      if(ltr && ltr[2].trim() && !detectAnswer(s)){ options[ltr[1]] = ltr[2].trim(); optIdxs.push(j); return; }
       if(s.match(/^-\s+\S/) && !detectAnswer(s)){
         const text = s.replace(/^-\s+/,'').trim();
         if(text && optIdxs.length < 5){
