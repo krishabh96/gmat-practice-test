@@ -328,31 +328,7 @@
         <button class="clean-btn" onclick="cleanField('pa-text','pa-preview')">✨ Clean</button>
         <textarea class="form-textarea" id="pa-text" rows="14" data-preview="pa-preview"
           oninput="updatePreview('pa-text','pa-preview')"
-          placeholder="Paste any question block here. Examples:
-
-── CR / Boldface CR ──
-The valet area at Chez Shay consistently handles more cars than Cancan Club. Which of the following can most reasonably be inferred?
-
-A. Patrons of Chez Shay are wealthier.
-B. Many diners who use valet at Chez Shay also valet at Cancan Club.
-C. Diners at Chez Shay prefer to pay rather than find street parking.
-D. Customers prefer Chez Shay's food.
-E. Even if free parking was available, diners would still choose valet.
-
-OA: C
-Explanation: The key is that Chez Shay has virtually no other parking...
-
-── RC ──
-[Paste the full passage here]
-
-[STEM]
-The passage suggests that changes in phytoplankton populations:
-
-A. Can be easily reversed with intervention.
-B. Have no effect on larger marine animals.
-...
-The correct answer is D.
-Explanation: The passage states..."></textarea>
+          placeholder="Paste any question block here..."></textarea>
       </div>
       <div class="preview-wrap">
         <div class="preview-label">Preview</div>
@@ -754,6 +730,65 @@ const SECTION_HINTS = {
   },
 };
 
+
+const PASTE_PLACEHOLDERS = {
+  Q: `Paste any Quant question here. Example:
+
+If m, p, s and v are positive, and $\\frac{m}{p} < \\frac{s}{v}$, which of the following must be between $\\frac{m}{p}$ and $\\frac{s}{v}$?
+
+I. $\\frac{m+s}{p+v}$
+II. $\\frac{ms}{pv}$
+III. $\\frac{s}{v} - \\frac{m}{p}$
+
+A. None
+B. I only
+C. II only
+D. III only
+E. I and II both
+
+The correct answer is B.
+
+Explanation: Statement I is always between m/p and s/v (mediant property). Statements II and III are not necessarily between them.`,
+
+  V: `Paste any Verbal question here. Examples:
+
+── CR: Weaken / Strengthen ──
+A city councilor argues that banning privately owned cars from the downtown area will reduce traffic congestion. Which of the following, if true, most seriously weakens this argument?
+
+A. Many residents use public transportation to commute to work.
+B. Several nearby cities have implemented similar bans with mixed results.
+C. A significant number of downtown visitors travel from areas with no public transit access.
+D. Traffic congestion has increased every year for the past decade.
+E. The downtown area has limited parking facilities.
+
+The correct answer is C.
+
+── RC: Paste full passage, then [STEM] on new line ──
+[Passage text here...]
+
+[STEM]
+The primary purpose of the passage is to:`,
+
+  D: `Paste any Data Insights question here. Examples:
+
+── Data Sufficiency ──
+Is x > 0?
+(1) x² > 0
+(2) x³ > 0
+
+A. Statement (1) ALONE is sufficient, but statement (2) alone is not sufficient.
+B. Statement (2) ALONE is sufficient, but statement (1) alone is not sufficient.
+C. BOTH statements TOGETHER are sufficient, but NEITHER statement alone is sufficient.
+D. EACH statement ALONE is sufficient.
+E. Statements (1) and (2) TOGETHER are NOT sufficient.
+
+The correct answer is B.
+
+── Two-Part Analysis ──
+[Source text or graph description]
+
+In the table, select the value for x and the value for y that together satisfy the conditions.`,
+};
 function switchSection(sec){
   ACTIVE_SECTION = sec;
 
@@ -778,6 +813,10 @@ function switchSection(sec){
 
   // Update hints
   updateHints(sec);
+
+  // Update paste textarea placeholder
+  const pa = document.getElementById('pa-text');
+  if(pa && PASTE_PLACEHOLDERS[sec]) pa.placeholder = PASTE_PLACEHOLDERS[sec];
 }
 
 function updateHints(sec){
@@ -791,6 +830,7 @@ function updateHints(sec){
 // Init on page load
 updateUploadType(); updatePasteType(); updateImageTypes();
 updateHints('Q');
+  const _pa=document.getElementById('pa-text'); if(_pa) _pa.placeholder=PASTE_PLACEHOLDERS['Q']||_pa.placeholder;
 
 // ── METHOD TABS ──
 function switchMethod(id, btn){
