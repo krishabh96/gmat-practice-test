@@ -12,6 +12,13 @@
 <style id="shared-styles"></style>
 <style>
 /* TABS */
+.section-tabs{display:flex;gap:0;margin-bottom:0;background:var(--white);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px;width:fit-content}
+.section-tab{padding:10px 28px;font-size:14px;font-weight:700;cursor:pointer;border:none;background:transparent;font-family:'Inter',sans-serif;transition:all .15s;color:var(--muted);border-right:1.5px solid var(--border)}
+.section-tab:last-child{border-right:none}
+.section-tab:hover{background:#f8f8f8}
+.section-tab.active-Q{background:#003865;color:#fff}
+.section-tab.active-V{background:#c62828;color:#fff}
+.section-tab.active-D{background:#2e7d32;color:#fff}
 .method-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:20px}
 .method-tab{padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:transparent;font-family:'Inter',sans-serif;transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-2px}
 .method-tab:hover{color:var(--text)}.method-tab.active{color:var(--navy);border-bottom-color:var(--teal)}
@@ -82,10 +89,19 @@
   <div class="page-title">Add Questions</div>
   <div class="page-sub">Questions save directly to Supabase — changes reflect instantly in tests, no export needed.</div>
 
+  <!-- SECTION TABS (top level) -->
+  <div class="section-tabs" id="section-tabs">
+    <button class="section-tab active-Q" id="stab-Q" onclick="switchSection('Q')">📐 Quant</button>
+    <button class="section-tab" id="stab-V" onclick="switchSection('V')">📖 Verbal</button>
+    <button class="section-tab" id="stab-D" onclick="switchSection('D')">📊 DI</button>
+  </div>
+
+  <!-- METHOD TABS -->
   <div class="method-tabs">
     <button class="method-tab active" onclick="switchMethod('upload',this)">📄 Upload Doc / PDF</button>
     <button class="method-tab" onclick="switchMethod('paste',this)">📋 Paste & Parse</button>
     <button class="method-tab" onclick="switchMethod('manual',this)">✏️ Manual Entry</button>
+    <button class="method-tab" onclick="switchMethod('image',this)">🖼️ Image → Question</button>
   </div>
 
   <!-- ══ UPLOAD ══ -->
@@ -114,7 +130,7 @@
             <option value="D">Data Insights (DI)</option>
           </select>
         </div>
-        <div class="form-group" style="margin-bottom:0" id="up-qtype-wrap" style="display:none">
+        <div class="form-group" style="margin-bottom:0" id="up-qtype-wrap">
           <label class="form-label">Question Type</label>
           <select class="form-select" id="up-qtype">
             <option value="CR">Critical Reasoning (CR)</option>
@@ -154,6 +170,8 @@
         <div style="font-size:11px;color:var(--muted)" id="ep-sub"></div>
       </div>
     </div>
+
+
     <div class="card" id="parsed-card" style="display:none">
       <div class="parsed-header">
         <div class="parsed-count" id="parsed-count">0 questions found</div>
@@ -167,17 +185,107 @@
     </div>
   </div>
 
+    <!-- IMAGE UPLOAD PANEL -->
+    <div class="method-panel" id="method-image">
+      <div class="card">
+        <div class="hint-box">
+          <strong>🖼️ Image → Question Extractor</strong><br>
+          Upload a photo of a GMAT question (textbook, screenshot, handwritten). AI extracts question, options, and equations — converts fractions to LaTeX automatically.
+          Tip: Use <code>$\frac{a}{b}$</code> in the extracted text for proper math rendering.
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Section</label>
+            <select class="form-select" id="img-section" onchange="updateImageTypes()">
+              <option value="Q">Quantitative (Q)</option>
+              <option value="V">Verbal (V)</option>
+              <option value="D">Data Insights (DI)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Question Type</label>
+            <select class="form-select" id="img-qtype"></select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Assign to Sectional</label>
+            <select class="form-select" id="img-sectional">
+              <option value="">Untagged</option>
+              <option value="1">Sectional 01</option><option value="2">Sectional 02</option>
+              <option value="3">Sectional 03</option><option value="4">Sectional 04</option>
+              <option value="5">Sectional 05</option><option value="6">Sectional 06</option>
+              <option value="7">Sectional 07</option><option value="8">Sectional 08</option>
+              <option value="9">Sectional 09</option><option value="10">Sectional 10</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="upload-zone" id="img-drop-zone"
+             onclick="g('img-file-input').click()"
+             ondragover="event.preventDefault();this.classList.add('over')"
+             ondragleave="this.classList.remove('over')"
+             ondrop="handleImageDrop(event)">
+          <input type="file" id="img-file-input" accept="image/*" style="display:none" onchange="handleImageFile(this.files[0])">
+          <div id="img-preview-wrap" style="display:none;margin-bottom:12px">
+            <img id="img-preview" style="max-height:220px;max-width:100%;border-radius:8px;border:1px solid var(--border)">
+          </div>
+          <div id="img-drop-text">
+            <div style="font-size:36px;margin-bottom:8px">📷</div>
+            <div style="font-size:14px;font-weight:600;color:var(--navy)">Drop image here or click to browse</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">PNG, JPG, JPEG, WEBP — textbook pages, screenshots, equations</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center">
+          <button class="btn btn-teal" id="img-extract-btn" onclick="extractFromImage()" style="display:none">
+            🤖 Extract Question with AI
+          </button>
+          <div id="img-extract-status" style="font-size:13px;color:var(--muted)"></div>
+        </div>
+
+        <div id="img-result" style="display:none;margin-top:20px;border-top:1px solid var(--border);padding-top:18px">
+          <div style="font-size:13px;font-weight:700;color:#2e7d32;margin-bottom:14px">✅ Extracted — Review & Edit before saving</div>
+          <div class="form-group">
+            <label class="form-label">Question Text</label>
+            <textarea class="form-input" id="img-q-text" rows="6" style="font-family:Georgia,serif;font-size:14px;line-height:1.8"></textarea>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+            <div class="form-group" style="margin-bottom:0"><label class="form-label">A.</label><input class="form-input" id="img-A" placeholder="Option A"></div>
+            <div class="form-group" style="margin-bottom:0"><label class="form-label">B.</label><input class="form-input" id="img-B" placeholder="Option B"></div>
+            <div class="form-group" style="margin-bottom:0"><label class="form-label">C.</label><input class="form-input" id="img-C" placeholder="Option C"></div>
+            <div class="form-group" style="margin-bottom:0"><label class="form-label">D.</label><input class="form-input" id="img-D" placeholder="Option D"></div>
+            <div class="form-group" style="margin-bottom:0"><label class="form-label">E. (optional)</label><input class="form-input" id="img-E" placeholder="Option E"></div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Correct Answer</label>
+              <select class="form-select" id="img-answer">
+                <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Difficulty</label>
+              <select class="form-select" id="img-difficulty">
+                <option>Easy</option><option selected>Medium</option><option>Hard</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Explanation (optional)</label>
+            <textarea class="form-input" id="img-explanation" rows="3" placeholder="Explanation of correct answer..."></textarea>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-teal" onclick="saveImageQuestion()">💾 Save to Supabase</button>
+            <button class="btn" onclick="resetImageExtractor()" style="background:var(--bg);border:1px solid var(--border);color:var(--text)">↺ Extract Another</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   <!-- ══ PASTE ══ -->
   <div class="method-panel" id="method-paste">
     <div class="card">
       <div class="card-title">📋 Paste & Parse</div>
-      <div class="hint-box">
-        <strong>✅ Answer formats:</strong>
-        <code>The correct answer is B.</code> <code>Answer: B</code> <code>OA: B</code> <code>Ans: B</code> <code>Correct Answer: B</code><br>
-        <strong>📝 Explanation:</strong> Text after the answer line is captured automatically — paste the full explanation block, it will be extracted.<br>
-        <strong>🔤 Boldface CR:</strong> Wrap bold in <code>**text**</code> e.g. <code>**The company increased prices**</code><br>
-        <strong>📖 RC:</strong> Paste the full passage, then on a new line write <code>[STEM]</code> followed by the question stem.
-      </div>
+      <div class="hint-box" id="paste-hint-box"><div id="paste-hint-content"></div></div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px">
         <div class="form-group" style="margin-bottom:0">
           <label class="form-label">Section</label>
@@ -293,7 +401,7 @@ Explanation: The passage states..."></textarea>
           <button class="qtype-tab" id="qt-RC" onclick="setQType('RC',this)">Reading Comprehension</button>
           <button class="qtype-tab" id="qt-BF" onclick="setQType('CR-BF',this)">Boldface CR</button>
         </div>
-        <input type="hidden" id="f-qtype" value="CR">
+        <input type="hidden" id="f-qtype" value="PS">
       </div>
 
       <!-- CR / Q / DI fields -->
@@ -473,17 +581,216 @@ function setQType(type, btn){
   }
 }
 
+
+// ── Section-specific question types ──
+// ── GMAT Focus Edition Official Question Types ──
+// Source: GMAT Club official taxonomy + thegmatco.com
+const SECTION_TYPES = {
+
+  // ── QUANTITATIVE (Problem Solving only in GMAT Focus) ──
+  Q: [
+    { value: 'PS',                           label: 'Problem Solving — All' },
+    // Algebra
+    { value: 'PS-Algebra',                   label: 'PS · Algebra' },
+    { value: 'PS-Algebra-Inequalities',      label: 'PS · Algebra — Inequalities' },
+    { value: 'PS-Algebra-Functions',         label: 'PS · Algebra — Functions & Custom Characters' },
+    { value: 'PS-Algebra-Exponents',         label: 'PS · Algebra — Exponents & Powers' },
+    { value: 'PS-Algebra-Roots',             label: 'PS · Algebra — Roots' },
+    { value: 'PS-Algebra-Sequences',         label: 'PS · Algebra — Sequences' },
+    { value: 'PS-Algebra-AbsoluteValue',     label: 'PS · Algebra — Absolute Values / Modulus' },
+    { value: 'PS-Algebra-MinMax',            label: 'PS · Algebra — Min / Max Problems' },
+    // Arithmetic
+    { value: 'PS-Arithmetic',                label: 'PS · Arithmetic' },
+    { value: 'PS-Arith-Fractions',           label: 'PS · Arithmetic — Fractions / Ratios / Decimals' },
+    { value: 'PS-Arith-Percents',            label: 'PS · Arithmetic — Percents & Interest Problems' },
+    // Number Theory
+    { value: 'PS-NumberTheory',              label: 'PS · Number Theory' },
+    { value: 'PS-NT-Divisibility',           label: 'PS · Number Theory — Divisibility / Multiples / Factors' },
+    { value: 'PS-NT-NumberProperties',       label: 'PS · Number Theory — Number Properties' },
+    { value: 'PS-NT-Remainders',             label: 'PS · Number Theory — Remainders' },
+    { value: 'PS-NT-MustCouldBeTrue',        label: 'PS · Number Theory — Must or Could Be True' },
+    // Word Problems
+    { value: 'PS-WordProblem',               label: 'PS · Word Problems' },
+    { value: 'PS-WP-DistanceRate',           label: 'PS · Word Problems — Distance / Rate / Time' },
+    { value: 'PS-WP-WorkRate',               label: 'PS · Word Problems — Work Rate Problems' },
+    { value: 'PS-WP-Mixtures',               label: 'PS · Word Problems — Mixture Problems' },
+    { value: 'PS-WP-OverlappingSets',        label: 'PS · Word Problems — Overlapping Sets' },
+    { value: 'PS-WP-CoordinateGeometry',     label: 'PS · Word Problems — Coordinate Geometry' },
+    // Statistics & Probability
+    { value: 'PS-Stats',                     label: 'PS · Statistics & Probability' },
+    { value: 'PS-Stats-StatisticsSets',      label: 'PS · Statistics — Statistics & Sets Problems' },
+    { value: 'PS-Stats-Probability',         label: 'PS · Statistics — Probability' },
+    { value: 'PS-Stats-Combinations',        label: 'PS · Statistics — Combinations & Permutations' },
+  ],
+
+  // ── VERBAL ──
+  V: [
+    // Critical Reasoning — exact types from GMAT Focus Official Guide
+    { value: 'CR',                           label: 'Critical Reasoning — All' },
+    { value: 'CR-Assumption',                label: 'CR · Assumption' },
+    { value: 'CR-Strengthen',                label: 'CR · Strengthen the Argument' },
+    { value: 'CR-Weaken',                    label: 'CR · Weaken the Argument' },
+    { value: 'CR-Inference',                 label: 'CR · Inference / Draw a Conclusion' },
+    { value: 'CR-Evaluate',                  label: 'CR · Evaluate the Argument' },
+    { value: 'CR-Flaw',                      label: 'CR · Identify the Flaw / Vulnerable To' },
+    { value: 'CR-Boldface',                  label: 'CR · Boldface / Role of Statement' },
+    { value: 'CR-Paradox',                   label: 'CR · Explain a Discrepancy / Resolve Paradox' },
+    { value: 'CR-MustBeTrue',                label: 'CR · Must Be True' },
+    { value: 'CR-Complete',                  label: 'CR · Complete the Passage' },
+    // Reading Comprehension — passage types + question subtypes
+    { value: 'RC',                           label: 'Reading Comprehension — All' },
+    { value: 'RC-ShortPassage',              label: 'RC · Short Passage' },
+    { value: 'RC-LongPassage',               label: 'RC · Long Passage' },
+    { value: 'RC-MainPurpose',               label: 'RC · Primary Purpose / Main Idea' },
+    { value: 'RC-Detail',                    label: 'RC · Specific Detail / According to the Passage' },
+    { value: 'RC-Inference',                 label: 'RC · Inference' },
+    { value: 'RC-Function',                  label: 'RC · Function / Purpose of a Paragraph' },
+    { value: 'RC-Strengthen',                label: 'RC · Strengthen / Support' },
+    { value: 'RC-Weaken',                    label: 'RC · Weaken' },
+    { value: 'RC-Tone',                      label: 'RC · Author Tone / Attitude' },
+    { value: 'RC-Vocab',                     label: 'RC · Vocabulary in Context' },
+    { value: 'RC-Except',                    label: 'RC · Except / Least / Not' },
+    { value: 'RC-Apply',                     label: 'RC · Application / Analogy' },
+  ],
+
+  // ── DATA INSIGHTS ──
+  D: [
+    // Data Sufficiency — same topic taxonomy as PS
+    { value: 'DS',                           label: 'Data Sufficiency — All' },
+    { value: 'DS-Algebra',                   label: 'DS · Algebra' },
+    { value: 'DS-Algebra-Inequalities',      label: 'DS · Algebra — Inequalities' },
+    { value: 'DS-Algebra-Exponents',         label: 'DS · Algebra — Exponents & Powers' },
+    { value: 'DS-Arith-Fractions',           label: 'DS · Arithmetic — Fractions / Ratios / Decimals' },
+    { value: 'DS-Arith-Percents',            label: 'DS · Arithmetic — Percents & Interest' },
+    { value: 'DS-NT-Divisibility',           label: 'DS · Number Theory — Divisibility / Multiples / Factors' },
+    { value: 'DS-NT-NumberProperties',       label: 'DS · Number Theory — Number Properties' },
+    { value: 'DS-NT-Remainders',             label: 'DS · Number Theory — Remainders' },
+    { value: 'DS-WordProblem',               label: 'DS · Word Problems' },
+    { value: 'DS-WP-DistanceRate',           label: 'DS · Word Problems — Distance / Rate / Time' },
+    { value: 'DS-WP-WorkRate',               label: 'DS · Word Problems — Work Rate' },
+    { value: 'DS-WP-OverlappingSets',        label: 'DS · Word Problems — Overlapping Sets' },
+    { value: 'DS-Stats-Probability',         label: 'DS · Statistics — Probability' },
+    { value: 'DS-Stats-Combinations',        label: 'DS · Statistics — Combinations' },
+    { value: 'DS-Stats-StatisticsSets',      label: 'DS · Statistics — Statistics & Sets' },
+    // Multi-Source Reasoning
+    { value: 'MSR',                          label: 'Multi-Source Reasoning (MSR) — All' },
+    { value: 'MSR-Inference',                label: 'MSR · Inference / Conclusion' },
+    { value: 'MSR-Calc',                     label: 'MSR · Calculation' },
+    { value: 'MSR-Evaluate',                 label: 'MSR · Evaluate / Assumption' },
+    // Two-Part Analysis
+    { value: 'TPA',                          label: 'Two-Part Analysis (TPA) — All' },
+    { value: 'TPA-Math',                     label: 'TPA · Quantitative / Math' },
+    { value: 'TPA-Verbal',                   label: 'TPA · Verbal / CR-style' },
+    // Graphic Interpretation
+    { value: 'GI',                           label: 'Graphic Interpretation (GI) — All' },
+    { value: 'GI-BarChart',                  label: 'GI · Bar Chart' },
+    { value: 'GI-LineGraph',                 label: 'GI · Line Graph' },
+    { value: 'GI-ScatterPlot',               label: 'GI · Scatter Plot' },
+    { value: 'GI-Mixed',                     label: 'GI · Mixed / Combined Charts' },
+    // Table Analysis
+    { value: 'TABLE',                        label: 'Table Analysis — All' },
+    { value: 'TABLE-Sort',                   label: 'Table Analysis · Sort & Filter' },
+    { value: 'TABLE-Calc',                   label: 'Table Analysis · Calculation' },
+  ],
+}
+
+function getTypeOptions(section){
+  return (SECTION_TYPES[section] || SECTION_TYPES.Q)
+    .map(t => `<option value="${t.value}">${t.label}</option>`).join('');
+}
+
 function updateUploadType(){
   const sec = g('up-section').value;
-  g('up-qtype-wrap').style.display = sec==='V' ? 'block' : 'none';
+  const wrap = g('up-qtype-wrap');
+  const sel  = g('up-qtype');
+  // All sections have type selection now
+  wrap.style.display = 'block';
+  sel.innerHTML = getTypeOptions(sec);
 }
 
 function updatePasteType(){
   const sec = g('pa-section').value;
-  g('pa-qtype-wrap').style.display = sec==='V' ? 'block' : 'none';
+  const wrap = g('pa-qtype-wrap');
+  const sel  = g('pa-qtype');
+  wrap.style.display = 'block';
+  if(sel) sel.innerHTML = getTypeOptions(sec);
 }
 // Init
-updateUploadType(); updatePasteType();
+
+// ── SECTION TABS ──
+let ACTIVE_SECTION = 'Q';
+
+const SECTION_HINTS = {
+  Q: {
+    upload: `<strong>✅ Answer formats:</strong> <code>The correct answer is B.</code> <code>Answer: B</code> <code>OA: B</code><br>
+      <strong>📐 LaTeX equations (renders in test):</strong> Wrap in <code>$...$</code> — e.g. <code>$\frac{m}{p} &lt; \frac{s}{v}$</code> renders as a proper fraction.<br>
+      <strong>📐 Quick LaTeX:</strong> <code>$\frac{a}{b}$</code> fraction &nbsp;·&nbsp; <code>$x^2$</code> exponent &nbsp;·&nbsp; <code>$\sqrt{x}$</code> root &nbsp;·&nbsp; <code>$a \times b$</code> multiply &nbsp;·&nbsp; <code>$\leq$</code> ≤ &nbsp;·&nbsp; <code>$\geq$</code> ≥<br>
+      <strong>🔢 Roman numeral options:</strong> Write <code>I. expression</code> / <code>II. expression</code> each on its own line.`,
+    paste: `<strong>✅ Answer formats:</strong> <code>The correct answer is B.</code> <code>Answer: B</code> <code>OA: B</code><br>
+      <strong>📐 LaTeX equations:</strong> Wrap math in <code>$...$</code> — e.g. <code>$\frac{m}{p} &lt; \frac{s}{v}$</code> renders as proper fractions in the test.<br>
+      <strong>📐 Quick reference:</strong> <code>$\frac{a}{b}$</code> &nbsp;·&nbsp; <code>$x^{2}$</code> &nbsp;·&nbsp; <code>$\sqrt{n}$</code> &nbsp;·&nbsp; <code>$|x|$</code> &nbsp;·&nbsp; <code>$\leq \geq \neq$</code> &nbsp;·&nbsp; <code>$\pi$</code><br>
+      <strong>🔢 Roman numerals:</strong> <code>I. m+sp+v</code> then <code>II. mspv</code> — each on its own line.<br>
+      <strong>📝 Explanation:</strong> Text after the answer line is captured automatically.`,
+  },
+  V: {
+    upload: `<strong>✅ Answer formats:</strong> <code>The correct answer is B.</code> <code>Answer: B</code> <code>OA: B</code><br>
+      <strong>🔤 Boldface CR:</strong> Wrap bold in <code>**text**</code> e.g. <code>**The company increased prices**</code><br>
+      <strong>📖 RC passages:</strong> Use passage header format: <code>EASY RC PASSAGE (Questions 19–22)</code> before the passage text. Questions follow after.<br>
+      <strong>📝 Explanation:</strong> Full explanation block after the answer line is extracted automatically.`,
+    paste: `<strong>✅ Answer formats:</strong> <code>The correct answer is B.</code> <code>Answer: B</code> <code>OA: B</code><br>
+      <strong>🔤 Boldface CR:</strong> Wrap bold text with <code>**text**</code><br>
+      <strong>📖 RC questions:</strong> Paste the full passage first, then write <code>[STEM]</code> on a new line, then the question stem.<br>
+      <strong>📝 Explanation:</strong> Text after the answer line is captured automatically.`,
+  },
+  D: {
+    upload: `<strong>✅ Answer formats:</strong> <code>The correct answer is B.</code> <code>Answer: B</code> <code>OA: B</code><br>
+      <strong>📊 MSR tabs:</strong> Use <code>[TAB: Tab Name]</code> markers to separate multi-source tabs in the passage field.<br>
+      <strong>📋 Tables:</strong> Format table rows with pipe separators: <code>Col1 | Col2 | Col3</code> — each row on its own line.<br>
+      <strong>📝 Explanation:</strong> Text after the answer line is captured automatically.`,
+    paste: `<strong>✅ Answer formats:</strong> <code>The correct answer is B.</code> <code>Answer: B</code> <code>OA: B</code><br>
+      <strong>📊 DS questions:</strong> Include Statement (1) and Statement (2) in the question text.<br>
+      <strong>📋 MSR:</strong> Paste source content, then write <code>[STEM]</code> on new line, then the question.<br>
+      <strong>📝 Explanation:</strong> Text after the answer line is captured automatically.`,
+  },
+};
+
+function switchSection(sec){
+  ACTIVE_SECTION = sec;
+
+  // Update section tab styles
+  ['Q','V','D'].forEach(s => {
+    const btn = g('stab-'+s);
+    btn.className = 'section-tab' + (s===sec ? ' active-'+s : '');
+  });
+
+  // Sync all section dropdowns across panels
+  ['up-section','pa-section','img-section'].forEach(id => {
+    const el = g(id); if(el) el.value = sec;
+  });
+
+  // Update question type dropdowns
+  updateUploadType();
+  updatePasteType();
+  updateImageTypes();
+
+  // Update manual entry section
+  if(typeof setSec === 'function') setSec(sec);
+
+  // Update hints
+  updateHints(sec);
+}
+
+function updateHints(sec){
+  const hints = SECTION_HINTS[sec] || SECTION_HINTS.Q;
+  const uh = g('upload-hint-content');
+  const ph = g('paste-hint-content');
+  if(uh) uh.innerHTML = hints.upload;
+  if(ph) ph.innerHTML = hints.paste;
+}
+
+// Init on page load
+updateUploadType(); updatePasteType(); updateImageTypes();
+updateHints('Q');
 
 // ── METHOD TABS ──
 function switchMethod(id, btn){
@@ -623,6 +930,31 @@ async function importPaste(){
 }
 
 // ══ RENDER PARSED LIST ══
+function escQ(text){
+  // Safely escape for display but preserve LaTeX delimiters for KaTeX
+  if(!text) return '';
+  return String(text)
+    .replace(/&(?![a-zA-Z#][a-zA-Z0-9]*;)/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+}
+
+function renderMath(container){
+  // Render KaTeX in all elements within container
+  if(typeof renderMathInElement === 'undefined') return;
+  renderMathInElement(container, {
+    delimiters: [
+      {left:'$$', right:'$$', display:true},
+      {left:'$', right:'$', display:false},
+      {left:'\\(', right:'\\)', display:false},
+      {left:'\\[', right:'\\]', display:true},
+    ],
+    throwOnError: false,
+    output: 'html'
+  });
+}
+
 function renderParsedList(qs,listId,countId){
   const list=g(listId);const countEl=g(countId);
   if(countEl) countEl.textContent=qs.length+' question(s) found';
@@ -630,20 +962,32 @@ function renderParsedList(qs,listId,countId){
   qs.forEach((q,i)=>{
     const item=document.createElement('div');
     item.className='pq-item';item.dataset.diff=q.difficulty;
+
+    // Safe math-aware question preview
+    const qPreview = escQ((q.question||'').slice(0,200)) + ((q.question||'').length>200?'…':'');
+
     const optHtml=Object.entries(q.options||{}).map(([l,v])=>
-      `<span class="pq-opt${l===q.answer?' correct':''}">${l}. ${String(v).slice(0,30)}${String(v).length>30?'…':''}</span>`
+      `<span class="pq-opt${l===q.answer?' correct':''}">${l}. ${escQ(String(v).slice(0,40))}${String(v).length>40?'…':''}</span>`
     ).join('');
-    // Show explanation preview — key fix
+
     const explHtml=q.explanation?
-      `<div class="pq-expl">📝 <strong>Explanation:</strong>\n${q.explanation.slice(0,300)}${q.explanation.length>300?'…':''}</div>`:'';
+      `<div class="pq-expl">📝 <strong>Explanation:</strong> ${escQ(q.explanation.slice(0,200))}${q.explanation.length>200?'…':''}</div>`:'';
+
     const passageHtml=q.passage?
-      `<div class="pq-expl" style="border-left-color:#005487;background:#f0f6fb">📖 <strong>Passage (${q.passage.length} chars):</strong> ${q.passage.slice(0,150)}…</div>`:'<div style="font-size:10px;color:#bbb;margin-top:4px">No passage (CR/Q/DI)</div>';
+      `<div class="pq-expl" style="border-left-color:#005487;background:#f0f6fb">📖 <strong>Passage (${q.passage.length} chars)</strong></div>`:
+      (q.section==='V'?'<div style="font-size:10px;color:#bbb;margin-top:4px">No passage (CR)</div>':'');
+
     const secNum=q.sectional?`<span style="font-size:10px;color:var(--teal-d);padding:2px 6px;background:var(--teal-l);border-radius:4px">S${String(q.sectional).padStart(2,'0')}</span>`:'';
     const typePill=q.topic?`<span style="font-size:10px;background:#e8f0f8;color:#003865;padding:2px 7px;border-radius:4px;font-weight:600">${q.topic}</span>`:'';
+
+    // Dynamic type options based on section
+    const typeOpts = getTypeOptions(q.section||ACTIVE_SECTION)
+      .replace(`value="${q.topic||''}"`,`value="${q.topic||''}" selected`);
+
     item.innerHTML=`
       <input type="checkbox" class="pq-check" data-idx="${i}" checked>
       <div class="pq-body">
-        <div class="pq-q">${(q.question||'').slice(0,200)}${(q.question||'').length>200?'…':''}</div>
+        <div class="pq-q">${qPreview}</div>
         <div class="pq-opts">${optHtml}</div>
         ${explHtml}
         ${passageHtml}
@@ -656,16 +1000,12 @@ function renderParsedList(qs,listId,countId){
             <option ${q.difficulty==='Medium'?'selected':''}>Medium</option>
             <option ${q.difficulty==='Hard'?'selected':''}>Hard</option>
           </select>
-          <select class="pq-type-sel" onchange="qs[${i}].topic=this.value">
-            <option value="">No type</option>
-            <option value="CR" ${(q.topic||'').includes('CR')&&!(q.topic||'').includes('BF')&&!(q.topic||'').includes('RC')?'selected':''}>CR</option>
-            <option value="RC" ${(q.topic||'').includes('RC')?'selected':''}>RC</option>
-            <option value="CR-BF" ${(q.topic||'').includes('BF')?'selected':''}>Boldface CR</option>
-          </select>
+          <select class="pq-type-sel" onchange="qs[${i}].topic=this.value">${typeOpts}</select>
         </div>
       </div>`;
     list.appendChild(item);
   });
+  setTimeout(() => renderMath(list), 50);
 }
 
 function selectAll(sel){g('parsed-list').querySelectorAll('.pq-check').forEach(c=>c.checked=sel);}
@@ -797,6 +1137,153 @@ if(editId){
     showToast('Editing question — make changes and save.','info');
   });
 }
+
+// ── IMAGE QUESTION EXTRACTOR ──
+let imgBase64 = null;
+let imgMimeType = null;
+
+function updateImageTypes(){
+  const sec = g('img-section').value;
+  g('img-qtype').innerHTML = getTypeOptions(sec);
+}
+
+function handleImageDrop(e){
+  e.preventDefault();
+  g('img-drop-zone').classList.remove('over');
+  const file = e.dataTransfer.files[0];
+  if(file) handleImageFile(file);
+}
+
+function handleImageFile(file){
+  if(!file) return;
+  const allowed = ['image/png','image/jpeg','image/jpg','image/webp','image/gif'];
+  if(!allowed.includes(file.type)){
+    showToast('Please upload an image file (PNG, JPG, WEBP)');
+    return;
+  }
+  imgMimeType = file.type;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    imgBase64 = e.target.result.split(',')[1]; // strip data: prefix
+    // Show preview
+    g('img-preview').src = e.target.result;
+    g('img-preview-wrap').style.display = 'block';
+    g('img-drop-text').style.display = 'none';
+    g('img-extract-btn').style.display = 'inline-flex';
+    g('img-extract-status').textContent = 'Image ready — click Extract to process';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function extractFromImage(){
+  if(!imgBase64){ showToast('No image loaded'); return; }
+
+  const btn = g('img-extract-btn');
+  const status = g('img-extract-status');
+  btn.disabled = true;
+  btn.textContent = '⏳ Extracting...';
+  status.textContent = 'Sending to AI — this takes 5-15 seconds...';
+
+  const section = g('img-section').value;
+  const qtype   = g('img-qtype').value;
+
+
+  try {
+    // Call Vercel proxy function (avoids CORS restriction on direct Anthropic calls)
+    const response = await fetch('/api/extract-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        imageBase64: imgBase64,
+        mimeType: imgMimeType,
+        section: g('img-section').value,
+        qtype: g('img-qtype').value
+      })
+    });
+
+    const result = await response.json();
+
+    if(!response.ok || result.error){
+      throw new Error(result.error || 'Server error');
+    }
+
+    let parsed = result.data;
+    if(!parsed) throw new Error('No data returned from server');
+
+    // Populate form
+    g('img-q-text').value    = parsed.question || '';
+    g('img-A').value         = parsed.A || '';
+    g('img-B').value         = parsed.B || '';
+    g('img-C').value         = parsed.C || '';
+    g('img-D').value         = parsed.D || '';
+    g('img-E').value         = parsed.E || '';
+    g('img-answer').value    = (parsed.answer || 'A').toUpperCase();
+    g('img-difficulty').value= parsed.difficulty || 'Medium';
+    g('img-explanation').value = parsed.explanation || '';
+
+    g('img-result').style.display = 'block';
+    status.textContent = '✅ Extraction complete — review and edit below';
+    btn.textContent = '🔄 Re-extract';
+    btn.disabled = false;
+
+  } catch(err){
+    status.textContent = '❌ ' + err.message;
+    btn.textContent = '🤖 Extract Question with AI';
+    btn.disabled = false;
+    console.error(err);
+  }
+}
+
+async function saveImageQuestion(){
+  const q = g('img-q-text').value.trim();
+  if(!q){ showToast('Question text is required'); return; }
+
+  const opts = {
+    A: g('img-A').value.trim(),
+    B: g('img-B').value.trim(),
+    C: g('img-C').value.trim(),
+    D: g('img-D').value.trim(),
+  };
+  const eOpt = g('img-E').value.trim();
+  if(eOpt) opts.E = eOpt;
+
+  if(!opts.A||!opts.B||!opts.C||!opts.D){ showToast('Options A–D are required'); return; }
+
+  const qObj = {
+    id: 'Q_'+Date.now()+'_img',
+    section:    g('img-section').value,
+    difficulty: g('img-difficulty').value,
+    topic:      g('img-qtype').value,
+    question:   q,
+    options:    opts,
+    answer:     g('img-answer').value,
+    explanation:g('img-explanation').value.trim(),
+    passage:    null,
+    sectional:  parseInt(g('img-sectional').value)||null,
+  };
+
+  try {
+    await DB.add(qObj);
+    showToast('✅ Question saved to Supabase!', 'success');
+    resetImageExtractor();
+  } catch(e){
+    showToast('Error saving: '+e.message);
+  }
+}
+
+function resetImageExtractor(){
+  imgBase64 = null; imgMimeType = null;
+  g('img-preview').src = '';
+  g('img-preview-wrap').style.display = 'none';
+  g('img-drop-text').style.display = 'block';
+  g('img-extract-btn').style.display = 'none';
+  g('img-extract-status').textContent = '';
+  g('img-result').style.display = 'none';
+  g('img-file-input').value = '';
+}
+
+// Init image type dropdown
+updateImageTypes();
 </script>
 </body>
 </html>

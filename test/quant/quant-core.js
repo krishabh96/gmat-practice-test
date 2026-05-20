@@ -189,7 +189,7 @@ function renderQuestion() {
   g('q-of-label').textContent   = 'of ' + TOTAL_QS;
   g('q-pos-label').textContent  = 'Question ' + (TEST.idx + 1) + ' of ' + TOTAL_QS;
   g('progress-fill').style.width = (TEST.idx / TOTAL_QS * 100) + '%';
-  g('q-text').textContent       = q.question;
+  g('q-text').innerHTML = safeHtmlQ(q.question);
 
   if(q.topic) g('q-topic').textContent = q.topic;
 
@@ -206,13 +206,21 @@ function renderQuestion() {
     const row = document.createElement('div');
     row.className = 'option-row' + (TEST.sel === l ? ' confirmed' : '');
     row.dataset.l = l;
-    row.innerHTML = `<div class="option-circle"></div><span class="option-letter">${l}.</span><span class="option-text">${q.options[l]}</span>`;
+    row.innerHTML = `<div class="option-circle"></div><span class="option-letter">${l}.</span><span class="option-text">${safeHtmlQ(q.options[l])}</span>`;
     if(TEST.sel !== l) row.addEventListener('click', () => pickOption(l));
     ol.appendChild(row);
   });
 
   g('btn-next').disabled = !TEST.sel;
   renderBookmarkChips();
+
+  // Render KaTeX math
+  if(typeof renderMathInElement !== 'undefined'){
+    setTimeout(() => renderMathInElement(document.getElementById('q-text')?.closest('.question-area') || document.body, {
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError:false, output:'html'
+    }), 80);
+  }
 }
 
 function pickOption(l) {

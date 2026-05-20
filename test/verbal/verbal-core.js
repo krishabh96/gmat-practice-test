@@ -240,10 +240,27 @@ function renderQuestion(){
     if(markEl) markEl.checked = TEST.markedGuess.has(idx);
 
     setNextBtn('rc-next-btn', !!TEST.sel);
+    triggerMathRender();
   }
 }
 
 // ── Build options (completely fresh each time) ──
+// After rendering, trigger KaTeX math rendering
+function triggerMathRender(){
+  if(typeof renderMathInElement === 'undefined') return;
+  setTimeout(() => {
+    renderMathInElement(document.getElementById('screen-test-cr') || document.body, {
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError:false, output:'html'
+    });
+    renderMathInElement(document.getElementById('screen-test-rc') || document.body, {
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError:false, output:'html'
+    });
+  }, 80);
+}
+
+
 function buildOptions(container, cls, q, currentSel){
   if(!container){ console.error('Options container not found'); return; }
   container.innerHTML = '';
@@ -290,12 +307,20 @@ function setNextBtn(id, enabled){
 // ── Safe HTML (escape & handle **bold**) ──
 function safeHtml(text){
   if(!text) return '';
-  return text
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\n/g,'<br>');
+  // Split on KaTeX math delimiters to preserve them
+  const mathPattern = /(\$\$[\s\S]*?\$\$|\$[^$\n]+?\$)/g;
+  const parts = String(text).split(mathPattern);
+  return parts.map((part, i) => {
+    if(mathPattern.test(part) || (i % 2 === 1)) {
+      return part; // math — preserve as-is for KaTeX
+    }
+    return part
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\n/g,'<br>');
+  }).join('');
 }
 
 function formatPassage(text){
